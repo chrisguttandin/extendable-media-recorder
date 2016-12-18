@@ -1,0 +1,9 @@
+{
+    "env": {
+        "node": true
+    },
+    "extends": "eslint-config-holy-grail",
+    "parserOptions": {
+        "sourceType": "module"
+    }
+}

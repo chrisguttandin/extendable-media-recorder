@@ -1,0 +1,16 @@
+{
+    "env": {
+        "browser": true,
+        "mocha": true
+    },
+    "extends": "eslint-config-holy-grail",
+    "globals": {
+        "expect": false
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-unused-expressions": 0
+    }
+}
