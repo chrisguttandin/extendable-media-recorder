@@ -1,5 +1,7 @@
 # extendable-media-recorder
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/chrisguttandin/extendable-media-recorder.svg)](https://greenkeeper.io/)
+
 **An extendable drop-in replacement for the native MediaRecorder.**
 
 [![tests](https://img.shields.io/travis/chrisguttandin/extendable-media-recorder/master.svg?style=flat-square)](https://travis-ci.org/chrisguttandin/extendable-media-recorder)
