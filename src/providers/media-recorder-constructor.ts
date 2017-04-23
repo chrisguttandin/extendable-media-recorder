@@ -114,7 +114,7 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     });
             }
 
-        };
+        }
 
         return MediaRecorder;
     }

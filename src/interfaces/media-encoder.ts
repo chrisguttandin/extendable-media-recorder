@@ -6,4 +6,4 @@ export interface IMediaEncoder {
 
     start (stream: MediaStream): IMediaFormatRecoder;
 
-};
+}

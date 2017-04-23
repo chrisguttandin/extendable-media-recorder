@@ -7,4 +7,4 @@ export interface IMediaRecorderConstructor {
 
     isTypeSupported (mimeType: string): boolean;
 
-};
+}
