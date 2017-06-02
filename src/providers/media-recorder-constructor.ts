@@ -67,11 +67,6 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                 return true;
             }
 
-            public static isTypeSupported (mimeType: string): boolean {
-                return NativeMediaRecorder.isTypeSupported(mimeType) ||
-                    encoders.some((encoder) => encoder.isTypeSupported(mimeType));
-            }
-
             public removeEventListener (type: string, listener: (event: Event) => {}): void {
                 if (this._nativeMediaRecorder !== null) {
                     return this._nativeMediaRecorder.removeEventListener(type, listener);
@@ -112,6 +107,11 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                             }
                         }
                     });
+            }
+
+            public static isTypeSupported (mimeType: string): boolean {
+                return NativeMediaRecorder.isTypeSupported(mimeType) ||
+                    encoders.some((encoder) => encoder.isTypeSupported(mimeType));
             }
 
         }
