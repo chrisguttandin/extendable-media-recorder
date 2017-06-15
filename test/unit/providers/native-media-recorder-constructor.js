@@ -13,7 +13,6 @@ describe('UnpatchedMediaRecorder', () => {
 
     it('should return null if there is no MediaRecorder', () => {
         const fakeWindow = {};
-
         const injector = ReflectiveInjector.resolveAndCreate([
             NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
             { provide: window, useValue: fakeWindow }
@@ -26,7 +25,6 @@ describe('UnpatchedMediaRecorder', () => {
         const fakeWindow = {
             MediaRecorder
         };
-
         const injector = ReflectiveInjector.resolveAndCreate([
             NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
             { provide: window, useValue: fakeWindow }
