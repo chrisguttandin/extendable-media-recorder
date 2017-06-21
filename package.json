@@ -43,7 +43,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "sinon": "^2.3.5",
     "sinon-chai": "^2.11.0",
-    "ts-loader": "^2.0.1",
+    "ts-loader": "^2.2.0",
     "tslint-config-holy-grail": "^9.0.2",
     "typescript": "^2.1.1",
     "webpack": "^3.0.0"
