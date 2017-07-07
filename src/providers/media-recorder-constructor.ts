@@ -12,7 +12,7 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
     ],
     provide: mediaRecorderConstructor,
     useFactory: (
-        encoders,
+        ncdrs,
         NativeMediaRecorder // tslint:disable-line:variable-name
     ): IMediaRecorderConstructor => {
         class MediaRecorder implements IMediaRecorder {
@@ -36,7 +36,7 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     this._nativeMediaRecorder = new NativeMediaRecorder(stream, options);
                     this._stream = null;
                 } else {
-                    const extendedEncoder = encoders.find((encoder) => encoder.isTypeSupported(mimeType));
+                    const extendedEncoder = ncdrs.find((encoder) => encoder.isTypeSupported(mimeType));
 
                     if (extendedEncoder === undefined) {
                         throw new Error(''); // @todo
@@ -111,7 +111,7 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
 
             public static isTypeSupported (mimeType: string): boolean {
                 return NativeMediaRecorder.isTypeSupported(mimeType) ||
-                    encoders.some((encoder) => encoder.isTypeSupported(mimeType));
+                    ncdrs.some((encoder) => encoder.isTypeSupported(mimeType));
             }
 
         }
