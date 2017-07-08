@@ -1,12 +1,13 @@
-import { OpaqueToken } from '@angular/core';
+import { InjectionToken } from '@angular/core';
+import { INativeMediaRecorder } from '../interfaces';
 import { window as wndw } from './window';
 
-export const nativeMediaRecorderConstructor = new OpaqueToken('NATIVE_MEDIA_RECORDER_CONSTRUCTOR');
+export const nativeMediaRecorderConstructor = new InjectionToken<Promise<null | INativeMediaRecorder>>('NATIVE_MEDIA_RECORDER_CONSTRUCTOR');
 
 export const NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
     deps: [ wndw ],
     provide: nativeMediaRecorderConstructor,
-    useFactory: (window) => (window.hasOwnProperty('MediaRecorder')) ?
-        window.MediaRecorder :
+    useFactory: (window: Window): Promise<null | INativeMediaRecorder> => (window.hasOwnProperty('MediaRecorder')) ?
+        (<any> window).MediaRecorder :
         null
 };

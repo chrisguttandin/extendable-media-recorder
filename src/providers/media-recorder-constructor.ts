@@ -1,9 +1,17 @@
-import { OpaqueToken } from '@angular/core';
-import { IMediaRecorder, IMediaRecorderConstructor, IMediaRecorderOptions } from '../interfaces';
+import { InjectionToken } from '@angular/core';
+import {
+    IMediaEncoder,
+    IMediaFormatRecoder,
+    IMediaRecorder,
+    IMediaRecorderConstructor,
+    IMediaRecorderOptions,
+    INativeMediaRecorder,
+    INativeMediaRecorderConstructor
+} from '../interfaces';
 import { encoders } from './encoders';
 import { nativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 
-export const mediaRecorderConstructor = new OpaqueToken('MEDIA_RECORDER_CONSTRUCTOR');
+export const mediaRecorderConstructor = new InjectionToken<IMediaRecorderConstructor>('MEDIA_RECORDER_CONSTRUCTOR');
 
 export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
     deps: [
@@ -12,20 +20,20 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
     ],
     provide: mediaRecorderConstructor,
     useFactory: (
-        ncdrs,
-        NativeMediaRecorder // tslint:disable-line:variable-name
+        ncdrs: IMediaEncoder[],
+        NativeMediaRecorder: INativeMediaRecorderConstructor // tslint:disable-line:variable-name
     ): IMediaRecorderConstructor => {
         class MediaRecorder implements IMediaRecorder {
 
-            private _extendedEncoder;
+            private _extendedEncoder: null | IMediaEncoder;
 
-            private _extendedRecorder;
+            private _extendedRecorder: null | IMediaFormatRecoder;
 
-            private _listeners: Map<string, Set<Function>>;
+            private _listeners: null | Map<string, Set<Function>>;
 
-            private _nativeMediaRecorder;
+            private _nativeMediaRecorder: null | INativeMediaRecorder;
 
-            private _stream;
+            private _stream: null | MediaStream;
 
             constructor (stream: MediaStream, options: IMediaRecorderOptions) {
                 const { mimeType } = options;
@@ -56,14 +64,20 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     return this._nativeMediaRecorder.addEventListener(type, listener);
                 }
 
-                if (this._listeners.has(type)) {
-                    this._listeners.get(type).add(listener);
+                if (this._listeners === null) {
+                    throw new Error(); // @todo
+                }
+
+                const listenersOfType = this._listeners.get(type);
+
+                if (listenersOfType !== undefined) {
+                    listenersOfType.add(listener);
                 } else {
                     this._listeners.set(type, new Set([ listener ]));
                 }
             }
 
-            public dispatchEvent (event: Event): boolean {
+            public dispatchEvent (_: Event): boolean {
                 return true;
             }
 
@@ -72,12 +86,16 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     return this._nativeMediaRecorder.removeEventListener(type, listener);
                 }
 
-                if (this._listeners.has(type)) {
-                    const listeners = this._listeners.get(type);
+                if (this._listeners === null) {
+                    throw new Error(); // @todo
+                }
 
-                    listeners.delete(listener);
+                const listenersOfType = this._listeners.get(type);
 
-                    if (listeners.size === 0) {
+                if (listenersOfType !== undefined) {
+                    listenersOfType.delete(listener);
+
+                    if (listenersOfType.size === 0) {
                         this._listeners.delete(type);
                     }
                 }
@@ -88,6 +106,10 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     return this._nativeMediaRecorder.start();
                 }
 
+                if (this._extendedEncoder === null || this._stream === null) {
+                    throw new Error();
+                }
+
                 this._extendedRecorder = this._extendedEncoder.start(this._stream);
             }
 
@@ -96,15 +118,21 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
                     return this._nativeMediaRecorder.stop();
                 }
 
+                if (this._extendedRecorder === null) {
+                    throw new Error(); // @todo
+                }
+
                 this._extendedRecorder
                     .stop()
                     .then((arrayBuffer) => {
-                        if (this._listeners.has('dataavailable')) {
-                            const listeners = this._listeners.get('dataavailable');
+                        if (this._listeners === null) {
+                            throw new Error(); // @todo
+                        }
 
-                            if (listeners) {
-                                listeners.forEach((listener) => listener({ data: arrayBuffer }));
-                            }
+                        const listenersOfType = this._listeners.get('dataavailable');
+
+                        if (listenersOfType) {
+                            listenersOfType.forEach((listener) => listener({ data: arrayBuffer }));
                         }
                     });
             }
