@@ -7,7 +7,7 @@
     "@angular/core": "^4.2.6",
     "core-js": "^2.4.1",
     "rxjs": "^5.4.2",
-    "zone.js": "^0.8.12"
+    "zone.js": "^0.8.13"
   },
   "description": "An extendable drop-in replacement for the native MediaRecorder.",
   "devDependencies": {
