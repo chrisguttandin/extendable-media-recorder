@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@angular/core": "^4.3.6",
+    "babel-plugin-external-helpers": "^6.22.0",
     "core-js": "^2.5.0",
     "rxjs": "^5.4.3",
     "tslint": "^5.7.0",
