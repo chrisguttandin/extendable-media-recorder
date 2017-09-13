@@ -8,7 +8,7 @@ import {
     INativeMediaRecorder,
     INativeMediaRecorderConstructor
 } from '../interfaces';
-import { encoders } from './encoders';
+import { encoders } from './encoders';
 import { nativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 
 export const mediaRecorderConstructor = new InjectionToken<IMediaRecorderConstructor>('MEDIA_RECORDER_CONSTRUCTOR');
@@ -29,9 +29,9 @@ export const MEDIA_RECORDER_CONSTRUCTOR_PROVIDER = {
 
             private _extendedRecorder: null | IMediaFormatRecoder;
 
-            private _listeners: null | Map<string, Set<Function>>;
+            private _listeners: null | Map<string, Set<Function>>;
 
-            private _nativeMediaRecorder: null | INativeMediaRecorder;
+            private _nativeMediaRecorder: null | INativeMediaRecorder;
 
             private _stream: null | MediaStream;
 

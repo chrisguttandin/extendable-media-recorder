@@ -1,5 +1,5 @@
-import { IMediaRecorderOptions } from './media-recorder-options';
-import { INativeMediaRecorder } from './native-media-recorder';
+import { IMediaRecorderOptions } from './media-recorder-options';
+import { INativeMediaRecorder } from './native-media-recorder';
 
 export interface INativeMediaRecorderConstructor {
 
