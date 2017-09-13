@@ -1,4 +1,4 @@
-import { MediaRecorder, isSupported } from '../../src/module';
+import { MediaRecorder, isSupported } from '../../src/module';
 
 describe('module', () => {
 
