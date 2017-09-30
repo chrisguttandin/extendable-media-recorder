@@ -2,6 +2,8 @@ module.exports = (config) => {
 
     config.set({
 
+        browserNoActivityTimeout: 20000,
+
         files: [
             '../../test/unit/**/*.js'
         ],
