@@ -1,8 +1,8 @@
 import { InjectionToken } from '@angular/core';
-import { IMediaFormatRecoder } from '../interfaces';
+import { IMediaEncoder } from '../interfaces';
 
-export const encoders = new InjectionToken<IMediaFormatRecoder[]>('ENCODERS');
+export const encoders = new InjectionToken<IMediaEncoder[]>('ENCODERS');
 
-const ncdrs: IMediaFormatRecoder[] = [];
+const ncdrs: IMediaEncoder[] = [];
 
 export const ENCODERS_PROVIDER = { provide: encoders, useValue: ncdrs };
