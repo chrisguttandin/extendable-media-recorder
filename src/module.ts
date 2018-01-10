@@ -6,13 +6,15 @@ import { MEDIA_RECORDER_CONSTRUCTOR_PROVIDER, mediaRecorderConstructor } from '.
 import { NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER } from './providers/native-media-recorder-constructor';
 import { WINDOW_PROVIDER } from './providers/window';
 
-const injector = Injector.create([
-    ENCODERS_PROVIDER,
-    MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
-    IS_SUPPORTED_PROMISE_PROVIDER,
-    NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
-    WINDOW_PROVIDER
-]);
+const injector = Injector.create({
+    providers: [
+        ENCODERS_PROVIDER,
+        MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
+        IS_SUPPORTED_PROMISE_PROVIDER,
+        NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
+        WINDOW_PROVIDER
+    ]
+});
 
 const ncdrs = injector.get(encoders);
 
