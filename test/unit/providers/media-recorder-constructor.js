@@ -1,5 +1,0 @@
-describe('MediaRecorder', () => {
-
-    // @todo
-
-});

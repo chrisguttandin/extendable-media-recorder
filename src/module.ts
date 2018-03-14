@@ -1,28 +1,27 @@
-import { Injector } from '@angular/core';
+import { createIsSupportedPromise } from './factories/is-supported-promise';
+import { createMediaRecorderConstructor } from './factories/media-recorder-constructor';
+import { createNativeMediaRecorderConstructor } from './factories/native-media-recorder-constructor';
+import { createWindow } from './factories/window';
 import { IMediaEncoder, IMediaRecorderConstructor } from './interfaces';
-import { ENCODERS_PROVIDER, encoders } from './providers/encoders';
-import { IS_SUPPORTED_PROMISE_PROVIDER, isSupportedPromise } from './providers/is-supported-promise';
-import { MEDIA_RECORDER_CONSTRUCTOR_PROVIDER, mediaRecorderConstructor } from './providers/media-recorder-constructor';
-import { NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER } from './providers/native-media-recorder-constructor';
-import { WINDOW_PROVIDER } from './providers/window';
 
-const injector = Injector.create({
-    providers: [
-        ENCODERS_PROVIDER,
-        MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
-        IS_SUPPORTED_PROMISE_PROVIDER,
-        NATIVE_MEDIA_RECORDER_CONSTRUCTOR_PROVIDER,
-        WINDOW_PROVIDER
-    ]
-});
+export * from './interfaces';
+export * from './types';
 
-const ncdrs = injector.get(encoders);
+const encoders: IMediaEncoder[] = [];
 
-// tslint:disable-next-line:variable-name
-export const MediaRecorder: IMediaRecorderConstructor = injector.get(mediaRecorderConstructor);
+const window = createWindow();
+
+const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
+
+const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
+    encoders,
+    nativeMediaRecorderConstructor
+);
+
+export { mediaRecorderConstructor as MediaRecorder };
 
 export const extend = (encoder: IMediaEncoder): void => {
-    ncdrs.push(encoder);
+    encoders.push(encoder);
 };
 
-export const isSupported: Promise<boolean> = injector.get(isSupportedPromise);
+export const isSupported: Promise<boolean> = createIsSupportedPromise(window);
