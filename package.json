@@ -66,9 +66,9 @@
   ],
   "homepage": "https://github.com/chrisguttandin/extendable-media-recorder",
   "keywords": [
-    "Web Audio API",
     "audio",
-    "browser"
+    "browser",
+    "Web Audio API"
   ],
   "license": "MIT",
   "main": "build/es5/bundle.js",
