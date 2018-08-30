@@ -9,7 +9,7 @@
     }
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0",
+    "@babel/runtime": "^7.0.0",
     "tslib": "^1.9.3"
   },
   "description": "An extendable drop-in replacement for the native MediaRecorder.",
