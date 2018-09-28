@@ -64,10 +64,16 @@
     "src/"
   ],
   "homepage": "https://github.com/chrisguttandin/extendable-media-recorder",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint --edit --extends @commitlint/config-angular",
+      "pre-commit": "grunt lint"
+    }
+  },
   "keywords": [
+    "Web Audio API",
     "audio",
-    "browser",
-    "Web Audio API"
+    "browser"
   ],
   "license": "MIT",
   "main": "build/es5/bundle.js",
@@ -78,8 +84,6 @@
     "url": "https://github.com/chrisguttandin/extendable-media-recorder.git"
   },
   "scripts": {
-    "commitmsg": "commitlint --edit --extends @commitlint/config-angular",
-    "precommit": "grunt lint",
     "prepublishOnly": "grunt build",
     "test": "grunt lint && grunt test"
   },
