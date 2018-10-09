@@ -1,9 +1,8 @@
 module.exports = {
     build: [
         'clean:build',
-        'sh:build-es2015',
-        'sh:build-es5',
-        'sh:build-esm'
+        'sh:build-es2018',
+        'sh:build-es5'
     ],
     continuous: [
         'karma:continuous'
