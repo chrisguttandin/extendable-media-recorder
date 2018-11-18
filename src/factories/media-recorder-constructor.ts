@@ -84,7 +84,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             }
         }
 
-        public start () {
+        public start (): void {
             if (this._nativeMediaRecorder !== null) {
                 return this._nativeMediaRecorder.start();
             }
@@ -96,7 +96,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._extendedRecorder = this._extendedEncoder.start(this._stream);
         }
 
-        public stop () {
+        public stop (): void {
             if (this._nativeMediaRecorder !== null) {
                 return this._nativeMediaRecorder.stop();
             }
