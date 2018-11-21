@@ -1,7 +1,7 @@
-import { IMediaEncoder, IMediaRecorderConstructor } from '../interfaces';
+import { IMediaRecorderConstructor } from '../interfaces';
 import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 
 export type TMediaRecorderConstructorFactory = (
-    encoders: IMediaEncoder[],
+    encoderRegexes: RegExp[],
     nativeMediaRecorderConstructor: null | TNativeMediaRecorderConstructor
 ) => IMediaRecorderConstructor;

@@ -1,13 +1,15 @@
-import { IMediaEncoder, IMediaFormatRecoder, IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
+import { IMediaEncoder, IMediaFormatRecorder, IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
 import { TMediaRecorderConstructorFactory, TNativeMediaRecorder } from '../types';
+// @todo This should be injected and not imported.
+import { createMediaEncoder } from './media-encoder';
 
-export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (encoders, nativeMediaRecorderConstructor) => {
+export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (encoderRegexes, nativeMediaRecorderConstructor) => {
 
     return class MediaRecorder implements IMediaRecorder {
 
         private _extendedEncoder: null | IMediaEncoder;
 
-        private _extendedRecorder: null | IMediaFormatRecoder;
+        private _extendedRecorder: null | IMediaFormatRecorder;
 
         private _listeners: null | Map<string, Set<Function>>;
 
@@ -25,13 +27,11 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 this._nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, options);
                 this._stream = null;
             } else if (mimeType !== undefined) {
-                const extendedEncoder = encoders.find((encoder) => encoder.isTypeSupported(mimeType));
-
-                if (extendedEncoder === undefined) {
+                if (encoderRegexes.every((regex) => !regex.test(mimeType))) {
                     throw new Error(''); // @todo
                 }
 
-                this._extendedEncoder = extendedEncoder;
+                this._extendedEncoder = createMediaEncoder(mimeType);
                 this._listeners = new Map();
                 this._nativeMediaRecorder = null;
                 this._stream = stream;
@@ -107,7 +107,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
             this._extendedRecorder
                 .stop()
-                .then((arrayBuffer) => {
+                // @todo This is blindly assuming that the array contains only one ArrayBuffer.
+                .then(([ arrayBuffer ]) => {
                     if (this._listeners === null) {
                         throw new Error(); // @todo
                     }
@@ -122,7 +123,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         public static isTypeSupported (mimeType: string): boolean {
             return (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported(mimeType)) ||
-                encoders.some((encoder) => encoder.isTypeSupported(mimeType));
+                encoderRegexes.some((regex) => !regex.test(mimeType));
         }
 
     };

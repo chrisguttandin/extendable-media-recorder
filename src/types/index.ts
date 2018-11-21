@@ -1,4 +1,5 @@
 export * from './is-supported-promise-factory';
+export * from './media-encoder-factory';
 export * from './media-recorder-constructor-factory';
 export * from './native-media-recorder';
 export * from './native-media-recorder-constructor';

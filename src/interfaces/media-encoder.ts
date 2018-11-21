@@ -1,9 +1,7 @@
-import { IMediaFormatRecoder } from './media-format-recoder';
+import { IMediaFormatRecorder } from './media-format-recorder';
 
 export interface IMediaEncoder {
 
-    isTypeSupported (type: string): boolean;
-
-    start (stream: MediaStream): IMediaFormatRecoder;
+    start (mediaStream: MediaStream): IMediaFormatRecorder;
 
 }
