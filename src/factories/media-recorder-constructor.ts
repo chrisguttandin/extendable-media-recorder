@@ -42,7 +42,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._extendedRecorder = null;
         }
 
-        public addEventListener (type: string, listener: (event: Event) => {}): void {
+        public addEventListener (type: string, listener: (event: Event) => { }): void {
             if (this._nativeMediaRecorder !== null) {
                 return this._nativeMediaRecorder.addEventListener(type, listener);
             }
@@ -64,7 +64,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             return true;
         }
 
-        public removeEventListener (type: string, listener: (event: Event) => {}): void {
+        public removeEventListener (type: string, listener: (event: Event) => { }): void {
             if (this._nativeMediaRecorder !== null) {
                 return this._nativeMediaRecorder.removeEventListener(type, listener);
             }
@@ -115,7 +115,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
                     const listenersOfType = this._listeners.get('dataavailable');
 
-                    if (listenersOfType) {
+                    if (listenersOfType !== undefined) {
                         listenersOfType.forEach((listener) => listener({ data: arrayBuffer }));
                     }
                 });
