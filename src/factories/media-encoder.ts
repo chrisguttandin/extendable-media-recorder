@@ -7,7 +7,7 @@ import { TMediaEncoderFactory } from '../types';
 // @todo This should live in a separate file.
 const createPromisedAudioContextAndEncoder = async (mimeType: string) => {
     const { encoderId, port } = await instantiate(mimeType);
-    const audioContext = new MinimalAudioContext();
+    const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
 
     await addRecorderAudioWorkletModule((url: string) => {
         if (addAudioWorkletModule === undefined) {
