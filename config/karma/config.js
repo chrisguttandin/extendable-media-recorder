@@ -7,6 +7,7 @@ module.exports = (config) => {
         browserNoActivityTimeout: 20000,
 
         files: [
+            '../../test/integration/**/*.js',
             '../../test/unit/**/*.js'
         ],
 
@@ -16,6 +17,7 @@ module.exports = (config) => {
         ],
 
         preprocessors: {
+            '../../test/integration/**/*.js': 'webpack',
             '../../test/unit/**/*.js': 'webpack'
         },
 
@@ -80,11 +82,18 @@ module.exports = (config) => {
         config.set({
 
             browsers: [
-                'ChromeHeadless',
-                'ChromeCanaryHeadless',
+                'Chrome',
+                'ChromeCanaryHeadlessWithNoRequiredUserGesture',
                 'FirefoxHeadless',
                 'FirefoxDeveloperHeadless'
-            ]
+            ],
+
+            customLaunchers: {
+                ChromeCanaryHeadlessWithNoRequiredUserGesture: {
+                    base: 'ChromeCanaryHeadless',
+                    flags: [ '--autoplay-policy=no-user-gesture-required' ]
+                }
+            }
 
         });
 
