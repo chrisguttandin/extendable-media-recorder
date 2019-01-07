@@ -15,8 +15,6 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         private _nativeMediaRecorder: null | TNativeMediaRecorder;
 
-        private _stream: null | MediaStream;
-
         constructor (stream: MediaStream, options: IMediaRecorderOptions) {
             const { mimeType } = options;
 
@@ -25,16 +23,14 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 this._extendedEncoder = null;
                 this._listeners = null;
                 this._nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, options);
-                this._stream = null;
             } else if (mimeType !== undefined) {
                 if (encoderRegexes.every((regex) => !regex.test(mimeType))) {
                     throw new Error(''); // @todo
                 }
 
-                this._extendedEncoder = createMediaEncoder(mimeType);
+                this._extendedEncoder = createMediaEncoder(stream, mimeType);
                 this._listeners = new Map();
                 this._nativeMediaRecorder = null;
-                this._stream = stream;
             } else {
                 throw new Error(); // @todo
             }
@@ -89,11 +85,11 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 return this._nativeMediaRecorder.start();
             }
 
-            if (this._extendedEncoder === null || this._stream === null) {
+            if (this._extendedEncoder === null) {
                 throw new Error();
             }
 
-            this._extendedRecorder = this._extendedEncoder.start(this._stream);
+            this._extendedRecorder = this._extendedEncoder.start();
         }
 
         public stop (): void {

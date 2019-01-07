@@ -1,3 +1,3 @@
 import { IMediaEncoder } from '../interfaces';
 
-export type TMediaEncoderFactory = (mimeType: string) => IMediaEncoder;
+export type TMediaEncoderFactory = (mediaStream: MediaStream, mimeType: string) => IMediaEncoder;
