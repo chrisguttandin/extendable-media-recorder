@@ -104,7 +104,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._extendedRecorder
                 .stop()
                 // @todo This is blindly assuming that the array contains only one ArrayBuffer.
-                .then(([ arrayBuffer ]) => {
+                .then((blob) => {
                     if (this._listeners === null) {
                         throw new Error(); // @todo
                     }
@@ -112,7 +112,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                     const listenersOfType = this._listeners.get('dataavailable');
 
                     if (listenersOfType !== undefined) {
-                        listenersOfType.forEach((listener) => listener({ data: arrayBuffer }));
+                        // @todo This should dispatch a BlobEvent.
+                        listenersOfType.forEach((listener) => listener({ data: blob }));
                     }
                 });
         }

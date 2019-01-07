@@ -1,5 +1,5 @@
 export interface IMediaFormatRecorder {
 
-    stop (): Promise<ArrayBuffer[]>;
+    stop (): Promise<Blob>;
 
 }

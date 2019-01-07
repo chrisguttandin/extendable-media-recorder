@@ -70,14 +70,16 @@ export const createMediaEncoder: TMediaEncoderFactory = (mediaStream, mimeType) 
 
             return {
 
-                async stop (): Promise<ArrayBuffer[]> {
+                async stop (): Promise<Blob> {
                     const { encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode } = await promisedAudioNodesAndEncoderId;
 
                     await recorderAudioWorkletNode.stop();
 
                     mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                    return encode(encoderId);
+                    const arrayBuffers = await encode(encoderId);
+
+                    return new Blob(arrayBuffers, { type: mimeType });
                 }
 
             };
