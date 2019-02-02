@@ -82,15 +82,19 @@ module.exports = (config) => {
         config.set({
 
             browsers: [
-                'Chrome',
                 'ChromeCanaryHeadlessWithNoRequiredUserGesture',
-                'FirefoxHeadless',
-                'FirefoxDeveloperHeadless'
+                'ChromeHeadlessWithNoRequiredUserGesture',
+                'FirefoxDeveloperHeadless',
+                'FirefoxHeadless'
             ],
 
             customLaunchers: {
                 ChromeCanaryHeadlessWithNoRequiredUserGesture: {
                     base: 'ChromeCanaryHeadless',
+                    flags: [ '--autoplay-policy=no-user-gesture-required' ]
+                },
+                ChromeHeadlessWithNoRequiredUserGesture: {
+                    base: 'ChromeHeadless',
                     flags: [ '--autoplay-policy=no-user-gesture-required' ]
                 }
             }
