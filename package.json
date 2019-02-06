@@ -60,7 +60,7 @@
     "tslint": "^5.12.1",
     "tslint-config-holy-grail": "^41.0.3",
     "typescript": "^3.3.1",
-    "webpack": "^4.29.1"
+    "webpack": "^4.29.2"
   },
   "files": [
     "build/es2018/",
