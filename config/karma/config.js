@@ -1,4 +1,5 @@
 const { env } = require('process');
+const { DefinePlugin } = require('webpack');
 
 module.exports = (config) => {
 
@@ -31,6 +32,13 @@ module.exports = (config) => {
                     }
                 } ]
             },
+            plugins: [
+                new DefinePlugin({
+                    'process.env': {
+                        TRAVIS: JSON.stringify(env.TRAVIS)
+                    }
+                })
+            ],
             resolve: {
                 extensions: [ '.js', '.ts' ]
             }
