@@ -15,7 +15,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         private _nativeMediaRecorder: null | TNativeMediaRecorder;
 
-        constructor (stream: MediaStream, options: IMediaRecorderOptions) {
+        constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
             const { mimeType } = options;
 
             if ((nativeMediaRecorderConstructor !== null) &&
