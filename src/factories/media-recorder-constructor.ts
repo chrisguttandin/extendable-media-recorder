@@ -11,7 +11,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         private _extendedRecorder: null | IMediaFormatRecorder;
 
-        private _listeners: null | Map<string, Set<Function>>;
+        private _listeners: null | Map<string, Set<EventListenerOrEventListenerObject>>;
 
         private _nativeMediaRecorder: null | TNativeMediaRecorder;
 
@@ -38,9 +38,14 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._extendedRecorder = null;
         }
 
-        public addEventListener (type: string, listener: (event: Event) => { }): void {
+        // @todo Respect the options object for faked events as well.
+        public addEventListener (
+            type: string,
+            listener: EventListenerOrEventListenerObject,
+            options?: boolean | AddEventListenerOptions
+        ): void {
             if (this._nativeMediaRecorder !== null) {
-                return this._nativeMediaRecorder.addEventListener(type, listener);
+                return this._nativeMediaRecorder.addEventListener(type, listener, options);
             }
 
             if (this._listeners === null) {
@@ -60,9 +65,13 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             return true;
         }
 
-        public removeEventListener (type: string, listener: (event: Event) => { }): void {
+        public removeEventListener (
+            type: string,
+            listener: EventListenerOrEventListenerObject,
+            options?: boolean | EventListenerOptions
+        ): void {
             if (this._nativeMediaRecorder !== null) {
-                return this._nativeMediaRecorder.removeEventListener(type, listener);
+                return this._nativeMediaRecorder.removeEventListener(type, listener, options);
             }
 
             if (this._listeners === null) {
@@ -112,8 +121,17 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                     const listenersOfType = this._listeners.get('dataavailable');
 
                     if (listenersOfType !== undefined) {
-                        // @todo This should dispatch a BlobEvent.
-                        listenersOfType.forEach((listener) => listener({ data: blob }));
+                        // @todo This should be a proper BlobEvent.
+                        const blobEvent: Event = <any> { data: blob };
+
+                        listenersOfType
+                            .forEach((listener) => {
+                                if (typeof listener === 'object') {
+                                    listener.handleEvent(blobEvent);
+                                } else {
+                                    listener(blobEvent);
+                                }
+                            });
                     }
                 });
         }
