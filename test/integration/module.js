@@ -34,10 +34,27 @@ describe('module', () => {
                 setTimeout(done, 2000);
             });
 
-            it('should abort the encoding when adding a track', () => {
+            it('should abort the encoding when adding a track', function (done) {
+                this.timeout(10000);
 
-                // @todo
+                let err = null;
 
+                mediaRecorder.addEventListener('dataavailable', () => {
+                    expect(err.code).to.equal(13);
+                    expect(err.name).to.equal('InvalidModificationError');
+
+                    done();
+                });
+
+                mediaRecorder.addEventListener('error', ({ error }) => {
+                    err = error;
+                });
+
+                mediaRecorder.start();
+
+                setTimeout(() => {
+                    mediaStream.addTrack(createMediaStream(audioContext).getAudioTracks()[0]);
+                }, 1000);
             });
 
             it('should abort the encoding when removing a track', function (done) {
