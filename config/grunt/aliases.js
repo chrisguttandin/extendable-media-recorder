@@ -13,6 +13,8 @@ module.exports = {
         'sh:lint'
     ],
     test: [
-        'karma:test'
+        'karma:test',
+        'karma:test-chrome',
+        'karma:test-firefox'
     ]
 };
