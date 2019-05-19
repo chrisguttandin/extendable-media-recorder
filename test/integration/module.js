@@ -1,5 +1,6 @@
 import { MediaRecorder, register } from '../../src/module';
 import { connect } from 'extendable-media-recorder-wav-encoder';
+import { createMediaStream } from '../helpers/create-media-stream';
 
 describe('module', () => {
 
@@ -15,7 +16,6 @@ describe('module', () => {
 
             let audioContext;
             let bufferLength;
-            let frequency;
             let mediaRecorder;
             let mediaStream;
 
@@ -26,15 +26,8 @@ describe('module', () => {
 
                 audioContext = new AudioContext();
                 bufferLength = 100;
-                frequency = audioContext.sampleRate / bufferLength;
 
-                const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext);
-                const oscillatorNode = new OscillatorNode(audioContext, { frequency });
-
-                oscillatorNode.connect(mediaStreamAudioDestinationNode);
-                oscillatorNode.start();
-
-                mediaStream = mediaStreamAudioDestinationNode.stream;
+                mediaStream = createMediaStream(audioContext, audioContext.sampleRate / bufferLength);
                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
 
                 // Wait two seconds before starting the recording.
