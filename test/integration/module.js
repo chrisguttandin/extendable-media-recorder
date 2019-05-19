@@ -98,8 +98,14 @@ describe('module', () => {
                                 audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
 
                                 for (let j = 0; j < bufferLength; j += 1) {
-                                    expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                    expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
+                                    try {
+                                        expect(rotatingBuffers[0][j]).to.not.equal(0);
+                                        expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
+                                    } catch (err) {
+                                        done(err);
+
+                                        return;
+                                    }
                                 }
 
                                 rotatingBuffers.push(rotatingBuffers.shift());
