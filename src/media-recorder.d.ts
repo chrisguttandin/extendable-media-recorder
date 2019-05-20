@@ -1,5 +1,29 @@
 // @todo Define the complete type declarations as defined by the MediaStream Recording specification.
 
+interface BlobEvent extends Event { // tslint:disable-line:interface-name
+
+    readonly data: Blob;
+
+    readonly timecode: number;
+
+}
+
+interface BlobEventInit extends EventInit { // tslint:disable-line:interface-name
+
+    data: Blob;
+
+    timecode?: number;
+
+}
+
+declare var BlobEvent: {
+
+    prototype: BlobEvent;
+
+    new (type: string, eventInitDict: BlobEventInit): BlobEvent;
+
+};
+
 interface MediaRecorderOptions { // tslint:disable-line:interface-name
 
     audioBitsPerSecond?: number;
