@@ -3,6 +3,7 @@ import { TMediaRecorderConstructorFactory, TNativeMediaRecorder } from '../types
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
+    createNotSupportedError,
     createWebAudioMediaRecorder,
     encoderRegexes,
     nativeMediaRecorderConstructor
@@ -15,17 +16,18 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
         constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
             const { mimeType } = options;
 
-            if ((nativeMediaRecorderConstructor !== null) &&
-                    (mimeType === undefined || nativeMediaRecorderConstructor.isTypeSupported(mimeType))) {
+            if ((nativeMediaRecorderConstructor !== null)
+                    && (mimeType === undefined || nativeMediaRecorderConstructor.isTypeSupported(mimeType))) {
                 this._internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
-            } else if (mimeType !== undefined) {
-                if (encoderRegexes.every((regex) => !regex.test(mimeType))) {
-                    throw new Error(''); // @todo
-                }
-
+            } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
                 this._internalMediaRecorder = createWebAudioMediaRecorder(stream, mimeType);
             } else {
-                throw new Error(); // @todo
+                // This is creating a native MediaRecorder just to provoke it to throw an error.
+                if (nativeMediaRecorderConstructor !== null) {
+                    createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
+                }
+
+                throw createNotSupportedError();
             }
         }
 

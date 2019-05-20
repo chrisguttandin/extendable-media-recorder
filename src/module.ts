@@ -4,6 +4,7 @@ import { createIsSupportedPromise } from './factories/is-supported-promise';
 import { createMediaRecorderConstructor } from './factories/media-recorder-constructor';
 import { createNativeMediaRecorderFactory } from './factories/native-media-recorder';
 import { createNativeMediaRecorderConstructor } from './factories/native-media-recorder-constructor';
+import { createNotSupportedError } from './factories/not-supported-error';
 import { createWebAudioMediaRecorderFactory } from './factories/web-audio-media-recorder';
 import { createWindow } from './factories/window';
 import { IMediaRecorderConstructor } from './interfaces';
@@ -20,6 +21,7 @@ const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(wind
 
 const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
     createNativeMediaRecorder,
+    createNotSupportedError,
     createWebAudioMediaRecorder,
     encoderRegexes,
     nativeMediaRecorderConstructor

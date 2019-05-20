@@ -135,4 +135,30 @@ describe('module', () => {
 
     }
 
+    describe('with the mimeType of audio/anything', () => {
+
+        let audioContext;
+        let mediaStream;
+
+        afterEach(() => audioContext.close());
+
+        beforeEach(() => {
+            audioContext = new AudioContext();
+
+            mediaStream = createMediaStream(audioContext);
+        });
+
+        it('should throw a NotSupportedError', (done) => {
+            try {
+                new MediaRecorder(mediaStream, { mimeType: 'audio/anything' });
+            } catch (err) {
+                expect(err.code).to.equal(9);
+                expect(err.name).to.equal('NotSupportedError');
+
+                done();
+            }
+        });
+
+    });
+
 });
