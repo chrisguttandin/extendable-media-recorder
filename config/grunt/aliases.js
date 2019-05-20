@@ -1,3 +1,5 @@
+const { env } = require('process');
+
 module.exports = {
     build: [
         'clean:build',
@@ -12,9 +14,14 @@ module.exports = {
         // @todo Use grunt-lint again when it support the type-check option.
         'sh:lint'
     ],
-    test: [
-        'karma:test',
-        'karma:test-chrome',
-        'karma:test-firefox'
-    ]
+    test: (env.TRAVIS)
+        ? [
+            'karma:test',
+            'karma:test-firefox'
+        ]
+        : [
+            'karma:test',
+            'karma:test-chrome',
+            'karma:test-firefox'
+        ]
 };
