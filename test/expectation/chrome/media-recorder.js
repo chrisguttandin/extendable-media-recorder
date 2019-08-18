@@ -1,4 +1,4 @@
-import { createMediaStream } from '../../helpers/create-media-stream';
+import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../../helpers/create-media-stream-with-video-track';
 
 describe('module', () => {
@@ -13,7 +13,7 @@ describe('module', () => {
 
         beforeEach(() => {
             audioContext = new AudioContext();
-            mediaStream = createMediaStream(audioContext);
+            mediaStream = createMediaStreamWithAudioTrack(audioContext);
             mediaRecorder = new MediaRecorder(mediaStream);
         });
 
@@ -29,7 +29,7 @@ describe('module', () => {
                 done();
             });
             mediaRecorder.start();
-            mediaStream.addTrack(createMediaStream(audioContext).getAudioTracks()[0]);
+            mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
         });
 
         // bug #4

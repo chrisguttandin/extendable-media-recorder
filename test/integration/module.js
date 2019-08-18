@@ -1,6 +1,6 @@
 import { MediaRecorder, register } from '../../src/module';
 import { connect } from 'extendable-media-recorder-wav-encoder';
-import { createMediaStream } from '../helpers/create-media-stream';
+import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 
 describe('module', () => {
 
@@ -30,7 +30,7 @@ describe('module', () => {
                     audioContext = new AudioContext();
                     bufferLength = 100;
 
-                    mediaStream = createMediaStream(audioContext, audioContext.sampleRate / bufferLength);
+                    mediaStream = createMediaStreamWithAudioTrack(audioContext, audioContext.sampleRate / bufferLength);
                     mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
 
                     // Wait two seconds before starting the recording.
@@ -56,7 +56,7 @@ describe('module', () => {
                     mediaRecorder.start();
 
                     setTimeout(() => {
-                        mediaStream.addTrack(createMediaStream(audioContext).getAudioTracks()[0]);
+                        mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
                     }, 1000);
                 });
 
@@ -150,7 +150,7 @@ describe('module', () => {
         beforeEach(() => {
             audioContext = new AudioContext();
 
-            mediaStream = createMediaStream(audioContext);
+            mediaStream = createMediaStreamWithAudioTrack(audioContext);
         });
 
         it('should throw a NotSupportedError', (done) => {
