@@ -1,47 +1,80 @@
 import { createMediaStream } from '../../helpers/create-media-stream';
+import { createMediaStreamWithVideoTrack } from '../../helpers/create-media-stream-with-video-track';
 
 describe('module', () => {
 
-    let audioContext;
-    let mediaRecorder;
-    let mediaStream;
+    describe('with a MediaStream which contains an audio track', () => {
 
-    afterEach(() => audioContext.close());
+        let audioContext;
+        let mediaRecorder;
+        let mediaStream;
 
-    beforeEach(() => {
-        audioContext = new AudioContext();
-        mediaStream = createMediaStream(audioContext);
-        mediaRecorder = new MediaRecorder(mediaStream);
+        afterEach(() => audioContext.close());
+
+        beforeEach(() => {
+            audioContext = new AudioContext();
+            mediaStream = createMediaStream(audioContext);
+            mediaRecorder = new MediaRecorder(mediaStream);
+        });
+
+        // bug #3
+
+        it('should fire an error event without an error when adding a track', function (done) {
+            this.timeout(10000);
+
+            mediaRecorder.addEventListener('error', (err) => {
+                expect(err.error).to.be.undefined;
+                expect(err.type).to.equal('error');
+
+                done();
+            });
+            mediaRecorder.start();
+            mediaStream.addTrack(createMediaStream(audioContext).getAudioTracks()[0]);
+        });
+
+        // bug #4
+
+        it('should fire an error event without an error when removing a track', function (done) {
+            this.timeout(10000);
+
+            mediaRecorder.addEventListener('error', (err) => {
+                expect(err.error).to.be.undefined;
+                expect(err.type).to.equal('error');
+
+                done();
+            });
+            mediaRecorder.start();
+            mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+        });
+
     });
 
-    // bug #3
+    describe('with a MediaStream which contains a video track', () => {
 
-    it('should fire an error event without an error when adding a track', function (done) {
-        this.timeout(10000);
+        let mediaStream;
+        let mediaRecorder;
 
-        mediaRecorder.addEventListener('error', (err) => {
-            expect(err.error).to.be.undefined;
-            expect(err.type).to.equal('error');
+        beforeEach(() => {
+            mediaStream = createMediaStreamWithVideoTrack();
 
-            done();
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
         });
-        mediaRecorder.start();
-        mediaStream.addTrack(createMediaStream(audioContext).getAudioTracks()[0]);
-    });
 
-    // bug #4
+        // bug #6
 
-    it('should fire an error event without an error when removing a track', function (done) {
-        this.timeout(10000);
+        it('should emit a blob without any data', function (done) {
+            this.timeout(10000);
 
-        mediaRecorder.addEventListener('error', (err) => {
-            expect(err.error).to.be.undefined;
-            expect(err.type).to.equal('error');
+            mediaRecorder.addEventListener('dataavailable', ({ data }) => {
+                expect(data.size).to.equal(0);
 
-            done();
+                done();
+            });
+            mediaRecorder.start();
+
+            setTimeout(() => mediaRecorder.stop(), 1000);
         });
-        mediaRecorder.start();
-        mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+
     });
 
 });
