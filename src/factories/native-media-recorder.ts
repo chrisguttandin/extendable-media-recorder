@@ -27,7 +27,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                             // Bug #3 & 4: Chrome throws an error event without any error.
                             if ((<ErrorEvent> event).error === undefined) {
                                 Object.defineProperty(event, type, { value: createInvalidModificationError() });
-                            // Bug #3 & 4: Firefox throws an error event with an UnknownError.
+                            // Bug #1 & 2: Firefox throws an error event with an UnknownError.
                             } else if ((<ErrorEvent> event).error.name === 'UnknownError') {
                                 const message = (<ErrorEvent> event).error.message;
 
