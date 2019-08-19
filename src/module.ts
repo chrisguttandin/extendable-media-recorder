@@ -14,8 +14,8 @@ export * from './types';
 
 const encoderRegexes: RegExp[] = [];
 
-const createNativeMediaRecorder = createNativeMediaRecorderFactory(createInvalidModificationError);
-const createWebAudioMediaRecorder = createWebAudioMediaRecorderFactory(createInvalidModificationError);
+const createNativeMediaRecorder = createNativeMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
+const createWebAudioMediaRecorder = createWebAudioMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
 const window = createWindow();
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 

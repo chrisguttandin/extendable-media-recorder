@@ -1,6 +1,9 @@
 import { TNativeMediaRecorder, TNativeMediaRecorderFactoryFactory } from '../types';
 
-export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (createInvalidModificationError) => {
+export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (
+    createInvalidModificationError,
+    createNotSupportedError
+) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
         const dataAvailableListeners = new WeakMap<any, null | ((this: TNativeMediaRecorder, event: Event) => any)>();
         const errorListeners = new WeakMap<any, null | ((this: TNativeMediaRecorder, event: Event) => any)>();
@@ -69,6 +72,24 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                 return removeEventListener.call(nativeMediaRecorder, type, patchedEventListener, options);
             };
         })(nativeMediaRecorder.removeEventListener);
+
+        nativeMediaRecorder.start = ((start) => {
+            return (timeslice?: number) => {
+                /*
+                 * Bug #5: Firefox will emit a blob of type video/webm when asked to encode a MediaStream with a video track into an audio
+                 * codec.
+                 * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio
+                 * codec.
+                 */
+                if (mediaRecorderOptions.mimeType !== undefined
+                        && mediaRecorderOptions.mimeType.startsWith('audio/')
+                        && stream.getVideoTracks().length > 0) {
+                    throw createNotSupportedError();
+                }
+
+                return (timeslice === undefined) ? start.call(nativeMediaRecorder) : start.call(nativeMediaRecorder, timeslice);
+            };
+        })(nativeMediaRecorder.start);
 
         return nativeMediaRecorder;
     };

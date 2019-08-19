@@ -38,7 +38,10 @@ const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream
     return { audioBufferSourceNode, audioContext, encoderId, length, port, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
 };
 
-export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (createInvalidModificationError) => {
+export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (
+    createInvalidModificationError,
+    createNotSupportedError
+) => {
     return (mediaStream, mimeType) => {
         const listeners = new Map<string, Set<EventListenerOrEventListenerObject>>();
         const promisedAudioNodesEncoderIdAndPort = createPromisedAudioNodesEncoderIdAndPort(mediaStream, mimeType);
@@ -129,6 +132,10 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             start (): void {
+                if (mediaStream.getVideoTracks().length > 0) {
+                    throw createNotSupportedError();
+                }
+
                 promisedAudioNodesAndEncoderId = promisedAudioNodesEncoderIdAndPort
                     .then(async ({
                         audioBufferSourceNode,
