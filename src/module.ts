@@ -31,6 +31,6 @@ export { mediaRecorderConstructor as MediaRecorder };
 
 export const isSupported: Promise<boolean> = createIsSupportedPromise(window);
 
-export const register = async (port: MessagePort): Promise<void> => {
+export const register = async (port: MessagePort): Promise<void> => { // tslint:disable-line:invalid-void
     encoderRegexes.push(await rgstr(port));
 };
