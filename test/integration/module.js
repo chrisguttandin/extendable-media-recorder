@@ -86,25 +86,24 @@ describe('module', () => {
                         }, 1000);
                     });
 
-                    if (mimeType === 'audio/wav') {
+                    it('should encode a mediaStream', function (done) {
+                        this.timeout(20000);
 
-                        it('should encode a mediaStream', function (done) {
-                            this.timeout(20000);
+                        mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
+                            // Test if the arrayBuffer is decodable.
+                            const arrayBuffer = await new Promise((resolve) => {
+                                const fileReader = new FileReader();
 
-                            mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
-                                // Test if the arrayBuffer is decodable.
-                                const arrayBuffer = await new Promise((resolve) => {
-                                    const fileReader = new FileReader();
+                                fileReader.onload = () => resolve(fileReader.result);
+                                fileReader.readAsArrayBuffer(data);
+                            });
+                            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-                                    fileReader.onload = () => resolve(fileReader.result);
-                                    fileReader.readAsArrayBuffer(data);
-                                });
-                                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                            // Test if the audioBuffer is at least half a second long.
+                            expect(audioBuffer.duration).to.above(0.5);
 
-                                // Test if the audioBuffer is at least half a second long.
-                                expect(audioBuffer.duration).to.above(0.5);
-
-                                // Test if the audioBuffer contains the ouput of the oscillator.
+                            // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                            if (mimeType === 'audio/wav') {
                                 const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
 
                                 for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
@@ -127,15 +126,14 @@ describe('module', () => {
                                         rotatingBuffers.push(rotatingBuffers.shift());
                                     }
                                 }
+                            }
 
-                                done();
-                            });
-                            mediaRecorder.start();
-
-                            setTimeout(() => mediaRecorder.stop(), 1000);
+                            done();
                         });
+                        mediaRecorder.start();
 
-                    }
+                        setTimeout(() => mediaRecorder.stop(), 1000);
+                    });
 
                 });
 
