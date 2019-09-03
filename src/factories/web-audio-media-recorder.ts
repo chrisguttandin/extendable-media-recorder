@@ -9,7 +9,7 @@ import {
     addAudioWorkletModule
 } from 'standardized-audio-context';
 import { IAudioNodesAndEncoderId } from '../interfaces';
-import { TWebAudioMediaRecorderFactoryFactory } from '../types';
+import { TRecordingState, TWebAudioMediaRecorderFactoryFactory } from '../types';
 
 // @todo This should live in a separate file.
 const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream, mimeType: string) => {
@@ -40,6 +40,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream
 
 export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (
     createInvalidModificationError,
+    createInvalidStateError,
     createNotSupportedError
 ) => {
     return (mediaStream, mimeType) => {
@@ -71,7 +72,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
         const stop = (): void => {
             if (promisedAudioNodesAndEncoderId === null) {
-                throw new Error();
+                return;
             }
 
             if (abortRecording !== null) {
@@ -93,9 +94,15 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                     dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
                 });
+
+            promisedAudioNodesAndEncoderId = null;
         };
 
         return {
+
+            get state (): TRecordingState {
+                return (promisedAudioNodesAndEncoderId === null) ? 'inactive' : 'recording';
+            },
 
             // @todo Respect the options object for faked events as well.
             addEventListener (
@@ -132,6 +139,10 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             start (): void {
+                if (promisedAudioNodesAndEncoderId !== null) {
+                    throw createInvalidStateError();
+                }
+
                 if (mediaStream.getVideoTracks().length > 0) {
                     throw createNotSupportedError();
                 }

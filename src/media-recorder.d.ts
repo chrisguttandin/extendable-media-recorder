@@ -36,7 +36,11 @@ interface MediaRecorderOptions { // tslint:disable-line:interface-name
 
 }
 
+type RecordingState = 'inactive' | 'paused' | 'recording';
+
 interface MediaRecorder extends EventTarget { // tslint:disable-line:interface-name
+
+    readonly state: RecordingState;
 
     start (timeslice?: number): void;
 

@@ -1,5 +1,6 @@
 import { register as rgstr } from 'media-encoder-host';
 import { createInvalidModificationError } from './factories/invalid-modification-error';
+import { createInvalidStateError } from './factories/invalid-state-error';
 import { createIsSupportedPromise } from './factories/is-supported-promise';
 import { createMediaRecorderConstructor } from './factories/media-recorder-constructor';
 import { createNativeMediaRecorderFactory } from './factories/native-media-recorder';
@@ -15,7 +16,11 @@ export * from './types';
 const encoderRegexes: RegExp[] = [];
 
 const createNativeMediaRecorder = createNativeMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
-const createWebAudioMediaRecorder = createWebAudioMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
+const createWebAudioMediaRecorder = createWebAudioMediaRecorderFactory(
+    createInvalidModificationError,
+    createInvalidStateError,
+    createNotSupportedError
+);
 const window = createWindow();
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 

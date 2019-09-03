@@ -1,8 +1,11 @@
+import { TRecordingState } from '../types';
 import { IMediaRecorderEventMap } from './media-encoder-event-map';
 
 export interface IMediaRecorder extends EventTarget {
 
     // @todo ondataavailable: ((this: IMediaRecorder, event: IBlobEvent) => any) | null;
+
+    readonly state: TRecordingState;
 
     addEventListener<K extends keyof IMediaRecorderEventMap> (
         type: K,

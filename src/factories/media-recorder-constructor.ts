@@ -1,5 +1,5 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
-import { TMediaRecorderConstructorFactory, TNativeMediaRecorder } from '../types';
+import { TMediaRecorderConstructorFactory, TNativeMediaRecorder, TRecordingState } from '../types';
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
@@ -29,6 +29,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
                 throw createNotSupportedError();
             }
+        }
+
+        get state (): TRecordingState {
+            return this._internalMediaRecorder.state;
         }
 
         public addEventListener (type: string, listener: (event: Event) => void): void {
