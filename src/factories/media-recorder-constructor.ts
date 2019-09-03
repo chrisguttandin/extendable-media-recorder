@@ -47,8 +47,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             return this._internalMediaRecorder.removeEventListener(type, listener);
         }
 
-        public start (): void {
-            return this._internalMediaRecorder.start();
+        public start (timeslice?: number): void {
+            return this._internalMediaRecorder.start(timeslice);
         }
 
         public stop (): void {

@@ -86,7 +86,7 @@ describe('module', () => {
                         }, 1000);
                     });
 
-                    it('should encode a mediaStream', function (done) {
+                    it('should encode a mediaStream as a whole', function (done) {
                         this.timeout(20000);
 
                         mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
@@ -131,6 +131,63 @@ describe('module', () => {
                             done();
                         });
                         mediaRecorder.start();
+
+                        setTimeout(() => mediaRecorder.stop(), 1000);
+                    });
+
+                    it('should encode a mediaStream in chunks', function (done) {
+                        this.timeout(20000);
+
+                        const chunks = [ ];
+
+                        mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
+                            chunks.push(data);
+
+                            if (mediaRecorder.state === 'inactive') {
+                                expect(chunks.length).to.be.above(5);
+
+                                // Test if the arrayBuffer is decodable.
+                                const arrayBuffer = await new Promise((resolve) => {
+                                    const fileReader = new FileReader();
+
+                                    fileReader.onload = () => resolve(fileReader.result);
+                                    fileReader.readAsArrayBuffer(new Blob(chunks, { mimeType }));
+                                });
+                                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                                // Test if the audioBuffer is at least half a second long.
+                                expect(audioBuffer.duration).to.be.above(0.5);
+
+                                // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                if (mimeType === 'audio/wav') {
+                                    const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
+
+                                    for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                        audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+
+                                        for (let startInChannel = bufferLength; startInChannel < audioBuffer.length - bufferLength; startInChannel += bufferLength) {
+                                            audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+
+                                            for (let j = 0; j < bufferLength; j += 1) {
+                                                try {
+                                                    expect(rotatingBuffers[0][j]).to.not.equal(0);
+                                                    expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
+                                                } catch (err) {
+                                                    done(err);
+
+                                                    return;
+                                                }
+                                            }
+
+                                            rotatingBuffers.push(rotatingBuffers.shift());
+                                        }
+                                    }
+                                }
+
+                                done();
+                            }
+                        });
+                        mediaRecorder.start(100);
 
                         setTimeout(() => mediaRecorder.stop(), 1000);
                     });

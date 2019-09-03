@@ -23,7 +23,7 @@ export interface IMediaRecorder extends EventTarget {
 
     removeEventListener (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 
-    start (): void;
+    start (timeslice?: number): void;
 
     stop (): void;
 
