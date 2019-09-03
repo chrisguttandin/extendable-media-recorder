@@ -100,7 +100,7 @@ describe('module', () => {
                             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
                             // Test if the audioBuffer is at least half a second long.
-                            expect(audioBuffer.duration).to.above(0.5);
+                            expect(audioBuffer.duration).to.be.above(0.5);
 
                             // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                             if (mimeType === 'audio/wav') {
