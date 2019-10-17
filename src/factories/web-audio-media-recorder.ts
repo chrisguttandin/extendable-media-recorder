@@ -13,8 +13,8 @@ import { TRecordingState, TWebAudioMediaRecorderFactoryFactory } from '../types'
 
 // @todo This should live in a separate file.
 const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream, mimeType: string) => {
-    const { encoderId, port } = await instantiate(mimeType);
     const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
+    const { encoderId, port } = await instantiate(mimeType, audioContext.sampleRate);
     const message = 'Missing AudioWorklet support. Maybe this is not running in a secure context.';
 
     await addRecorderAudioWorkletModule((url: string) => {
