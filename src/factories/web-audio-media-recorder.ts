@@ -30,7 +30,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream
     }
 
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(audioContext, { mediaStream });
-    const length = Math.ceil(audioContext.baseLatency * audioContext.sampleRate);
+    const length = Math.max(512, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
     const audioBuffer = new AudioBuffer({ length, sampleRate: audioContext.sampleRate });
     const audioBufferSourceNode = new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
     const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext);
