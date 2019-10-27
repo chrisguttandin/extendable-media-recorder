@@ -13,5 +13,9 @@ module.exports = {
     'test-firefox': {
         configFile: 'config/karma/expectation-firefox.js',
         singleRun: true
+    },
+    'test-firefox-developer': {
+        configFile: 'config/karma/expectation-firefox-developer.js',
+        singleRun: true
     }
 };
