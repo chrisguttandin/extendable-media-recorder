@@ -11,7 +11,7 @@
   "dependencies": {
     "@babel/runtime": "^7.6.3",
     "media-encoder-host": "^6.0.1",
-    "recorder-audio-worklet": "^4.0.30",
+    "recorder-audio-worklet": "^4.0.31",
     "standardized-audio-context": "^22.0.2",
     "tslib": "^1.10.0"
   },
