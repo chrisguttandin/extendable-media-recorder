@@ -5,21 +5,21 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
     createNotSupportedError
 ) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
-        const dataAvailableListeners = new WeakMap<any, null | ((this: TNativeMediaRecorder, event: Event) => any)>();
-        const errorListeners = new WeakMap<any, null | ((this: TNativeMediaRecorder, event: Event) => any)>();
+        const dataAvailableListeners = new WeakMap<any, (this: TNativeMediaRecorder, event: Event) => any>();
+        const errorListeners = new WeakMap<any, (this: TNativeMediaRecorder, event: Event) => any>();
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {
             return (
                 type: string,
-                listener: EventListenerOrEventListenerObject | null = null,
+                listener: EventListenerOrEventListenerObject,
                 options?: boolean | AddEventListenerOptions
             ) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {
                     if (type === 'dataavailable') {
-                        patchedEventListener = (event: Event) => setTimeout(() => listener(event));
+                        patchedEventListener = (event: Event) => setTimeout(() => listener.call(nativeMediaRecorder, event));
 
                         dataAvailableListeners.set(listener, patchedEventListener);
                     } else if (type === 'error') {
@@ -34,7 +34,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                                 Object.defineProperty(event, type, { value: createInvalidModificationError(message) });
                             }
 
-                            listener(event);
+                            listener.call(nativeMediaRecorder, event);
                         };
 
                         dataAvailableListeners.set(listener, patchedEventListener);
@@ -48,7 +48,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         nativeMediaRecorder.removeEventListener = ((removeEventListener) => {
             return (
                 type: string,
-                listener: EventListenerOrEventListenerObject | null = null,
+                listener: EventListenerOrEventListenerObject,
                 options?: boolean | AddEventListenerOptions
             ) => {
                 let patchedEventListener = listener;

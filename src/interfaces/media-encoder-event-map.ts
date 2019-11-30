@@ -5,7 +5,7 @@ export interface IMediaRecorderEventMap {
     dataavailable: IBlobEvent;
 
     // @todo This should fire a MediaRecorderErrorEvent.
-    error: Event;
+    error: ErrorEvent;
 
     pause: Event;
 
