@@ -4,6 +4,7 @@ import {
     AudioBuffer,
     AudioBufferSourceNode,
     AudioWorkletNode,
+    IMinimalAudioContext,
     MediaStreamAudioSourceNode,
     MinimalAudioContext,
     addAudioWorkletModule
@@ -12,8 +13,7 @@ import { IAudioNodesAndEncoderId } from '../interfaces';
 import { TRecordingState, TWebAudioMediaRecorderFactoryFactory } from '../types';
 
 // @todo This should live in a separate file.
-const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream, mimeType: string) => {
-    const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
+const createPromisedAudioNodesEncoderIdAndPort = async (audioContext: IMinimalAudioContext, mediaStream: MediaStream, mimeType: string) => {
     const { encoderId, port } = await instantiate(mimeType, audioContext.sampleRate);
     const message = 'Missing AudioWorklet support. Maybe this is not running in a secure context.';
 
@@ -35,7 +35,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (mediaStream: MediaStream
     const audioBufferSourceNode = new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
     const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext);
 
-    return { audioBufferSourceNode, audioContext, encoderId, length, port, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
+    return { audioBufferSourceNode, encoderId, length, port, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
 };
 
 export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (
@@ -45,7 +45,8 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 ) => {
     return (mediaStream, mimeType) => {
         const listeners = new Map<string, Set<EventListenerOrEventListenerObject>>();
-        const promisedAudioNodesEncoderIdAndPort = createPromisedAudioNodesEncoderIdAndPort(mediaStream, mimeType);
+        const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
+        const promisedAudioNodesEncoderIdAndPort = createPromisedAudioNodesEncoderIdAndPort(audioContext, mediaStream, mimeType);
 
         let abortRecording: null | (() => void) = null;
         let intervalId: null | number = null;
@@ -162,16 +163,19 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                     throw createNotSupportedError();
                 }
 
-                promisedAudioNodesAndEncoderId = promisedAudioNodesEncoderIdAndPort
-                    .then(async ({
+                promisedAudioNodesAndEncoderId = Promise
+                    .all([
+                        audioContext.resume(),
+                        promisedAudioNodesEncoderIdAndPort
+                    ])
+                    .then(async ([ , {
                         audioBufferSourceNode,
-                        audioContext,
                         encoderId,
                         length,
                         port,
                         mediaStreamAudioSourceNode,
                         recorderAudioWorkletNode
-                    }) => {
+                    } ]) => {
                         mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
 
                         await new Promise((resolve) => {
