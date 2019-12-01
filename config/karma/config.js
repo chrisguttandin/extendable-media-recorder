@@ -7,6 +7,8 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 20000,
 
+        concurrency: 1,
+
         files: [
             '../../test/integration/**/*.js',
             '../../test/unit/**/*.js'
