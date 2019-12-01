@@ -1,5 +1,11 @@
 // @todo Define the complete type declarations as defined by the MediaStream Recording specification.
 
+interface Blob { // tslint:disable-line:interface-name
+
+    arrayBuffer (): Promise<ArrayBuffer>;
+
+}
+
 interface BlobEvent extends Event { // tslint:disable-line:interface-name
 
     readonly data: Blob;

@@ -5,6 +5,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     createNativeMediaRecorder,
     createNotSupportedError,
     createWebAudioMediaRecorder,
+    createWebmPcmMediaRecorder,
     encoderRegexes,
     nativeMediaRecorderConstructor
 ) => {
@@ -20,7 +21,11 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                     && (mimeType === undefined || nativeMediaRecorderConstructor.isTypeSupported(mimeType))) {
                 this._internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
             } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
-                this._internalMediaRecorder = createWebAudioMediaRecorder(stream, mimeType);
+                if (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported('audio/webm; codecs=pcm')) {
+                    this._internalMediaRecorder = createWebmPcmMediaRecorder(nativeMediaRecorderConstructor, stream, mimeType);
+                } else {
+                    this._internalMediaRecorder = createWebAudioMediaRecorder(stream, mimeType);
+                }
             } else {
                 // This is creating a native MediaRecorder just to provoke it to throw an error.
                 if (nativeMediaRecorderConstructor !== null) {
