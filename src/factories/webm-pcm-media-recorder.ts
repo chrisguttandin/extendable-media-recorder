@@ -119,7 +119,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                     throw createNotSupportedError();
                 }
 
-                if (nativeMediaRecorder.state !== 'inactive') {
+                if (nativeMediaRecorder.state === 'inactive') {
                     nativeMediaRecorder.addEventListener('dataavailable', ({ data }) => {
                         if (promisedElementTypeEncoderIdAndPort !== null) {
                             promisedElementTypeEncoderIdAndPort = promisedElementTypeEncoderIdAndPort
