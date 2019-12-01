@@ -91,13 +91,7 @@ describe('module', () => {
 
                         mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
                             // Test if the arrayBuffer is decodable.
-                            const arrayBuffer = await new Promise((resolve) => {
-                                const fileReader = new FileReader();
-
-                                fileReader.onload = () => resolve(fileReader.result);
-                                fileReader.readAsArrayBuffer(data);
-                            });
-                            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                            const audioBuffer = await audioContext.decodeAudioData(await data.arrayBuffer());
 
                             // Test if the audioBuffer is at least half a second long.
                             expect(audioBuffer.duration).to.be.above(0.5);
@@ -147,13 +141,7 @@ describe('module', () => {
                                 expect(chunks.length).to.be.above(5);
 
                                 // Test if the arrayBuffer is decodable.
-                                const arrayBuffer = await new Promise((resolve) => {
-                                    const fileReader = new FileReader();
-
-                                    fileReader.onload = () => resolve(fileReader.result);
-                                    fileReader.readAsArrayBuffer(new Blob(chunks, { mimeType }));
-                                });
-                                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                                const audioBuffer = await audioContext.decodeAudioData(await (new Blob(chunks, { mimeType })).arrayBuffer());
 
                                 // Test if the audioBuffer is at least half a second long.
                                 expect(audioBuffer.duration).to.be.above(0.5);
