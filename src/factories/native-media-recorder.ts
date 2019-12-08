@@ -76,8 +76,6 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         nativeMediaRecorder.start = ((start) => {
             return (timeslice?: number) => {
                 /*
-                 * Bug #5: Firefox will emit a blob of type video/webm when asked to encode a MediaStream with a video track into an audio
-                 * codec.
                  * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio
                  * codec.
                  */
