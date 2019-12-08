@@ -7,10 +7,7 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 20000,
 
-        concurrency: 1,
-
         files: [
-            '../../test/integration/**/*.js',
             '../../test/unit/**/*.js'
         ],
 
@@ -20,7 +17,6 @@ module.exports = (config) => {
         ],
 
         preprocessors: {
-            '../../test/integration/**/*.js': 'webpack',
             '../../test/unit/**/*.js': 'webpack'
         },
 
@@ -58,13 +54,23 @@ module.exports = (config) => {
 
             browserStack: {
                 accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                username: env.BROWSER_STACK_USERNAME
+                build: `${ env.TRAVIS_REPO_SLUG }/${ env.TRAVIS_JOB_NUMBER }/unit-${ env.TARGET }`,
+                username: env.BROWSER_STACK_USERNAME,
+                video: false
             },
 
-            browsers: [
-                'ChromeBrowserStack',
-                'FirefoxBrowserStack'
-            ],
+            browsers: (env.TARGET === 'chrome')
+                ? [
+                    'ChromeBrowserStack'
+                ]
+                : (env.TARGET === 'firefox')
+                    ? [
+                        'FirefoxBrowserStack'
+                    ]
+                    : [
+                        'ChromeBrowserStack',
+                        'FirefoxBrowserStack'
+                    ],
 
             captureTimeout: 120000,
 
@@ -81,9 +87,7 @@ module.exports = (config) => {
                     os: 'Windows',
                     os_version: '10' // eslint-disable-line camelcase
                 }
-            },
-
-            tunnelIdentifier: env.TRAVIS_JOB_NUMBER
+            }
 
         });
 

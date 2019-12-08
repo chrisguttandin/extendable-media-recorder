@@ -2,20 +2,24 @@ module.exports = {
     'continuous': {
         configFile: 'config/karma/config.js'
     },
-    'test': {
-        configFile: 'config/karma/config.js',
-        singleRun: true
-    },
-    'test-chrome': {
+    'expectation-chrome': {
         configFile: 'config/karma/expectation-chrome.js',
         singleRun: true
     },
-    'test-firefox': {
+    'expectation-firefox': {
         configFile: 'config/karma/expectation-firefox.js',
         singleRun: true
     },
-    'test-firefox-developer': {
+    'expectation-firefox-developer': {
         configFile: 'config/karma/expectation-firefox-developer.js',
+        singleRun: true
+    },
+    'integration': {
+        configFile: 'config/karma/integration.js',
+        singleRun: true
+    },
+    'unit': {
+        configFile: 'config/karma/unit.js',
         singleRun: true
     }
 };
