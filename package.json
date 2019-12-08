@@ -12,7 +12,7 @@
     "@babel/runtime": "^7.7.6",
     "media-encoder-host": "^7.0.6",
     "recorder-audio-worklet": "^4.0.35",
-    "standardized-audio-context": "^23.0.4",
+    "standardized-audio-context": "^23.0.5",
     "tslib": "^1.10.0"
   },
   "description": "An extendable drop-in replacement for the native MediaRecorder.",
