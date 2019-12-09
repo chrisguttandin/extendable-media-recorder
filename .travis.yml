@@ -22,3 +22,5 @@ matrix:
       node_js: 12
     - env: [TARGET=firefox, TYPE=unit]
       node_js: 12
+    - env: [TARGET=firefox-unsupported, TYPE=integration]
+      node_js: 12

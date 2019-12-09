@@ -35,6 +35,7 @@ module.exports = (config) => {
             plugins: [
                 new DefinePlugin({
                     'process.env': {
+                        TARGET: JSON.stringify(env.TARGET),
                         TRAVIS: JSON.stringify(env.TRAVIS)
                     }
                 })
@@ -65,7 +66,7 @@ module.exports = (config) => {
                 ? [
                     'ChromeBrowserStack'
                 ]
-                : (env.TARGET === 'firefox')
+                : (env.TARGET === 'firefox' || env.TARGET === 'firefox-unsupported')
                     ? [
                         'FirefoxBrowserStack'
                     ]
@@ -86,6 +87,7 @@ module.exports = (config) => {
                 FirefoxBrowserStack: {
                     base: 'BrowserStack',
                     browser: 'firefox',
+                    ...(env.TARGET.endsWith('-unsupported') ? { browser_version: '70' } : null), // eslint-disable-line camelcase
                     os: 'Windows',
                     os_version: '10' // eslint-disable-line camelcase
                 }
