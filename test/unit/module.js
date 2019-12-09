@@ -1,4 +1,4 @@
-import { MediaRecorder, isSupported } from '../../src/module';
+import { MediaRecorder, isSupported, register } from '../../src/module';
 
 describe('module', () => {
 
@@ -8,6 +8,10 @@ describe('module', () => {
 
     it('should export the isSupported function', () => {
         expect(isSupported).to.be.a('function');
+    });
+
+    it('should export the register function', () => {
+        expect(register).to.be.a('function');
     });
 
 });
