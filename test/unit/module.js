@@ -6,8 +6,8 @@ describe('module', () => {
         expect(MediaRecorder).to.be.a('function');
     });
 
-    it('should export the isSupported promise', () => {
-        expect(isSupported).to.be.an.instanceof(Promise);
+    it('should export the isSupported function', () => {
+        expect(isSupported).to.be.a('function');
     });
 
 });

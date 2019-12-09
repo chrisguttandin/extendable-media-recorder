@@ -241,10 +241,10 @@ describe('module', () => {
 
     });
 
-    describe('isSupported', () => {
+    describe('isSupported()', () => {
 
         it('should resolve to true', async () => {
-            expect(await isSupported).to.be.true;
+            expect(await isSupported()).to.be.true;
         });
 
     });
