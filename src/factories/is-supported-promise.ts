@@ -20,7 +20,8 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
 
             try {
                 mediaRecorder.start();
-                mediaRecorder.stop();
+
+                setTimeout(() => mediaRecorder.stop(), 10);
             } catch (err) {
                 resolve(err.name === 'NotSupportedError');
             }
