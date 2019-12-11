@@ -36,7 +36,7 @@ import { connect } from 'extendable-media-recorder-wav-encoder';
 await register(await connect());
 
 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-const mediaRecoder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
+const mediaRecoder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
 ```
 
 ## Inner Workings
