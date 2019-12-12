@@ -2,7 +2,13 @@ import { TReadElementTypeFactory } from '../types';
 
 export const createReadElementType: TReadElementTypeFactory = (readVariableSizeInteger) => {
     return (dataView, offset) => {
-        const { length, value } = readVariableSizeInteger(dataView, offset);
+        const lengthAndValue = readVariableSizeInteger(dataView, offset);
+
+        if (lengthAndValue === null) {
+            return lengthAndValue;
+        }
+
+        const { length, value } = lengthAndValue;
 
         if (value === 35) {
             return { length, type: 'binary' };

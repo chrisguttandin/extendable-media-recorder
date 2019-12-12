@@ -2,10 +2,20 @@ import { TReadElementContentFactory } from '../types';
 
 export const createReadElementContent: TReadElementContentFactory = (readVariableSizeInteger) => {
     return (dataView, offset, type) => {
-        const { length, value } = readVariableSizeInteger(dataView, offset);
+        const lengthAndValue = readVariableSizeInteger(dataView, offset);
+
+        if (lengthAndValue === null) {
+            return lengthAndValue;
+        }
+
+        const { length, value } = lengthAndValue;
 
         if (type === 'master') {
             return { content: null, length };
+        }
+
+        if (offset + length + value > dataView.byteOffset + dataView.byteLength) {
+            return null;
         }
 
         if (type === 'binary') {

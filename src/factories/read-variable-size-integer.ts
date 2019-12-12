@@ -3,7 +3,17 @@ import { TReadVariableSizeIntegerFactory } from '../types';
 export const createReadVariableSizeInteger: TReadVariableSizeIntegerFactory = (readVariableSizeIntegerLength) => {
     return (dataView, offset) => {
         const length = readVariableSizeIntegerLength(dataView, offset);
+
+        if (length === null) {
+            return length;
+        }
+
         const firstDataByteOffset = offset + Math.floor((length - 1) / 8);
+
+        if (firstDataByteOffset + length > dataView.byteOffset + dataView.byteLength) {
+            return null;
+        }
+
         const firstDataByte = dataView.getUint8(firstDataByteOffset);
 
         let value = firstDataByte & ((1 << (8 - (length % 8))) - 1); // tslint:disable-line:no-bitwise

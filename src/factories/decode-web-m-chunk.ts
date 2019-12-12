@@ -1,8 +1,7 @@
 import { TDecodeWebMChunkFactory } from '../types';
 
 export const createDecodeWebMChunk: TDecodeWebMChunkFactory = (readElementContent, readElementType) => {
-    return (arrayBuffer, elementType) => {
-        const dataView = new DataView(arrayBuffer);
+    return (dataView, elementType) => {
         const contents: (readonly [ Float32Array, Float32Array ])[] = [];
 
         let currentElementType = elementType;
@@ -10,12 +9,24 @@ export const createDecodeWebMChunk: TDecodeWebMChunkFactory = (readElementConten
 
         while (offset < dataView.byteLength) {
             if (currentElementType === null) {
-                const { length, type } = readElementType(dataView, offset);
+                const lengthAndType = readElementType(dataView, offset);
+
+                if (lengthAndType === null) {
+                    break;
+                }
+
+                const { length, type } = lengthAndType;
 
                 currentElementType = type;
                 offset += length;
             } else {
-                const { length, content } = readElementContent(dataView, offset, currentElementType);
+                const contentAndLength = readElementContent(dataView, offset, currentElementType);
+
+                if (contentAndLength === null) {
+                    break;
+                }
+
+                const { content, length } = contentAndLength;
 
                 currentElementType = null;
                 offset += length;
@@ -26,6 +37,6 @@ export const createDecodeWebMChunk: TDecodeWebMChunkFactory = (readElementConten
             }
         }
 
-        return { contents, currentElementType };
+        return { contents, currentElementType, offset };
     };
 };

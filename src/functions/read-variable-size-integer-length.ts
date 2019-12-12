@@ -1,6 +1,10 @@
 import { TReadVariableSizeIntegerLengthFunction } from '../types';
 
 export const readVariableSizeIntegerLength: TReadVariableSizeIntegerLengthFunction = (dataView, offset) => {
+    if (offset > dataView.byteOffset + dataView.byteLength) {
+        return null;
+    }
+
     const byte = dataView.getUint8(offset);
 
     if (byte > 127) {
@@ -35,5 +39,7 @@ export const readVariableSizeIntegerLength: TReadVariableSizeIntegerLengthFuncti
         return 8;
     }
 
-    return 8 + readVariableSizeIntegerLength(dataView, offset + 1);
+    const length = readVariableSizeIntegerLength(dataView, offset + 1);
+
+    return (length === null) ? null : length + 8;
 };

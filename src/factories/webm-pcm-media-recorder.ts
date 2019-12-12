@@ -1,5 +1,6 @@
 import { encode, instantiate } from 'media-encoder-host';
-import { TPromisedElementTypeEncoderIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
+import { MultiBufferDataView } from 'multi-buffer-data-view';
+import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
     createInvalidModificationError,
@@ -14,7 +15,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             ? undefined
             : audioTracks[0].getSettings().sampleRate;
 
-        let promisedElementTypeEncoderIdAndPort: null | TPromisedElementTypeEncoderIdAndPort = (sampleRate !== undefined)
+        let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort = (sampleRate !== undefined)
             ? instantiate(mimeType, sampleRate)
             : null;
         let promisedPartialRecording: null | Promise<void> = null; // tslint:disable-line:invalid-void
@@ -121,10 +122,29 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                 if (nativeMediaRecorder.state === 'inactive') {
                     nativeMediaRecorder.addEventListener('dataavailable', ({ data }) => {
-                        if (promisedElementTypeEncoderIdAndPort !== null) {
-                            promisedElementTypeEncoderIdAndPort = promisedElementTypeEncoderIdAndPort
-                                .then(async ({ elementType = null, encoderId, port }) => {
-                                    const { currentElementType, contents } = decodeWebMChunk(await data.arrayBuffer(), elementType);
+                        if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
+                            promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort
+                                .then(async ({ dataView = null, elementType = null, encoderId, port }) => {
+                                    const multiOrSingleBufferDataView = (dataView === null)
+                                        ? new DataView(await data.arrayBuffer())
+                                        : new MultiBufferDataView([ ...dataView.buffers, await data.arrayBuffer() ], dataView.byteOffset);
+
+                                    const { currentElementType, offset, contents } = decodeWebMChunk(
+                                        multiOrSingleBufferDataView,
+                                        elementType
+                                    );
+
+                                    const remainingDataView = (offset < multiOrSingleBufferDataView.byteLength)
+                                        ? ('buffer' in multiOrSingleBufferDataView)
+                                            ? new MultiBufferDataView(
+                                                [ multiOrSingleBufferDataView.buffer ],
+                                                multiOrSingleBufferDataView.byteOffset + offset
+                                            )
+                                            : new MultiBufferDataView(
+                                                multiOrSingleBufferDataView.buffers,
+                                                multiOrSingleBufferDataView.byteOffset + offset
+                                            )
+                                        : null;
 
                                     contents
                                         .forEach((content) => port.postMessage(content, content.map(({ buffer }) => buffer)));
@@ -137,13 +157,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                         port.close();
                                     }
 
-                                    return { elementType: currentElementType, encoderId, port };
+                                    return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
                                 });
                         }
                     });
 
-                    if (promisedElementTypeEncoderIdAndPort !== null && timeslice !== undefined) {
-                        promisedElementTypeEncoderIdAndPort
+                    if (promisedDataViewElementTypeEncoderIdAndPort !== null && timeslice !== undefined) {
+                        promisedDataViewElementTypeEncoderIdAndPort
                             .then(({ encoderId }) => promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice));
                     }
                 }

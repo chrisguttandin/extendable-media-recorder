@@ -1,7 +1,7 @@
 import { TElementType } from './element-type';
 
 export type TReadElementContentFunction = (
-    dataView: DataView,
+    dataView: Pick<DataView, 'byteLength' | 'byteOffset' | 'getFloat32' | 'getUint8'>,
     offset: number,
     type: TElementType
-) => { content: null | readonly [ Float32Array, Float32Array ]; length: number };
+) => null | { content: null | readonly [ Float32Array, Float32Array ]; length: number };
