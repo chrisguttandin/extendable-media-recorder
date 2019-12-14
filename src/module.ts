@@ -16,8 +16,12 @@ import { createWindow } from './factories/window';
 import { readVariableSizeIntegerLength } from './functions/read-variable-size-integer-length';
 import { IMediaRecorderConstructor } from './interfaces';
 
-export * from './interfaces';
-export * from './types';
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+export * from './interfaces/index';
+export * from './types/index';
 
 const encoderRegexes: RegExp[] = [];
 
