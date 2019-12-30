@@ -44,108 +44,95 @@ describe('module', () => {
                                 setTimeout(done, 2000);
                             });
 
-                            it('should abort the encoding when adding a track', function (done) {
-                                this.timeout(10000);
+                            describe('start()', () => {
 
-                                let err = null;
+                                it('should abort the encoding when adding a track', function (done) {
+                                    this.timeout(10000);
 
-                                mediaRecorder.addEventListener('dataavailable', () => {
-                                    expect(err.code).to.equal(13);
-                                    expect(err.name).to.equal('InvalidModificationError');
+                                    let err = null;
 
-                                    done();
+                                    mediaRecorder.addEventListener('dataavailable', function (event) {
+                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('dataavailable');
+
+                                        expect(this).to.equal(mediaRecorder);
+
+                                        expect(err.code).to.equal(13);
+                                        expect(err.name).to.equal('InvalidModificationError');
+
+                                        done();
+                                    });
+
+                                    mediaRecorder.addEventListener('error', function (event) {
+                                        expect(event).to.be.an.instanceOf(ErrorEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('error');
+
+                                        expect(this).to.equal(mediaRecorder);
+
+                                        err = event.error;
+                                    });
+
+                                    mediaRecorder.start();
+
+                                    setTimeout(() => {
+                                        mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
+                                    }, 1000);
                                 });
 
-                                mediaRecorder.addEventListener('error', ({ error }) => {
-                                    err = error;
+                                it('should abort the encoding when removing a track', function (done) {
+                                    this.timeout(10000);
+
+                                    let err = null;
+
+                                    mediaRecorder.addEventListener('dataavailable', function (event) {
+                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('dataavailable');
+
+                                        expect(this).to.equal(mediaRecorder);
+
+                                        expect(err.code).to.equal(13);
+                                        expect(err.name).to.equal('InvalidModificationError');
+
+                                        done();
+                                    });
+
+                                    mediaRecorder.addEventListener('error', function (event) {
+                                        expect(event).to.be.an.instanceOf(ErrorEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('error');
+
+                                        expect(this).to.equal(mediaRecorder);
+
+                                        err = event.error;
+                                    });
+
+                                    mediaRecorder.start();
+
+                                    setTimeout(() => {
+                                        mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+                                    }, 1000);
                                 });
 
-                                mediaRecorder.start();
+                                it('should encode a mediaStream as a whole', function (done) {
+                                    this.timeout(20000);
 
-                                setTimeout(() => {
-                                    mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
-                                }, 1000);
-                            });
+                                    mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('dataavailable');
 
-                            it('should abort the encoding when removing a track', function (done) {
-                                this.timeout(10000);
-
-                                let err = null;
-
-                                mediaRecorder.addEventListener('dataavailable', () => {
-                                    expect(err.code).to.equal(13);
-                                    expect(err.name).to.equal('InvalidModificationError');
-
-                                    done();
-                                });
-
-                                mediaRecorder.addEventListener('error', ({ error }) => {
-                                    err = error;
-                                });
-
-                                mediaRecorder.start();
-
-                                setTimeout(() => {
-                                    mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
-                                }, 1000);
-                            });
-
-                            it('should encode a mediaStream as a whole', function (done) {
-                                this.timeout(20000);
-
-                                mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
-                                    // Test if the arrayBuffer is decodable.
-                                    const audioBuffer = await audioContext.decodeAudioData(await data.arrayBuffer());
-
-                                    // Test if the audioBuffer is at least half a second long.
-                                    expect(audioBuffer.duration).to.be.above(0.5);
-
-                                    // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
-                                    if (mimeType === 'audio/wav') {
-                                        const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
-
-                                        for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
-                                            audioBuffer.copyFromChannel(rotatingBuffers[0], i);
-
-                                            for (let startInChannel = bufferLength; startInChannel < audioBuffer.length - bufferLength; startInChannel += bufferLength) {
-                                                audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
-
-                                                for (let j = 0; j < bufferLength; j += 1) {
-                                                    try {
-                                                        expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                                        expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
-                                                    } catch (err) {
-                                                        done(err);
-
-                                                        return;
-                                                    }
-                                                }
-
-                                                rotatingBuffers.push(rotatingBuffers.shift());
-                                            }
-                                        }
-                                    }
-
-                                    done();
-                                });
-                                mediaRecorder.start();
-
-                                setTimeout(() => mediaRecorder.stop(), 1000);
-                            });
-
-                            it('should encode a mediaStream in chunks', function (done) {
-                                this.timeout(20000);
-
-                                const chunks = [ ];
-
-                                mediaRecorder.addEventListener('dataavailable', async ({ data }) => {
-                                    chunks.push(data);
-
-                                    if (mediaRecorder.state === 'inactive') {
-                                        expect(chunks.length).to.be.above(5);
+                                        expect(this).to.equal(mediaRecorder);
 
                                         // Test if the arrayBuffer is decodable.
-                                        const audioBuffer = await audioContext.decodeAudioData(await (new Blob(chunks, { mimeType })).arrayBuffer());
+                                        const audioBuffer = await audioContext.decodeAudioData(await event.data.arrayBuffer());
 
                                         // Test if the audioBuffer is at least half a second long.
                                         expect(audioBuffer.duration).to.be.above(0.5);
@@ -177,11 +164,70 @@ describe('module', () => {
                                         }
 
                                         done();
-                                    }
-                                });
-                                mediaRecorder.start(100);
+                                    });
+                                    mediaRecorder.start();
 
-                                setTimeout(() => mediaRecorder.stop(), 1000);
+                                    setTimeout(() => mediaRecorder.stop(), 1000);
+                                });
+
+                                it('should encode a mediaStream in chunks', function (done) {
+                                    this.timeout(20000);
+
+                                    const chunks = [ ];
+
+                                    mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                        expect(event.target).to.equal(mediaRecorder);
+                                        expect(event.type).to.equal('dataavailable');
+
+                                        expect(this).to.equal(mediaRecorder);
+
+                                        chunks.push(event.data);
+
+                                        if (mediaRecorder.state === 'inactive') {
+                                            expect(chunks.length).to.be.above(5);
+
+                                            // Test if the arrayBuffer is decodable.
+                                            const audioBuffer = await audioContext.decodeAudioData(await (new Blob(chunks, { mimeType })).arrayBuffer());
+
+                                            // Test if the audioBuffer is at least half a second long.
+                                            expect(audioBuffer.duration).to.be.above(0.5);
+
+                                            // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                            if (mimeType === 'audio/wav') {
+                                                const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
+
+                                                for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                                    audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+
+                                                    for (let startInChannel = bufferLength; startInChannel < audioBuffer.length - bufferLength; startInChannel += bufferLength) {
+                                                        audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+
+                                                        for (let j = 0; j < bufferLength; j += 1) {
+                                                            try {
+                                                                expect(rotatingBuffers[0][j]).to.not.equal(0);
+                                                                expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
+                                                            } catch (err) {
+                                                                done(err);
+
+                                                                return;
+                                                            }
+                                                        }
+
+                                                        rotatingBuffers.push(rotatingBuffers.shift());
+                                                    }
+                                                }
+                                            }
+
+                                            done();
+                                        }
+                                    });
+                                    mediaRecorder.start(100);
+
+                                    setTimeout(() => mediaRecorder.stop(), 1000);
+                                });
+
                             });
 
                         });
@@ -196,15 +242,19 @@ describe('module', () => {
                                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                             });
 
-                            it('should throw a NotSupportedError', (done) => {
-                                try {
-                                    mediaRecorder.start();
-                                } catch (err) {
-                                    expect(err.code).to.equal(9);
-                                    expect(err.name).to.equal('NotSupportedError');
+                            describe('start()', () => {
 
-                                    done();
-                                }
+                                it('should throw a NotSupportedError', (done) => {
+                                    try {
+                                        mediaRecorder.start();
+                                    } catch (err) {
+                                        expect(err.code).to.equal(9);
+                                        expect(err.name).to.equal('NotSupportedError');
+
+                                        done();
+                                    }
+                                });
+
                             });
 
                         });

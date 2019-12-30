@@ -1,5 +1,5 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
-import { TMediaRecorderConstructorFactory, TNativeEventTarget, TNativeMediaRecorder, TRecordingState } from '../types';
+import { TMediaRecorderConstructorFactory, TNativeMediaRecorder, TRecordingState } from '../types';
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
@@ -11,9 +11,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     nativeMediaRecorderConstructor
 ) => {
 
-    return class MediaRecorder implements IMediaRecorder {
-
-        private _eventTarget: TNativeEventTarget;
+    return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
 
         private _internalMediaRecorder: IMediaRecorder | TNativeMediaRecorder;
 
@@ -22,20 +20,18 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
             if ((nativeMediaRecorderConstructor !== null)
                     && (mimeType === undefined || nativeMediaRecorderConstructor.isTypeSupported(mimeType))) {
-                this._internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
-                this._eventTarget = new eventTargetConstructor(this._internalMediaRecorder);
+                const internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
+
+                super(internalMediaRecorder);
+
+                this._internalMediaRecorder = internalMediaRecorder;
             } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
-                this._eventTarget = new eventTargetConstructor();
+                super();
 
                 if (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported('audio/webm; codecs=pcm')) {
-                    this._internalMediaRecorder = createWebmPcmMediaRecorder(
-                        this._eventTarget,
-                        nativeMediaRecorderConstructor,
-                        stream,
-                        mimeType
-                    );
+                    this._internalMediaRecorder = createWebmPcmMediaRecorder(this, nativeMediaRecorderConstructor, stream, mimeType);
                 } else {
-                    this._internalMediaRecorder = createWebAudioMediaRecorder(this._eventTarget, stream, mimeType);
+                    this._internalMediaRecorder = createWebAudioMediaRecorder(this, stream, mimeType);
                 }
             } else {
                 // This is creating a native MediaRecorder just to provoke it to throw an error.
@@ -49,18 +45,6 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         get state (): TRecordingState {
             return this._internalMediaRecorder.state;
-        }
-
-        public addEventListener (type: string, listener: (event: Event) => void): void {
-            return this._eventTarget.addEventListener(type, listener);
-        }
-
-        public dispatchEvent (event: Event): boolean {
-            return this._eventTarget.dispatchEvent(event);
-        }
-
-        public removeEventListener (type: string, listener: (event: Event) => void): void {
-            return this._eventTarget.removeEventListener(type, listener);
         }
 
         public start (timeslice?: number): void {

@@ -26,15 +26,18 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                         patchedEventListener = (event: Event) => {
                             // Bug #3 & 4: Chrome throws an error event without any error.
                             if ((<ErrorEvent> event).error === undefined) {
-                                Object.defineProperty(event, type, { value: createInvalidModificationError() });
+                                listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: createInvalidModificationError() }));
                             // Bug #1 & 2: Firefox throws an error event with an UnknownError.
                             } else if ((<ErrorEvent> event).error.name === 'UnknownError') {
                                 const message = (<ErrorEvent> event).error.message;
 
-                                Object.defineProperty(event, type, { value: createInvalidModificationError(message) });
+                                listener.call(
+                                    nativeMediaRecorder,
+                                    new ErrorEvent('error', { error: createInvalidModificationError(message) })
+                                );
+                            } else {
+                                listener.call(nativeMediaRecorder, event);
                             }
-
-                            listener.call(nativeMediaRecorder, event);
                         };
 
                         dataAvailableListeners.set(listener, patchedEventListener);
