@@ -1,3 +1,8 @@
 import { IMediaRecorder } from '../interfaces';
+import { TNativeEventTarget } from './native-event-target';
 
-export type TWebAudioMediaRecorderFactory = (mediaStream: MediaStream, mimeType: string) => IMediaRecorder;
+export type TWebAudioMediaRecorderFactory = (
+    eventTarget: TNativeEventTarget,
+    mediaStream: MediaStream,
+    mimeType: string
+) => IMediaRecorder;

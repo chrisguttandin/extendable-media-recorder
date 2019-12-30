@@ -1,4 +1,5 @@
 import { IMediaRecorderConstructor } from '../interfaces';
+import { TEventTargetConstructor } from './event-target-constructor';
 import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 import { TNativeMediaRecorderFactory } from './native-media-recorder-factory';
 import { TNotSupportedErrorFactory } from './not-supported-error-factory';
@@ -11,5 +12,6 @@ export type TMediaRecorderConstructorFactory = (
     createWebAudioMediaRecorder: TWebAudioMediaRecorderFactory,
     createWebmPcmMediaRecorder: TWebmPcmMediaRecorderFactory,
     encoderRegexes: RegExp[],
+    eventTargetConstructor: TEventTargetConstructor,
     nativeMediaRecorderConstructor: null | TNativeMediaRecorderConstructor
 ) => IMediaRecorderConstructor;

@@ -7,8 +7,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     createNotSupportedError,
     decodeWebMChunk
 ) => {
-    return (nativeMediaRecorderConstructor, mediaStream, mimeType) => {
-        const listeners = new Map<string, Set<EventListenerOrEventListenerObject>>();
+    return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const audioTracks = mediaStream.getAudioTracks();
         const sampleRate = (audioTracks.length === 0)
@@ -20,27 +19,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             : null;
         let promisedPartialRecording: null | Promise<void> = null; // tslint:disable-line:invalid-void
 
-        const dispatchEvent = (event: Event): boolean => {
-            const listenersOfType = listeners.get(event.type);
-
-            if (listenersOfType === undefined) {
-                return false;
-            }
-
-            listenersOfType
-                .forEach((listener) => {
-                    if (typeof listener === 'object') {
-                        listener.handleEvent(event);
-                    } else {
-                        listener(event);
-                    }
-                });
-
-            return true;
-        };
-
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
-            dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
+            eventTarget.dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
         const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => { // tslint:disable-line:invalid-void max-line-length
@@ -63,12 +43,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             nativeMediaRecorder.stop();
         };
 
-        nativeMediaRecorder.addEventListener('error', (event) => {
-            // Bug #3 & 4: Chrome throws an error event without any error.
-            Object.defineProperty(event, 'error', { value: createInvalidModificationError() });
-
+        nativeMediaRecorder.addEventListener('error', () => {
             stop();
-            dispatchEvent(event);
+            // Bug #3 & 4: Chrome throws an error event without any error.
+            eventTarget.dispatchEvent(new ErrorEvent('error', { error: createInvalidModificationError() }));
         });
 
         return {
@@ -77,38 +55,24 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 return nativeMediaRecorder.state;
             },
 
-            // @todo Respect the options object for faked events as well.
             addEventListener (
                 type: string,
-                listener: EventListenerOrEventListenerObject,
-                _options?: boolean | AddEventListenerOptions
+                listener: null | EventListenerOrEventListenerObject,
+                options?: boolean | AddEventListenerOptions
             ): void {
-                const listenersOfType = listeners.get(type);
-
-                if (listenersOfType !== undefined) {
-                    listenersOfType.add(listener);
-                } else {
-                    listeners.set(type, new Set([ listener ]));
-                }
+                eventTarget.addEventListener(type, listener, options);
             },
 
-            dispatchEvent,
+            dispatchEvent (event: Event): boolean {
+                return eventTarget.dispatchEvent(event);
+            },
 
-            // @todo Respect the options object for faked events as well.
             removeEventListener (
                 type: string,
-                listener: EventListenerOrEventListenerObject,
-                _options?: boolean | EventListenerOptions
+                listener: null | EventListenerOrEventListenerObject,
+                options?: boolean | EventListenerOptions
             ): void {
-                const listenersOfType = listeners.get(type);
-
-                if (listenersOfType !== undefined) {
-                    listenersOfType.delete(listener);
-
-                    if (listenersOfType.size === 0) {
-                        listeners.delete(type);
-                    }
-                }
+                eventTarget.removeEventListener(type, listener, options);
             },
 
             start (timeslice?: number): void {

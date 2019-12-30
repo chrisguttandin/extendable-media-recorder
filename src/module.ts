@@ -1,5 +1,7 @@
 import { register as rgstr } from 'media-encoder-host';
 import { createDecodeWebMChunk } from './factories/decode-web-m-chunk';
+import { createEventTargetConstructor } from './factories/event-target-constructor';
+import { createEventTargetFactory } from './factories/event-target-factory';
 import { createInvalidModificationError } from './factories/invalid-modification-error';
 import { createInvalidStateError } from './factories/invalid-state-error';
 import { createIsSupportedPromise } from './factories/is-supported-promise';
@@ -14,6 +16,7 @@ import { createWebAudioMediaRecorderFactory } from './factories/web-audio-media-
 import { createWebmPcmMediaRecorderFactory } from './factories/webm-pcm-media-recorder';
 import { createWindow } from './factories/window';
 import { readVariableSizeIntegerLength } from './functions/read-variable-size-integer-length';
+import { wrapEventListener } from './functions/wrap-event-listener';
 import { IMediaRecorderConstructor } from './interfaces';
 
 /*
@@ -41,6 +44,7 @@ const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(
     decodeWebMChunk
 );
 const window = createWindow();
+const createEventTarget = createEventTargetFactory(window);
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 
 const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
@@ -49,6 +53,7 @@ const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderC
     createWebAudioMediaRecorder,
     createWebmPcmMediaRecorder,
     encoderRegexes,
+    createEventTargetConstructor(createEventTarget, wrapEventListener),
     nativeMediaRecorderConstructor
 );
 
