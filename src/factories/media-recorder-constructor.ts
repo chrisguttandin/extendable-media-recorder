@@ -1,5 +1,11 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
-import { TMediaRecorderConstructorFactory, TNativeMediaRecorder, TRecordingState } from '../types';
+import {
+    TDataavailableEventHandler,
+    TMediaRecorderConstructorFactory,
+    TNativeEventTarget,
+    TNativeMediaRecorder,
+    TRecordingState
+} from '../types';
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
@@ -13,7 +19,9 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
     return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
 
-        private _internalMediaRecorder: IMediaRecorder | TNativeMediaRecorder;
+        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | keyof TNativeEventTarget> | TNativeMediaRecorder;
+
+        private _ondataavailable: null | [ TDataavailableEventHandler, TDataavailableEventHandler ];
 
         constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
             const { mimeType } = options;
@@ -40,6 +48,28 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 }
 
                 throw createNotSupportedError();
+            }
+
+            this._ondataavailable = null;
+        }
+
+        get ondataavailable (): null | TDataavailableEventHandler {
+            return this._ondataavailable === null ? this._ondataavailable : this._ondataavailable[0];
+        }
+
+        set ondataavailable (value) {
+            if (this._ondataavailable !== null) {
+                (<IMediaRecorder> this).removeEventListener('dataavailable', this._ondataavailable[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                (<IMediaRecorder> this).addEventListener('dataavailable', boundListener);
+
+                this._ondataavailable = [ value, boundListener ];
+            } else {
+                this._ondataavailable = null;
             }
         }
 

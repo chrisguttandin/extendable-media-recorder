@@ -100,26 +100,6 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 return (promisedAudioNodesAndEncoderId === null) ? 'inactive' : 'recording';
             },
 
-            addEventListener (
-                type: string,
-                listener: null | EventListenerOrEventListenerObject,
-                options?: boolean | AddEventListenerOptions
-            ): void {
-                eventTarget.addEventListener(type, listener, options);
-            },
-
-            dispatchEvent (event: Event): boolean {
-                return eventTarget.dispatchEvent(event);
-            },
-
-            removeEventListener (
-                type: string,
-                listener: null | EventListenerOrEventListenerObject,
-                options?: boolean | EventListenerOptions
-            ): void {
-                eventTarget.removeEventListener(type, listener, options);
-            },
-
             start (timeslice?: number): void {
                 if (promisedAudioNodesAndEncoderId !== null) {
                     throw createInvalidStateError();

@@ -2,6 +2,7 @@ import { MediaRecorder, isSupported, register } from '../../src/module';
 import { connect } from 'extendable-media-recorder-wav-encoder';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
+import { spy } from 'sinon';
 
 describe('module', () => {
 
@@ -31,20 +32,71 @@ describe('module', () => {
 
                             afterEach(() => audioContext.close());
 
-                            beforeEach(function (done) {
-                                this.timeout(3000);
-
+                            beforeEach(() => {
                                 audioContext = new AudioContext();
                                 bufferLength = 100;
 
                                 mediaStream = createMediaStreamWithAudioTrack(audioContext, audioContext.sampleRate / bufferLength);
                                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+                            });
 
-                                // Wait two seconds before starting the recording.
-                                setTimeout(done, 2000);
+                            describe('ondataavailable', () => {
+
+                                it('should be null', () => {
+                                    expect(mediaRecorder.ondataavailable).to.be.null;
+                                });
+
+                                it('should be assignable to a function', () => {
+                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                    const ondataavailable = mediaRecorder.ondataavailable = fn; // eslint-disable-line no-multi-assign
+
+                                    expect(ondataavailable).to.equal(fn);
+                                    expect(mediaRecorder.ondataavailable).to.equal(fn);
+                                });
+
+                                it('should be assignable to null', () => {
+                                    const ondataavailable = mediaRecorder.ondataavailable = null; // eslint-disable-line no-multi-assign
+
+                                    expect(ondataavailable).to.be.null;
+                                    expect(mediaRecorder.ondataavailable).to.be.null;
+                                });
+
+                                it('should not be assignable to something else', () => {
+                                    const string = 'no function or null value';
+
+                                    mediaRecorder.ondataavailable = () => {};
+
+                                    const ondataavailable = mediaRecorder.ondataavailable = string; // eslint-disable-line no-multi-assign
+
+                                    expect(ondataavailable).to.equal(string);
+                                    expect(mediaRecorder.ondataavailable).to.be.null;
+                                });
+
+                                it('should register an independent event listener', (done) => {
+                                    const ondataavailable = spy();
+
+                                    mediaRecorder.ondataavailable = ondataavailable;
+                                    mediaRecorder.addEventListener('dataavailable', ondataavailable);
+
+                                    mediaRecorder.dispatchEvent(new Event('dataavailable'));
+
+                                    setTimeout(() => {
+                                        expect(ondataavailable).to.have.been.calledTwice;
+
+                                        done();
+                                    });
+                                });
+
                             });
 
                             describe('start()', () => {
+
+                                beforeEach(function (done) {
+                                    this.timeout(3000);
+
+                                    // Wait two seconds before starting the recording.
+                                    setTimeout(done, 2000);
+                                });
 
                                 it('should abort the encoding when adding a track', function (done) {
                                     this.timeout(10000);

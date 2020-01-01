@@ -55,26 +55,6 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 return nativeMediaRecorder.state;
             },
 
-            addEventListener (
-                type: string,
-                listener: null | EventListenerOrEventListenerObject,
-                options?: boolean | AddEventListenerOptions
-            ): void {
-                eventTarget.addEventListener(type, listener, options);
-            },
-
-            dispatchEvent (event: Event): boolean {
-                return eventTarget.dispatchEvent(event);
-            },
-
-            removeEventListener (
-                type: string,
-                listener: null | EventListenerOrEventListenerObject,
-                options?: boolean | EventListenerOptions
-            ): void {
-                eventTarget.removeEventListener(type, listener, options);
-            },
-
             start (timeslice?: number): void {
                 /*
                  * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio

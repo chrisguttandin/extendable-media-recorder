@@ -1,9 +1,9 @@
-import { TNativeEventTarget, TRecordingState } from '../types';
+import { TDataavailableEventHandler, TNativeEventTarget, TRecordingState } from '../types';
 import { IMediaRecorderEventMap } from './media-encoder-event-map';
 
 export interface IMediaRecorder extends TNativeEventTarget {
 
-    // @todo ondataavailable: ((this: IMediaRecorder, event: IBlobEvent) => any) | null;
+    ondataavailable: null | TDataavailableEventHandler;
 
     readonly state: TRecordingState;
 

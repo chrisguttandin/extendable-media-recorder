@@ -1,3 +1,4 @@
+export * from './dataavailable-event-handler';
 export * from './decode-web-m-chunk-factory';
 export * from './decode-web-m-chunk-function';
 export * from './element-type';
