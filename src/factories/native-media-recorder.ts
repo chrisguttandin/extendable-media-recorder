@@ -19,6 +19,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                 if (typeof listener === 'function') {
                     if (type === 'dataavailable') {
+                        // Bug #7 & 8: Chrome fires a dataavailable event before it fires an error event.
                         patchedEventListener = (event: Event) => setTimeout(() => listener.call(nativeMediaRecorder, event));
 
                         dataAvailableListeners.set(listener, patchedEventListener);

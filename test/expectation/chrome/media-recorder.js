@@ -1,5 +1,6 @@
 import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../../helpers/create-media-stream-with-video-track';
+import { spy } from 'sinon';
 
 describe('module', () => {
 
@@ -40,6 +41,40 @@ describe('module', () => {
             mediaRecorder.addEventListener('error', (err) => {
                 expect(err.error).to.be.undefined;
                 expect(err.type).to.equal('error');
+
+                done();
+            });
+            mediaRecorder.start();
+            mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+        });
+
+        // bug #7
+
+        it('should fire an error event after the dataavailable event when adding a track', function (done) {
+            this.timeout(10000);
+
+            const ondataavailable = spy();
+
+            mediaRecorder.addEventListener('dataavailable', ondataavailable);
+            mediaRecorder.addEventListener('error', () => {
+                expect(ondataavailable).to.have.been.calledOnce;
+
+                done();
+            });
+            mediaRecorder.start();
+            mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
+        });
+
+        // bug #8
+
+        it('should fire an error event after the dataavailable event when removing a track', function (done) {
+            this.timeout(10000);
+
+            const ondataavailable = spy();
+
+            mediaRecorder.addEventListener('dataavailable', ondataavailable);
+            mediaRecorder.addEventListener('error', () => {
+                expect(ondataavailable).to.have.been.calledOnce;
 
                 done();
             });

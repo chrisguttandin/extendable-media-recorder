@@ -80,6 +80,7 @@ describe('module', () => {
 
                                     mediaRecorder.dispatchEvent(new Event('dataavailable'));
 
+                                    // Bug #7 & 8: The dataavailable event is currently delayed.
                                     setTimeout(() => {
                                         expect(ondataavailable).to.have.been.calledTwice;
 
