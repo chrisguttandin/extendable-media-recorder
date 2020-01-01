@@ -90,6 +90,51 @@ describe('module', () => {
 
                             });
 
+                            describe('onerror', () => {
+
+                                it('should be null', () => {
+                                    expect(mediaRecorder.onerror).to.be.null;
+                                });
+
+                                it('should be assignable to a function', () => {
+                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                    const onerror = mediaRecorder.onerror = fn; // eslint-disable-line no-multi-assign
+
+                                    expect(onerror).to.equal(fn);
+                                    expect(mediaRecorder.onerror).to.equal(fn);
+                                });
+
+                                it('should be assignable to null', () => {
+                                    const onerror = mediaRecorder.onerror = null; // eslint-disable-line no-multi-assign
+
+                                    expect(onerror).to.be.null;
+                                    expect(mediaRecorder.onerror).to.be.null;
+                                });
+
+                                it('should not be assignable to something else', () => {
+                                    const string = 'no function or null value';
+
+                                    mediaRecorder.onerror = () => {};
+
+                                    const onerror = mediaRecorder.onerror = string; // eslint-disable-line no-multi-assign
+
+                                    expect(onerror).to.equal(string);
+                                    expect(mediaRecorder.onerror).to.be.null;
+                                });
+
+                                it('should register an independent event listener', () => {
+                                    const onerror = spy();
+
+                                    mediaRecorder.onerror = onerror;
+                                    mediaRecorder.addEventListener('error', onerror);
+
+                                    mediaRecorder.dispatchEvent(new Event('error'));
+
+                                    expect(onerror).to.have.been.calledTwice;
+                                });
+
+                            });
+
                             describe('start()', () => {
 
                                 beforeEach(function (done) {

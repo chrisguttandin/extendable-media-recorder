@@ -1,6 +1,7 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
 import {
     TDataavailableEventHandler,
+    TErrorEventHandler,
     TMediaRecorderConstructorFactory,
     TNativeEventTarget,
     TNativeMediaRecorder,
@@ -22,6 +23,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
         private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | keyof TNativeEventTarget> | TNativeMediaRecorder;
 
         private _ondataavailable: null | [ TDataavailableEventHandler, TDataavailableEventHandler ];
+
+        private _onerror: null | [ TErrorEventHandler, TErrorEventHandler ];
 
         constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
             const { mimeType } = options;
@@ -51,6 +54,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             }
 
             this._ondataavailable = null;
+            this._onerror = null;
         }
 
         get ondataavailable (): null | TDataavailableEventHandler {
@@ -70,6 +74,26 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 this._ondataavailable = [ value, boundListener ];
             } else {
                 this._ondataavailable = null;
+            }
+        }
+
+        get onerror (): null | TErrorEventHandler {
+            return this._onerror === null ? this._onerror : this._onerror[0];
+        }
+
+        set onerror (value) {
+            if (this._onerror !== null) {
+                (<IMediaRecorder> this).removeEventListener('error', this._onerror[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                (<IMediaRecorder> this).addEventListener('error', boundListener);
+
+                this._onerror = [ value, boundListener ];
+            } else {
+                this._onerror = null;
             }
         }
 

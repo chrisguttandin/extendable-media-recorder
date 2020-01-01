@@ -2,6 +2,7 @@ export * from './dataavailable-event-handler';
 export * from './decode-web-m-chunk-factory';
 export * from './decode-web-m-chunk-function';
 export * from './element-type';
+export * from './error-event-handler';
 export * from './event-target-constructor';
 export * from './event-target-constructor-factory';
 export * from './event-target-factory';
