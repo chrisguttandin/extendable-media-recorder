@@ -19,9 +19,9 @@ describe('module', () => {
             // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
             if (!(process.env.TRAVIS && /Chrome/.test(navigator.userAgent))) { // eslint-disable-line no-undef
 
-                for (const mimeType of [ 'audio/wav', 'audio/webm' ]) {
+                for (const [ channelCount, mimeType ] of [ [ 1, 'audio/wav' ], [ 2, 'audio/wav' ], [ 1, 'audio/webm' ], [ 2, 'audio/webm' ] ]) {
 
-                    describe(`with the mimeType of ${ mimeType }`, () => {
+                    describe(`with a channelCount of ${ channelCount } and a mimeType of ${ mimeType }`, () => {
 
                         describe('with a MediaStream which contains an audio track', () => {
 
@@ -32,11 +32,11 @@ describe('module', () => {
 
                             afterEach(() => audioContext.close());
 
-                            beforeEach(() => {
+                            beforeEach(async () => {
                                 audioContext = new AudioContext();
                                 bufferLength = 100;
 
-                                mediaStream = createMediaStreamWithAudioTrack(audioContext, audioContext.sampleRate / bufferLength);
+                                mediaStream = await createMediaStreamWithAudioTrack(audioContext, channelCount, audioContext.sampleRate / bufferLength);
                                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                             });
 
@@ -177,7 +177,8 @@ describe('module', () => {
                                     mediaRecorder.start();
 
                                     setTimeout(() => {
-                                        mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
+                                        createMediaStreamWithAudioTrack(audioContext)
+                                            .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
                                     }, 1000);
                                 });
 
@@ -370,10 +371,10 @@ describe('module', () => {
 
                 afterEach(() => audioContext.close());
 
-                beforeEach(() => {
+                beforeEach(async () => {
                     audioContext = new AudioContext();
 
-                    mediaStream = createMediaStreamWithAudioTrack(audioContext);
+                    mediaStream = await createMediaStreamWithAudioTrack(audioContext);
                 });
 
                 it('should throw a NotSupportedError', (done) => {

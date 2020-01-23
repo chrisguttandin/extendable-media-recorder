@@ -10,9 +10,9 @@ describe('module', () => {
 
         afterEach(() => audioContext.close());
 
-        beforeEach(() => {
+        beforeEach(async () => {
             audioContext = new AudioContext();
-            mediaStream = createMediaStreamWithAudioTrack(audioContext);
+            mediaStream = await createMediaStreamWithAudioTrack(audioContext);
             mediaRecorder = new MediaRecorder(mediaStream);
         });
 
@@ -29,7 +29,8 @@ describe('module', () => {
             });
             mediaRecorder.start();
 
-            mediaStream.addTrack(createMediaStreamWithAudioTrack(audioContext).getAudioTracks()[0]);
+            createMediaStreamWithAudioTrack(audioContext)
+                .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
         });
 
         // bug #2

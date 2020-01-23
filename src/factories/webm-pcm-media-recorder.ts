@@ -10,6 +10,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const audioTracks = mediaStream.getAudioTracks();
+        const channelCount = (audioTracks.length === 0)
+            ? undefined
+            : audioTracks[0].getSettings().channelCount;
         const sampleRate = (audioTracks.length === 0)
             ? undefined
             : audioTracks[0].getSettings().sampleRate;
@@ -75,7 +78,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                                     const { currentElementType, offset, contents } = decodeWebMChunk(
                                         multiOrSingleBufferDataView,
-                                        elementType
+                                        elementType,
+                                        channelCount
                                     );
 
                                     const remainingDataView = (offset < multiOrSingleBufferDataView.byteLength)

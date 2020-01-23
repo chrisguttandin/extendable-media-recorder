@@ -1,7 +1,7 @@
 import { TReadElementContentFactory } from '../types';
 
 export const createReadElementContent: TReadElementContentFactory = (readVariableSizeInteger) => {
-    return (dataView, offset, type) => {
+    return (dataView, offset, type, channelCount = 2) => {
         const lengthAndValue = readVariableSizeInteger(dataView, offset);
 
         if (lengthAndValue === null) {
@@ -19,12 +19,15 @@ export const createReadElementContent: TReadElementContentFactory = (readVariabl
         }
 
         if (type === 'binary') {
-            const numberOfSamples = ((value / Float32Array.BYTES_PER_ELEMENT) - 1) / 2;
-            const content = [ new Float32Array(numberOfSamples), new Float32Array(numberOfSamples) ] as const;
+            const numberOfSamples = ((value / Float32Array.BYTES_PER_ELEMENT) - 1) / channelCount;
+            const content = Array.from({ length: channelCount }, () => new Float32Array(numberOfSamples));
 
             for (let i = 0; i < numberOfSamples; i += 1) {
-                content[0][i] = dataView.getFloat32(offset + length + (((i * 2) + 1) * Float32Array.BYTES_PER_ELEMENT), true);
-                content[1][i] = dataView.getFloat32(offset + length + (((i * 2) + 2) * Float32Array.BYTES_PER_ELEMENT), true);
+                const elementOffset = (i * channelCount) + 1;
+
+                for (let j = 0; j < channelCount; j += 1) {
+                    content[j][i] = dataView.getFloat32(offset + length + ((elementOffset + j) * Float32Array.BYTES_PER_ELEMENT), true);
+                }
             }
 
             return { content, length: length + value };
