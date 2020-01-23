@@ -83,7 +83,7 @@ declare var MediaRecorder: {
 
     prototype: MediaRecorder;
 
-    new (stream: MediaStream, options: MediaRecorderOptions): MediaRecorder;
+    new (stream: MediaStream, options?: MediaRecorderOptions): MediaRecorder;
 
     isTypeSupported (mimeType: string): boolean;
 
