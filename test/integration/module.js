@@ -30,7 +30,11 @@ describe('module', () => {
                             let mediaRecorder;
                             let mediaStream;
 
-                            afterEach(() => audioContext.close());
+                            afterEach(function () {
+                                this.timeout(20000);
+
+                                return audioContext.close();
+                            });
 
                             beforeEach(async () => {
                                 audioContext = new AudioContext();
