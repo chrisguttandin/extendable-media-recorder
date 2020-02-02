@@ -22,11 +22,10 @@ module.exports = {
     test: [
         ...filter(
             isType('expectation'),
-            ...filter(isTarget(), 'karma:expectation-chrome'),
-            ...filter(isTarget('firefox'), 'karma:expectation-firefox'),
-            ...filter(isTarget(), 'karma:expectation-firefox-developer')
+            ...filter(isTarget(), 'sh:test-expectation-chrome'),
+            ...filter(isTarget('firefox'), 'sh:test-expectation-firefox')
         ),
-        ...filter(isType('integration'), 'karma:integration'),
-        ...filter(isType('unit'), 'karma:unit')
+        ...filter(isType('integration'), 'sh:test-integration'),
+        ...filter(isType('unit'), 'sh:test-unit')
     ]
 };

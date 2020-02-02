@@ -7,8 +7,7 @@ module.exports = (config) => {
         browserNoActivityTimeout: 20000,
 
         files: [
-            '../../test/expectation/firefox/any/**/*.js',
-            '../../test/expectation/firefox/current/**/*.js'
+            '../../test/expectation/firefox/**/*.js'
         ],
 
         frameworks: [
@@ -17,8 +16,7 @@ module.exports = (config) => {
         ],
 
         preprocessors: {
-            '../../test/expectation/firefox/any/**/*.js': 'webpack',
-            '../../test/expectation/firefox/current/**/*.js': 'webpack'
+            '../../test/expectation/firefox/**/*.js': 'webpack'
         },
 
         webpack: {
@@ -75,6 +73,7 @@ module.exports = (config) => {
         config.set({
 
             browsers: [
+                'FirefoxDeveloperHeadless',
                 'FirefoxHeadless'
             ]
 

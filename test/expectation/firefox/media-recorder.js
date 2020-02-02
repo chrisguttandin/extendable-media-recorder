@@ -1,4 +1,4 @@
-import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
+import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
 
 describe('module', () => {
 
