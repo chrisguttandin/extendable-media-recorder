@@ -50,13 +50,13 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         let abortRecording: null | (() => void) = null;
         let intervalId: null | number = null;
         let promisedAudioNodesAndEncoderId: null | Promise<IAudioNodesAndEncoderId> = null;
-        let promisedPartialRecording: null | Promise<void> = null; // tslint:disable-line:invalid-void
+        let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
             eventTarget.dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
-        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => { // tslint:disable-line:invalid-void max-line-length
+        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
             dispatchDataAvailableEvent(await encode(encoderId, timeslice));
 
             if (promisedAudioNodesAndEncoderId !== null) {

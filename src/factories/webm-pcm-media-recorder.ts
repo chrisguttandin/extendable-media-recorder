@@ -20,13 +20,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort = (sampleRate !== undefined)
             ? instantiate(mimeType, sampleRate)
             : null;
-        let promisedPartialRecording: null | Promise<void> = null; // tslint:disable-line:invalid-void
+        let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
             eventTarget.dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
-        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => { // tslint:disable-line:invalid-void max-line-length
+        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
             dispatchDataAvailableEvent(await encode(encoderId, timeslice));
 
             if (nativeMediaRecorder.state !== 'inactive') {
