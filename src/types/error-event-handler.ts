@@ -1,3 +1,3 @@
-import { IMediaRecorder } from '../interfaces';
+import { TEventHandler } from './event-handler';
 
-export type TErrorEventHandler = (this: IMediaRecorder, event: ErrorEvent) => void;
+export type TErrorEventHandler<T> = TEventHandler<T, ErrorEvent>;

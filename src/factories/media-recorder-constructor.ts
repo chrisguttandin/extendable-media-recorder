@@ -1,10 +1,9 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
 import {
-    TDataavailableEventHandler,
+    TBlobEventHandler,
     TErrorEventHandler,
     TMediaRecorderConstructorFactory,
     TNativeEventTarget,
-    TNativeMediaRecorder,
     TRecordingState
 } from '../types';
 
@@ -20,11 +19,11 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
     return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
 
-        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | keyof TNativeEventTarget> | TNativeMediaRecorder;
+        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | keyof TNativeEventTarget>;
 
-        private _ondataavailable: null | [ TDataavailableEventHandler, TDataavailableEventHandler ];
+        private _ondataavailable: null | [ TBlobEventHandler<this>, TBlobEventHandler<this> ];
 
-        private _onerror: null | [ TErrorEventHandler, TErrorEventHandler ];
+        private _onerror: null | [ TErrorEventHandler<this>, TErrorEventHandler<this> ];
 
         constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
             const { mimeType } = options;
@@ -57,7 +56,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._onerror = null;
         }
 
-        get ondataavailable (): null | TDataavailableEventHandler {
+        get ondataavailable (): null | TBlobEventHandler<this> {
             return this._ondataavailable === null ? this._ondataavailable : this._ondataavailable[0];
         }
 
@@ -77,7 +76,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             }
         }
 
-        get onerror (): null | TErrorEventHandler {
+        get onerror (): null | TErrorEventHandler<this> {
             return this._onerror === null ? this._onerror : this._onerror[0];
         }
 

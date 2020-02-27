@@ -9,8 +9,8 @@ export const createEventTargetConstructor: TEventTargetConstructorFactory = (cre
         private _nativeEventTarget: TNativeEventTarget;
 
         constructor (nativeEventTarget: null | TNativeEventTarget = null) {
-            this._nativeEventTarget = (nativeEventTarget === null) ? createEventTarget() : nativeEventTarget;
             this._listeners = new WeakMap();
+            this._nativeEventTarget = (nativeEventTarget === null) ? createEventTarget() : nativeEventTarget;
         }
 
         public addEventListener (
