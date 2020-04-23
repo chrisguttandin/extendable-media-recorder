@@ -55,6 +55,8 @@ interface MediaRecorderEventMap { // tslint:disable-line:interface-name
 
 interface MediaRecorder extends EventTarget { // tslint:disable-line:interface-name
 
+    readonly mimeType: string;
+
     readonly state: RecordingState;
 
     addEventListener<K extends keyof MediaRecorderEventMap> (

@@ -44,6 +44,14 @@ describe('module', () => {
                                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                             });
 
+                            describe('mimeType', () => {
+
+                                it('should expose the given mimeType', () => {
+                                    expect(mediaRecorder.mimeType).to.equal(mimeType);
+                                });
+
+                            });
+
                             describe('ondataavailable', () => {
 
                                 it('should be null', () => {

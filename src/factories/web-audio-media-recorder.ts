@@ -96,6 +96,10 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
         return {
 
+            get mimeType (): string {
+                return mimeType;
+            },
+
             get state (): TRecordingState {
                 return (promisedAudioNodesAndEncoderId === null) ? 'inactive' : 'recording';
             },

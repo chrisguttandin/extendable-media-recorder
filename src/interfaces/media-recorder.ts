@@ -3,6 +3,8 @@ import { IMediaRecorderEventMap } from './media-recorder-event-map';
 
 export interface IMediaRecorder extends TNativeEventTarget {
 
+    readonly mimeType: string;
+
     ondataavailable: null | TBlobEventHandler<this>;
 
     onerror: null | TErrorEventHandler<this>;

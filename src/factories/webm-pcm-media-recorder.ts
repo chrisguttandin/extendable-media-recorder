@@ -54,6 +54,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
         return {
 
+            get mimeType (): string {
+                return mimeType;
+            },
+
             get state (): TRecordingState {
                 return nativeMediaRecorder.state;
             },

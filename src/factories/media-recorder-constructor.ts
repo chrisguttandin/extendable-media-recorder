@@ -56,6 +56,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._onerror = null;
         }
 
+        get mimeType (): string {
+            return this._internalMediaRecorder.mimeType;
+        }
+
         get ondataavailable (): null | TBlobEventHandler<this> {
             return this._ondataavailable === null ? this._ondataavailable : this._ondataavailable[0];
         }
