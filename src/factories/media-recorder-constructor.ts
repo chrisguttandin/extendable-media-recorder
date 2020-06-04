@@ -30,7 +30,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
             if ((nativeMediaRecorderConstructor !== null)
                     // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                    && (mimeType === undefined || (nativeMediaRecorderConstructor.isTypeSupported !== undefined && nativeMediaRecorderConstructor.isTypeSupported(mimeType)))) {
+                    && (mimeType === undefined || (nativeMediaRecorderConstructor?.isTypeSupported(mimeType) === true))) {
                 const internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
 
                 super(internalMediaRecorder);
@@ -116,8 +116,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
         public static isTypeSupported (mimeType: string): boolean {
             return (nativeMediaRecorderConstructor !== null
                     // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                    && nativeMediaRecorderConstructor.isTypeSupported !== undefined
-                    && nativeMediaRecorderConstructor.isTypeSupported(mimeType))
+                    && nativeMediaRecorderConstructor?.isTypeSupported(mimeType) === true)
                 ||  encoderRegexes.some((regex) => regex.test(mimeType));
         }
 
