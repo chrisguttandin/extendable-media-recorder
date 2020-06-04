@@ -23,7 +23,8 @@ module.exports = {
         ...filter(
             isType('expectation'),
             ...filter(isTarget(), 'sh:test-expectation-chrome'),
-            ...filter(isTarget('firefox'), 'sh:test-expectation-firefox')
+            ...filter(isTarget('firefox'), 'sh:test-expectation-firefox'),
+            ...filter(isTarget(), 'sh:test-expectation-safari')
         ),
         ...filter(isType('integration'), 'sh:test-integration'),
         ...filter(isType('unit'), 'sh:test-unit')

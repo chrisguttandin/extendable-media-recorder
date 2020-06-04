@@ -24,6 +24,9 @@ module.exports = (grunt) => {
         'test-expectation-firefox': {
             cmd: `karma start config/karma/config-expectation-firefox.js ${ continuous ? '--concurrency Infinity' : '--single-run' }`
         },
+        'test-expectation-safari': {
+            cmd: `karma start config/karma/config-expectation-safari.js ${ continuous ? '--concurrency Infinity' : '--single-run' }`
+        },
         'test-integration': {
             cmd: `karma start config/karma/config-integration.js ${ continuous ? '--concurrency Infinity' : '--single-run' }`
         },
