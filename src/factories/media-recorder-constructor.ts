@@ -39,7 +39,9 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
                 super();
 
-                if (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported('audio/webm;codecs=pcm')) {
+                // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                if (nativeMediaRecorderConstructor !== null
+                        && nativeMediaRecorderConstructor?.isTypeSupported('audio/webm;codecs=pcm') === true) {
                     this._internalMediaRecorder = createWebmPcmMediaRecorder(this, nativeMediaRecorderConstructor, stream, mimeType);
                 } else {
                     this._internalMediaRecorder = createWebAudioMediaRecorder(this, stream, mimeType);
