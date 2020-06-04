@@ -29,8 +29,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             const { mimeType } = options;
 
             if ((nativeMediaRecorderConstructor !== null)
-                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                    && (mimeType === undefined || (nativeMediaRecorderConstructor?.isTypeSupported(mimeType) === true))) {
+                    && (mimeType === undefined
+                        // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                        || (nativeMediaRecorderConstructor.isTypeSupported !== undefined
+                            && nativeMediaRecorderConstructor.isTypeSupported(mimeType)))) {
                 const internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
 
                 super(internalMediaRecorder);
@@ -39,9 +41,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
                 super();
 
-                // Bug #10: Safari does not yet implement the isTypeSupported() method.
                 if (nativeMediaRecorderConstructor !== null
-                        && nativeMediaRecorderConstructor?.isTypeSupported('audio/webm;codecs=pcm') === true) {
+                        // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                        && nativeMediaRecorderConstructor.isTypeSupported !== undefined
+                        && nativeMediaRecorderConstructor.isTypeSupported('audio/webm;codecs=pcm')) {
                     this._internalMediaRecorder = createWebmPcmMediaRecorder(this, nativeMediaRecorderConstructor, stream, mimeType);
                 } else {
                     this._internalMediaRecorder = createWebAudioMediaRecorder(this, stream, mimeType);
@@ -117,9 +120,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         public static isTypeSupported (mimeType: string): boolean {
             return (nativeMediaRecorderConstructor !== null
-                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                    && nativeMediaRecorderConstructor?.isTypeSupported(mimeType) === true)
-                ||  encoderRegexes.some((regex) => regex.test(mimeType));
+                // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                && nativeMediaRecorderConstructor.isTypeSupported !== undefined
+                && nativeMediaRecorderConstructor.isTypeSupported(mimeType))
+                    || encoderRegexes.some((regex) => regex.test(mimeType));
         }
 
     };
