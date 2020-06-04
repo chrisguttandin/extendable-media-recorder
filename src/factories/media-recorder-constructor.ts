@@ -29,7 +29,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             const { mimeType } = options;
 
             if ((nativeMediaRecorderConstructor !== null)
-                    && (mimeType === undefined || nativeMediaRecorderConstructor.isTypeSupported(mimeType))) {
+                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                    && (mimeType === undefined || (nativeMediaRecorderConstructor.isTypeSupported !== undefined && nativeMediaRecorderConstructor.isTypeSupported(mimeType)))) {
                 const internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
 
                 super(internalMediaRecorder);
@@ -113,8 +114,11 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
         }
 
         public static isTypeSupported (mimeType: string): boolean {
-            return (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported(mimeType)) ||
-                encoderRegexes.some((regex) => regex.test(mimeType));
+            return (nativeMediaRecorderConstructor !== null
+                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                    && nativeMediaRecorderConstructor.isTypeSupported !== undefined
+                    && nativeMediaRecorderConstructor.isTypeSupported(mimeType))
+                ||  encoderRegexes.some((regex) => regex.test(mimeType));
         }
 
     };
