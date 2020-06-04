@@ -114,7 +114,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         public static isTypeSupported (mimeType: string): boolean {
             return (nativeMediaRecorderConstructor !== null && nativeMediaRecorderConstructor.isTypeSupported(mimeType)) ||
-                encoderRegexes.some((regex) => !regex.test(mimeType));
+                encoderRegexes.some((regex) => regex.test(mimeType));
         }
 
     };
