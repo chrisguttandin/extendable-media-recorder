@@ -10,11 +10,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {
-            return (
-                type: string,
-                listener: EventListenerOrEventListenerObject,
-                options?: boolean | AddEventListenerOptions
-            ) => {
+            return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {
@@ -26,11 +22,11 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                     } else if (type === 'error') {
                         patchedEventListener = (event: Event) => {
                             // Bug #3 & 4: Chrome throws an error event without any error.
-                            if ((<ErrorEvent> event).error === undefined) {
+                            if ((<ErrorEvent>event).error === undefined) {
                                 listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: createInvalidModificationError() }));
-                            // Bug #1 & 2: Firefox throws an error event with an UnknownError.
-                            } else if ((<ErrorEvent> event).error.name === 'UnknownError') {
-                                const message = (<ErrorEvent> event).error.message;
+                                // Bug #1 & 2: Firefox throws an error event with an UnknownError.
+                            } else if ((<ErrorEvent>event).error.name === 'UnknownError') {
+                                const message = (<ErrorEvent>event).error.message;
 
                                 listener.call(
                                     nativeMediaRecorder,
@@ -50,11 +46,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         })(nativeMediaRecorder.addEventListener);
 
         nativeMediaRecorder.removeEventListener = ((removeEventListener) => {
-            return (
-                type: string,
-                listener: EventListenerOrEventListenerObject,
-                options?: boolean | AddEventListenerOptions
-            ) => {
+            return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {
@@ -83,13 +75,15 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                  * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio
                  * codec.
                  */
-                if (mediaRecorderOptions.mimeType !== undefined
-                        && mediaRecorderOptions.mimeType.startsWith('audio/')
-                        && stream.getVideoTracks().length > 0) {
+                if (
+                    mediaRecorderOptions.mimeType !== undefined &&
+                    mediaRecorderOptions.mimeType.startsWith('audio/') &&
+                    stream.getVideoTracks().length > 0
+                ) {
                     throw createNotSupportedError();
                 }
 
-                return (timeslice === undefined) ? start.call(nativeMediaRecorder) : start.call(nativeMediaRecorder, timeslice);
+                return timeslice === undefined ? start.call(nativeMediaRecorder) : start.call(nativeMediaRecorder, timeslice);
             };
         })(nativeMediaRecorder.start);
 

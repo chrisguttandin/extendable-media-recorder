@@ -5,11 +5,9 @@ import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-
 import { spy } from 'sinon';
 
 describe('module', () => {
-
-    if (!process.env.TARGET || !process.env.TARGET.endsWith('-unsupported')) { // eslint-disable-line no-undef
-
+    // eslint-disable-next-line no-undef
+    if (!process.env.TARGET || !process.env.TARGET.endsWith('-unsupported')) {
         describe('MediaRecorder', () => {
-
             before(async () => {
                 const port = await connect();
 
@@ -17,14 +15,16 @@ describe('module', () => {
             });
 
             // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
-            if (!(process.env.TRAVIS && /Chrome/.test(navigator.userAgent))) { // eslint-disable-line no-undef
-
-                for (const [ channelCount, mimeType ] of [ [ 1, 'audio/wav' ], [ 2, 'audio/wav' ], [ 1, 'audio/webm' ], [ 2, 'audio/webm' ] ]) {
-
-                    describe(`with a channelCount of ${ channelCount } and a mimeType of ${ mimeType }`, () => {
-
+            // eslint-disable-next-line no-undef
+            if (!(process.env.TRAVIS && /Chrome/.test(navigator.userAgent))) {
+                for (const [channelCount, mimeType] of [
+                    [1, 'audio/wav'],
+                    [2, 'audio/wav'],
+                    [1, 'audio/webm'],
+                    [2, 'audio/webm']
+                ]) {
+                    describe(`with a channelCount of ${channelCount} and a mimeType of ${mimeType}`, () => {
                         describe('with a MediaStream which contains an audio track', () => {
-
                             let audioContext;
                             let bufferLength;
                             let mediaRecorder;
@@ -40,34 +40,35 @@ describe('module', () => {
                                 audioContext = new AudioContext();
                                 bufferLength = 100;
 
-                                mediaStream = await createMediaStreamWithAudioTrack(audioContext, channelCount, audioContext.sampleRate / bufferLength);
+                                mediaStream = await createMediaStreamWithAudioTrack(
+                                    audioContext,
+                                    channelCount,
+                                    audioContext.sampleRate / bufferLength
+                                );
                                 mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                             });
 
                             describe('mimeType', () => {
-
                                 it('should expose the given mimeType', () => {
                                     expect(mediaRecorder.mimeType).to.equal(mimeType);
                                 });
-
                             });
 
                             describe('ondataavailable', () => {
-
                                 it('should be null', () => {
                                     expect(mediaRecorder.ondataavailable).to.be.null;
                                 });
 
                                 it('should be assignable to a function', () => {
                                     const fn = () => {};
-                                    const ondataavailable = mediaRecorder.ondataavailable = fn; // eslint-disable-line no-multi-assign
+                                    const ondataavailable = (mediaRecorder.ondataavailable = fn); // eslint-disable-line no-multi-assign
 
                                     expect(ondataavailable).to.equal(fn);
                                     expect(mediaRecorder.ondataavailable).to.equal(fn);
                                 });
 
                                 it('should be assignable to null', () => {
-                                    const ondataavailable = mediaRecorder.ondataavailable = null; // eslint-disable-line no-multi-assign
+                                    const ondataavailable = (mediaRecorder.ondataavailable = null); // eslint-disable-line no-multi-assign
 
                                     expect(ondataavailable).to.be.null;
                                     expect(mediaRecorder.ondataavailable).to.be.null;
@@ -78,7 +79,7 @@ describe('module', () => {
 
                                     mediaRecorder.ondataavailable = () => {};
 
-                                    const ondataavailable = mediaRecorder.ondataavailable = string; // eslint-disable-line no-multi-assign
+                                    const ondataavailable = (mediaRecorder.ondataavailable = string); // eslint-disable-line no-multi-assign
 
                                     expect(ondataavailable).to.equal(string);
                                     expect(mediaRecorder.ondataavailable).to.be.null;
@@ -99,25 +100,23 @@ describe('module', () => {
                                         done();
                                     });
                                 });
-
                             });
 
                             describe('onerror', () => {
-
                                 it('should be null', () => {
                                     expect(mediaRecorder.onerror).to.be.null;
                                 });
 
                                 it('should be assignable to a function', () => {
                                     const fn = () => {};
-                                    const onerror = mediaRecorder.onerror = fn; // eslint-disable-line no-multi-assign
+                                    const onerror = (mediaRecorder.onerror = fn); // eslint-disable-line no-multi-assign
 
                                     expect(onerror).to.equal(fn);
                                     expect(mediaRecorder.onerror).to.equal(fn);
                                 });
 
                                 it('should be assignable to null', () => {
-                                    const onerror = mediaRecorder.onerror = null; // eslint-disable-line no-multi-assign
+                                    const onerror = (mediaRecorder.onerror = null); // eslint-disable-line no-multi-assign
 
                                     expect(onerror).to.be.null;
                                     expect(mediaRecorder.onerror).to.be.null;
@@ -128,7 +127,7 @@ describe('module', () => {
 
                                     mediaRecorder.onerror = () => {};
 
-                                    const onerror = mediaRecorder.onerror = string; // eslint-disable-line no-multi-assign
+                                    const onerror = (mediaRecorder.onerror = string); // eslint-disable-line no-multi-assign
 
                                     expect(onerror).to.equal(string);
                                     expect(mediaRecorder.onerror).to.be.null;
@@ -144,11 +143,9 @@ describe('module', () => {
 
                                     expect(onerror).to.have.been.calledTwice;
                                 });
-
                             });
 
                             describe('start()', () => {
-
                                 beforeEach(function (done) {
                                     this.timeout(3000);
 
@@ -189,8 +186,9 @@ describe('module', () => {
                                     mediaRecorder.start();
 
                                     setTimeout(() => {
-                                        createMediaStreamWithAudioTrack(audioContext)
-                                            .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
+                                        createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
+                                            mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
+                                        );
                                     }, 1000);
                                 });
 
@@ -250,12 +248,16 @@ describe('module', () => {
 
                                         // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                         if (mimeType === 'audio/wav') {
-                                            const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
+                                            const rotatingBuffers = [new Float32Array(bufferLength), new Float32Array(bufferLength)];
 
                                             for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
                                                 audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
-                                                for (let startInChannel = bufferLength; startInChannel < audioBuffer.length - bufferLength; startInChannel += bufferLength) {
+                                                for (
+                                                    let startInChannel = bufferLength;
+                                                    startInChannel < audioBuffer.length - bufferLength;
+                                                    startInChannel += bufferLength
+                                                ) {
                                                     audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
 
                                                     for (let j = 0; j < bufferLength; j += 1) {
@@ -284,7 +286,7 @@ describe('module', () => {
                                 it('should encode a mediaStream in chunks', function (done) {
                                     this.timeout(20000);
 
-                                    const chunks = [ ];
+                                    const chunks = [];
 
                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
                                         expect(event).to.be.an.instanceOf(BlobEvent);
@@ -300,19 +302,25 @@ describe('module', () => {
                                             expect(chunks.length).to.be.above(5);
 
                                             // Test if the arrayBuffer is decodable.
-                                            const audioBuffer = await audioContext.decodeAudioData(await (new Blob(chunks, { mimeType })).arrayBuffer());
+                                            const audioBuffer = await audioContext.decodeAudioData(
+                                                await new Blob(chunks, { mimeType }).arrayBuffer()
+                                            );
 
                                             // Test if the audioBuffer is at least half a second long.
                                             expect(audioBuffer.duration).to.be.above(0.5);
 
                                             // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                             if (mimeType === 'audio/wav') {
-                                                const rotatingBuffers = [ new Float32Array(bufferLength), new Float32Array(bufferLength) ];
+                                                const rotatingBuffers = [new Float32Array(bufferLength), new Float32Array(bufferLength)];
 
                                                 for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
                                                     audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
-                                                    for (let startInChannel = bufferLength; startInChannel < audioBuffer.length - bufferLength; startInChannel += bufferLength) {
+                                                    for (
+                                                        let startInChannel = bufferLength;
+                                                        startInChannel < audioBuffer.length - bufferLength;
+                                                        startInChannel += bufferLength
+                                                    ) {
                                                         audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
 
                                                         for (let j = 0; j < bufferLength; j += 1) {
@@ -338,13 +346,10 @@ describe('module', () => {
 
                                     setTimeout(() => mediaRecorder.stop(), 1000);
                                 });
-
                             });
-
                         });
 
                         describe('with a MediaStream which contains a video track', () => {
-
                             let mediaRecorder;
 
                             beforeEach(() => {
@@ -354,7 +359,6 @@ describe('module', () => {
                             });
 
                             describe('start()', () => {
-
                                 it('should throw a NotSupportedError', (done) => {
                                     try {
                                         mediaRecorder.start();
@@ -365,19 +369,13 @@ describe('module', () => {
                                         done();
                                     }
                                 });
-
                             });
-
                         });
-
                     });
-
                 }
-
             }
 
             describe('with the mimeType of audio/anything', () => {
-
                 let audioContext;
                 let mediaStream;
 
@@ -399,29 +397,20 @@ describe('module', () => {
                         done();
                     }
                 });
-
             });
-
         });
-
     }
 
     describe('isSupported()', () => {
-
-        if (process.env.TARGET && process.env.TARGET.endsWith('-unsupported')) { // eslint-disable-line no-undef
-
+        // eslint-disable-next-line no-undef
+        if (process.env.TARGET && process.env.TARGET.endsWith('-unsupported')) {
             it('should resolve to false', async () => {
                 expect(await isSupported()).to.be.false;
             });
-
         } else {
-
             it('should resolve to true', async () => {
                 expect(await isSupported()).to.be.true;
             });
-
         }
-
     });
-
 });

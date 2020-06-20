@@ -1,19 +1,17 @@
 import { TEventTargetConstructorFactory, TNativeEventTarget } from '../types';
 
 export const createEventTargetConstructor: TEventTargetConstructorFactory = (createEventTarget, wrapEventListener) => {
-
     return class EventTarget implements TNativeEventTarget {
-
         private _listeners: WeakMap<EventListenerOrEventListenerObject, EventListenerOrEventListenerObject>;
 
         private _nativeEventTarget: TNativeEventTarget;
 
-        constructor (nativeEventTarget: null | TNativeEventTarget = null) {
+        constructor(nativeEventTarget: null | TNativeEventTarget = null) {
             this._listeners = new WeakMap();
-            this._nativeEventTarget = (nativeEventTarget === null) ? createEventTarget() : nativeEventTarget;
+            this._nativeEventTarget = nativeEventTarget === null ? createEventTarget() : nativeEventTarget;
         }
 
-        public addEventListener (
+        public addEventListener(
             type: string,
             listener: null | EventListenerOrEventListenerObject,
             options?: boolean | AddEventListenerOptions
@@ -33,24 +31,18 @@ export const createEventTargetConstructor: TEventTargetConstructorFactory = (cre
             }
         }
 
-        public dispatchEvent (event: Event): boolean {
+        public dispatchEvent(event: Event): boolean {
             return this._nativeEventTarget.dispatchEvent(event);
         }
 
-        public removeEventListener (
+        public removeEventListener(
             type: string,
             listener: null | EventListenerOrEventListenerObject,
             options?: boolean | EventListenerOptions
         ): void {
-            const wrappedEventListener = (listener === null) ? undefined : this._listeners.get(listener);
+            const wrappedEventListener = listener === null ? undefined : this._listeners.get(listener);
 
-            this._nativeEventTarget.removeEventListener(
-                type,
-                (wrappedEventListener === undefined) ? null : wrappedEventListener,
-                options
-            );
+            this._nativeEventTarget.removeEventListener(type, wrappedEventListener === undefined ? null : wrappedEventListener, options);
         }
-
     };
-
 };

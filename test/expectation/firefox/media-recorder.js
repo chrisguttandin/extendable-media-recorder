@@ -1,9 +1,7 @@
 import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
 
 describe('module', () => {
-
     describe('with a MediaStream which contains an audio track', () => {
-
         let audioContext;
         let mediaRecorder;
         let mediaStream;
@@ -29,8 +27,9 @@ describe('module', () => {
             });
             mediaRecorder.start();
 
-            createMediaStreamWithAudioTrack(audioContext)
-                .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
+            createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
+                mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
+            );
         });
 
         // bug #2
@@ -50,7 +49,5 @@ describe('module', () => {
                 mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
             }, 1000);
         });
-
     });
-
 });

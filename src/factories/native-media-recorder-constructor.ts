@@ -5,5 +5,5 @@ export const createNativeMediaRecorderConstructor: TNativeMediaRecorderConstruct
         return null;
     }
 
-    return (window.hasOwnProperty('MediaRecorder')) ? window.MediaRecorder : null;
+    return window.hasOwnProperty('MediaRecorder') ? window.MediaRecorder : null;
 };

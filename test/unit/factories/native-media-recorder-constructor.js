@@ -1,7 +1,6 @@
 import { createNativeMediaRecorderConstructor } from '../../../src/factories/native-media-recorder-constructor';
 
 describe('createNativeMediaRecorderConstructor()', () => {
-
     let fakeWindow;
 
     beforeEach(() => {
@@ -19,5 +18,4 @@ describe('createNativeMediaRecorderConstructor()', () => {
 
         expect(createNativeMediaRecorderConstructor(fakeWindow)).to.equal(fakeMediaRecorder);
     });
-
 });

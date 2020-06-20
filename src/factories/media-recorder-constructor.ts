@@ -1,11 +1,5 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
-import {
-    TBlobEventHandler,
-    TErrorEventHandler,
-    TMediaRecorderConstructorFactory,
-    TNativeEventTarget,
-    TRecordingState
-} from '../types';
+import { TBlobEventHandler, TErrorEventHandler, TMediaRecorderConstructorFactory, TNativeEventTarget, TRecordingState } from '../types';
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
@@ -16,23 +10,23 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     eventTargetConstructor,
     nativeMediaRecorderConstructor
 ) => {
-
     return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
-
         private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | keyof TNativeEventTarget>;
 
-        private _ondataavailable: null | [ TBlobEventHandler<this>, TBlobEventHandler<this> ];
+        private _ondataavailable: null | [TBlobEventHandler<this>, TBlobEventHandler<this>];
 
-        private _onerror: null | [ TErrorEventHandler<this>, TErrorEventHandler<this> ];
+        private _onerror: null | [TErrorEventHandler<this>, TErrorEventHandler<this>];
 
-        constructor (stream: MediaStream, options: IMediaRecorderOptions = { }) {
+        constructor(stream: MediaStream, options: IMediaRecorderOptions = {}) {
             const { mimeType } = options;
 
-            if ((nativeMediaRecorderConstructor !== null)
-                    && (mimeType === undefined
-                        // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                        || (nativeMediaRecorderConstructor.isTypeSupported !== undefined
-                            && nativeMediaRecorderConstructor.isTypeSupported(mimeType)))) {
+            if (
+                nativeMediaRecorderConstructor !== null &&
+                (mimeType === undefined ||
+                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                    (nativeMediaRecorderConstructor.isTypeSupported !== undefined &&
+                        nativeMediaRecorderConstructor.isTypeSupported(mimeType)))
+            ) {
                 const internalMediaRecorder = createNativeMediaRecorder(nativeMediaRecorderConstructor, stream, options);
 
                 super(internalMediaRecorder);
@@ -41,10 +35,12 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             } else if (mimeType !== undefined && encoderRegexes.some((regex) => regex.test(mimeType))) {
                 super();
 
-                if (nativeMediaRecorderConstructor !== null
-                        // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                        && nativeMediaRecorderConstructor.isTypeSupported !== undefined
-                        && nativeMediaRecorderConstructor.isTypeSupported('audio/webm;codecs=pcm')) {
+                if (
+                    nativeMediaRecorderConstructor !== null &&
+                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                    nativeMediaRecorderConstructor.isTypeSupported !== undefined &&
+                    nativeMediaRecorderConstructor.isTypeSupported('audio/webm;codecs=pcm')
+                ) {
                     this._internalMediaRecorder = createWebmPcmMediaRecorder(this, nativeMediaRecorderConstructor, stream, mimeType);
                 } else {
                     this._internalMediaRecorder = createWebAudioMediaRecorder(this, stream, mimeType);
@@ -62,70 +58,70 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._onerror = null;
         }
 
-        get mimeType (): string {
+        get mimeType(): string {
             return this._internalMediaRecorder.mimeType;
         }
 
-        get ondataavailable (): null | TBlobEventHandler<this> {
+        get ondataavailable(): null | TBlobEventHandler<this> {
             return this._ondataavailable === null ? this._ondataavailable : this._ondataavailable[0];
         }
 
-        set ondataavailable (value) {
+        set ondataavailable(value) {
             if (this._ondataavailable !== null) {
-                (<IMediaRecorder> this).removeEventListener('dataavailable', this._ondataavailable[1]);
+                (<IMediaRecorder>this).removeEventListener('dataavailable', this._ondataavailable[1]);
             }
 
             if (typeof value === 'function') {
                 const boundListener = value.bind(this);
 
-                (<IMediaRecorder> this).addEventListener('dataavailable', boundListener);
+                (<IMediaRecorder>this).addEventListener('dataavailable', boundListener);
 
-                this._ondataavailable = [ value, boundListener ];
+                this._ondataavailable = [value, boundListener];
             } else {
                 this._ondataavailable = null;
             }
         }
 
-        get onerror (): null | TErrorEventHandler<this> {
+        get onerror(): null | TErrorEventHandler<this> {
             return this._onerror === null ? this._onerror : this._onerror[0];
         }
 
-        set onerror (value) {
+        set onerror(value) {
             if (this._onerror !== null) {
-                (<IMediaRecorder> this).removeEventListener('error', this._onerror[1]);
+                (<IMediaRecorder>this).removeEventListener('error', this._onerror[1]);
             }
 
             if (typeof value === 'function') {
                 const boundListener = value.bind(this);
 
-                (<IMediaRecorder> this).addEventListener('error', boundListener);
+                (<IMediaRecorder>this).addEventListener('error', boundListener);
 
-                this._onerror = [ value, boundListener ];
+                this._onerror = [value, boundListener];
             } else {
                 this._onerror = null;
             }
         }
 
-        get state (): TRecordingState {
+        get state(): TRecordingState {
             return this._internalMediaRecorder.state;
         }
 
-        public start (timeslice?: number): void {
+        public start(timeslice?: number): void {
             return this._internalMediaRecorder.start(timeslice);
         }
 
-        public stop (): void {
+        public stop(): void {
             return this._internalMediaRecorder.stop();
         }
 
-        public static isTypeSupported (mimeType: string): boolean {
-            return (nativeMediaRecorderConstructor !== null
-                // Bug #10: Safari does not yet implement the isTypeSupported() method.
-                && nativeMediaRecorderConstructor.isTypeSupported !== undefined
-                && nativeMediaRecorderConstructor.isTypeSupported(mimeType))
-                    || encoderRegexes.some((regex) => regex.test(mimeType));
+        public static isTypeSupported(mimeType: string): boolean {
+            return (
+                (nativeMediaRecorderConstructor !== null &&
+                    // Bug #10: Safari does not yet implement the isTypeSupported() method.
+                    nativeMediaRecorderConstructor.isTypeSupported !== undefined &&
+                    nativeMediaRecorderConstructor.isTypeSupported(mimeType)) ||
+                encoderRegexes.some((regex) => regex.test(mimeType))
+            );
         }
-
     };
-
 };

@@ -2,7 +2,6 @@ import { TBlobEventHandler, TErrorEventHandler, TNativeEventTarget, TRecordingSt
 import { IMediaRecorderEventMap } from './media-recorder-event-map';
 
 export interface IMediaRecorder extends TNativeEventTarget {
-
     readonly mimeType: string;
 
     ondataavailable: null | TBlobEventHandler<this>;
@@ -11,24 +10,23 @@ export interface IMediaRecorder extends TNativeEventTarget {
 
     readonly state: TRecordingState;
 
-    addEventListener<K extends keyof IMediaRecorderEventMap> (
+    addEventListener<K extends keyof IMediaRecorderEventMap>(
         type: K,
         listener: (this: this, event: IMediaRecorderEventMap[K]) => void,
         options?: boolean | AddEventListenerOptions
     ): void;
 
-    addEventListener (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
 
-    removeEventListener<K extends keyof IMediaRecorderEventMap> (
+    removeEventListener<K extends keyof IMediaRecorderEventMap>(
         type: K,
         listener: (this: this, event: IMediaRecorderEventMap[K]) => void,
         options?: boolean | EventListenerOptions
     ): void;
 
-    removeEventListener (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 
-    start (timeslice?: number): void;
+    start(timeslice?: number): void;
 
-    stop (): void;
-
+    stop(): void;
 }

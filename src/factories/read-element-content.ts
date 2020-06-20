@@ -19,14 +19,14 @@ export const createReadElementContent: TReadElementContentFactory = (readVariabl
         }
 
         if (type === 'binary') {
-            const numberOfSamples = ((value / Float32Array.BYTES_PER_ELEMENT) - 1) / channelCount;
+            const numberOfSamples = (value / Float32Array.BYTES_PER_ELEMENT - 1) / channelCount;
             const content = Array.from({ length: channelCount }, () => new Float32Array(numberOfSamples));
 
             for (let i = 0; i < numberOfSamples; i += 1) {
-                const elementOffset = (i * channelCount) + 1;
+                const elementOffset = i * channelCount + 1;
 
                 for (let j = 0; j < channelCount; j += 1) {
-                    content[j][i] = dataView.getFloat32(offset + length + ((elementOffset + j) * Float32Array.BYTES_PER_ELEMENT), true);
+                    content[j][i] = dataView.getFloat32(offset + length + (elementOffset + j) * Float32Array.BYTES_PER_ELEMENT, true);
                 }
             }
 

@@ -2,7 +2,6 @@ import { MultiBufferDataView } from 'multi-buffer-data-view';
 import { TElementType } from './element-type';
 
 export type TPromisedDataViewElementTypeEncoderIdAndPort = Promise<{
-
     dataView?: null | MultiBufferDataView;
 
     elementType?: null | TElementType;
@@ -10,5 +9,4 @@ export type TPromisedDataViewElementTypeEncoderIdAndPort = Promise<{
     encoderId: number;
 
     port: MessagePort;
-
 }>;

@@ -41,5 +41,5 @@ export const readVariableSizeIntegerLength: TReadVariableSizeIntegerLengthFuncti
 
     const length = readVariableSizeIntegerLength(dataView, offset + 1);
 
-    return (length === null) ? null : length + 8;
+    return length === null ? null : length + 8;
 };

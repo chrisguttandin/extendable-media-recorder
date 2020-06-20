@@ -3,9 +3,7 @@ import { createMediaStreamWithVideoTrack } from '../../helpers/create-media-stre
 import { spy } from 'sinon';
 
 describe('module', () => {
-
     describe('with a MediaStream which contains an audio track', () => {
-
         let audioContext;
         let mediaRecorder;
         let mediaStream;
@@ -31,8 +29,9 @@ describe('module', () => {
             });
             mediaRecorder.start();
 
-            createMediaStreamWithAudioTrack(audioContext)
-                .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
+            createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
+                mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
+            );
         });
 
         // bug #4
@@ -65,8 +64,9 @@ describe('module', () => {
             });
             mediaRecorder.start();
 
-            createMediaStreamWithAudioTrack(audioContext)
-                .then((anotherMediaStream) => mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0]));
+            createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
+                mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
+            );
         });
 
         // bug #8
@@ -85,11 +85,9 @@ describe('module', () => {
             mediaRecorder.start();
             mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
         });
-
     });
 
     describe('with a MediaStream which contains a video track', () => {
-
         let mediaStream;
         let mediaRecorder;
 
@@ -113,7 +111,5 @@ describe('module', () => {
 
             setTimeout(() => mediaRecorder.stop(), 1000);
         });
-
     });
-
 });

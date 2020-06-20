@@ -79,32 +79,32 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             }
 
             if (promisedPartialRecording !== null) {
-                promisedPartialRecording.catch(() => { /* @todo Only catch the errors caused by a duplicate call to encode. */ });
+                promisedPartialRecording.catch(() => {
+                    /* @todo Only catch the errors caused by a duplicate call to encode. */
+                });
             }
 
-            promisedAudioNodesAndEncoderId
-                .then(async ({ encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
-                    await recorderAudioWorkletNode.stop();
+            promisedAudioNodesAndEncoderId.then(async ({ encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
+                await recorderAudioWorkletNode.stop();
 
-                    mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
+                mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                    dispatchDataAvailableEvent(await encode(encoderId, null));
-                });
+                dispatchDataAvailableEvent(await encode(encoderId, null));
+            });
 
             promisedAudioNodesAndEncoderId = null;
         };
 
         return {
-
-            get mimeType (): string {
+            get mimeType(): string {
                 return mimeType;
             },
 
-            get state (): TRecordingState {
-                return (promisedAudioNodesAndEncoderId === null) ? 'inactive' : 'recording';
+            get state(): TRecordingState {
+                return promisedAudioNodesAndEncoderId === null ? 'inactive' : 'recording';
             },
 
-            start (timeslice?: number): void {
+            start(timeslice?: number): void {
                 if (promisedAudioNodesAndEncoderId !== null) {
                     throw createInvalidStateError();
                 }
@@ -113,25 +113,17 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                     throw createNotSupportedError();
                 }
 
-                promisedAudioNodesAndEncoderId = Promise
-                    .all([
-                        audioContext.resume(),
-                        promisedAudioNodesEncoderIdAndPort
-                    ])
-                    .then(async ([ , {
-                        audioBufferSourceNode,
-                        encoderId,
-                        length,
-                        port,
-                        mediaStreamAudioSourceNode,
-                        recorderAudioWorkletNode
-                    } ]) => {
+                promisedAudioNodesAndEncoderId = Promise.all([audioContext.resume(), promisedAudioNodesEncoderIdAndPort]).then(
+                    async ([
+                        ,
+                        { audioBufferSourceNode, encoderId, length, port, mediaStreamAudioSourceNode, recorderAudioWorkletNode }
+                    ]) => {
                         mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
 
                         await new Promise((resolve) => {
                             audioBufferSourceNode.onended = resolve;
                             audioBufferSourceNode.connect(recorderAudioWorkletNode);
-                            audioBufferSourceNode.start(audioContext.currentTime + (length / audioContext.sampleRate));
+                            audioBufferSourceNode.start(audioContext.currentTime + length / audioContext.sampleRate);
                         });
 
                         audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
@@ -143,7 +135,8 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                         }
 
                         return { encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
-                    });
+                    }
+                );
 
                 const tracks = mediaStream.getTracks();
 
@@ -158,16 +151,16 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 intervalId = setInterval(() => {
                     const currentTracks = mediaStream.getTracks();
 
-                    if ((currentTracks.length !== tracks.length || currentTracks.some((track, index) => (track !== tracks[index])))
-                            && abortRecording !== null) {
+                    if (
+                        (currentTracks.length !== tracks.length || currentTracks.some((track, index) => track !== tracks[index])) &&
+                        abortRecording !== null
+                    ) {
                         abortRecording();
                     }
                 }, 1000);
             },
 
             stop
-
         };
-
     };
 };

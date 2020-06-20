@@ -10,16 +10,11 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const audioTracks = mediaStream.getAudioTracks();
-        const channelCount = (audioTracks.length === 0)
-            ? undefined
-            : audioTracks[0].getSettings().channelCount;
-        const sampleRate = (audioTracks.length === 0)
-            ? undefined
-            : audioTracks[0].getSettings().sampleRate;
+        const channelCount = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().channelCount;
+        const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
-        let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort = (sampleRate !== undefined)
-            ? instantiate(mimeType, sampleRate)
-            : null;
+        let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort =
+            sampleRate !== undefined ? instantiate(mimeType, sampleRate) : null;
         let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
@@ -40,7 +35,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             }
 
             if (promisedPartialRecording !== null) {
-                promisedPartialRecording.catch(() => { /* @todo Only catch the errors caused by a duplicate call to encode. */ });
+                promisedPartialRecording.catch(() => {
+                    /* @todo Only catch the errors caused by a duplicate call to encode. */
+                });
             }
 
             nativeMediaRecorder.stop();
@@ -53,16 +50,15 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         });
 
         return {
-
-            get mimeType (): string {
+            get mimeType(): string {
                 return mimeType;
             },
 
-            get state (): TRecordingState {
+            get state(): TRecordingState {
                 return nativeMediaRecorder.state;
             },
 
-            start (timeslice?: number): void {
+            start(timeslice?: number): void {
                 /*
                  * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio
                  * codec.
@@ -74,11 +70,12 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 if (nativeMediaRecorder.state === 'inactive') {
                     nativeMediaRecorder.addEventListener('dataavailable', ({ data }) => {
                         if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
-                            promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort
-                                .then(async ({ dataView = null, elementType = null, encoderId, port }) => {
-                                    const multiOrSingleBufferDataView = (dataView === null)
-                                        ? new DataView(await data.arrayBuffer())
-                                        : new MultiBufferDataView([ ...dataView.buffers, await data.arrayBuffer() ], dataView.byteOffset);
+                            promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
+                                async ({ dataView = null, elementType = null, encoderId, port }) => {
+                                    const multiOrSingleBufferDataView =
+                                        dataView === null
+                                            ? new DataView(await data.arrayBuffer())
+                                            : new MultiBufferDataView([...dataView.buffers, await data.arrayBuffer()], dataView.byteOffset);
 
                                     const { currentElementType, offset, contents } = decodeWebMChunk(
                                         multiOrSingleBufferDataView,
@@ -86,37 +83,43 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                         channelCount
                                     );
 
-                                    const remainingDataView = (offset < multiOrSingleBufferDataView.byteLength)
-                                        ? ('buffer' in multiOrSingleBufferDataView)
-                                            ? new MultiBufferDataView(
-                                                [ multiOrSingleBufferDataView.buffer ],
-                                                multiOrSingleBufferDataView.byteOffset + offset
-                                            )
-                                            : new MultiBufferDataView(
-                                                multiOrSingleBufferDataView.buffers,
-                                                multiOrSingleBufferDataView.byteOffset + offset
-                                            )
-                                        : null;
+                                    const remainingDataView =
+                                        offset < multiOrSingleBufferDataView.byteLength
+                                            ? 'buffer' in multiOrSingleBufferDataView
+                                                ? new MultiBufferDataView(
+                                                      [multiOrSingleBufferDataView.buffer],
+                                                      multiOrSingleBufferDataView.byteOffset + offset
+                                                  )
+                                                : new MultiBufferDataView(
+                                                      multiOrSingleBufferDataView.buffers,
+                                                      multiOrSingleBufferDataView.byteOffset + offset
+                                                  )
+                                            : null;
 
-                                    contents
-                                        .forEach((content) => port.postMessage(content, content.map(({ buffer }) => buffer)));
+                                    contents.forEach((content) =>
+                                        port.postMessage(
+                                            content,
+                                            content.map(({ buffer }) => buffer)
+                                        )
+                                    );
 
                                     if (nativeMediaRecorder.state === 'inactive') {
-                                        encode(encoderId, null)
-                                            .then(dispatchDataAvailableEvent);
+                                        encode(encoderId, null).then(dispatchDataAvailableEvent);
 
-                                        port.postMessage([ ]);
+                                        port.postMessage([]);
                                         port.close();
                                     }
 
                                     return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
-                                });
+                                }
+                            );
                         }
                     });
 
                     if (promisedDataViewElementTypeEncoderIdAndPort !== null && timeslice !== undefined) {
-                        promisedDataViewElementTypeEncoderIdAndPort
-                            .then(({ encoderId }) => promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice));
+                        promisedDataViewElementTypeEncoderIdAndPort.then(
+                            ({ encoderId }) => (promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice))
+                        );
                     }
                 }
 
@@ -124,8 +127,6 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             },
 
             stop
-
         };
-
     };
 };

@@ -2,21 +2,14 @@ const { env } = require('process');
 const { DefinePlugin } = require('webpack');
 
 module.exports = (config) => {
-
     config.set({
-
         browserNoActivityTimeout: 20000,
 
         concurrency: 1,
 
-        files: [
-            '../../test/integration/**/*.js'
-        ],
+        files: ['../../test/integration/**/*.js'],
 
-        frameworks: [
-            'mocha',
-            'sinon-chai'
-        ],
+        frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
             '../../test/integration/**/*.js': 'webpack'
@@ -25,12 +18,14 @@ module.exports = (config) => {
         webpack: {
             mode: 'development',
             module: {
-                rules: [ {
-                    test: /\.ts?$/,
-                    use: {
-                        loader: 'ts-loader'
+                rules: [
+                    {
+                        test: /\.ts?$/,
+                        use: {
+                            loader: 'ts-loader'
+                        }
                     }
-                } ]
+                ]
             },
             plugins: [
                 new DefinePlugin({
@@ -41,39 +36,30 @@ module.exports = (config) => {
                 })
             ],
             resolve: {
-                extensions: [ '.js', '.ts' ]
+                extensions: ['.js', '.ts']
             }
         },
 
         webpackMiddleware: {
             noInfo: true
         }
-
     });
 
     if (env.TRAVIS) {
-
         config.set({
-
             browserStack: {
                 accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${ env.TRAVIS_REPO_SLUG }/${ env.TRAVIS_JOB_NUMBER }/integration-${ env.TARGET }`,
+                build: `${env.TRAVIS_REPO_SLUG}/${env.TRAVIS_JOB_NUMBER}/integration-${env.TARGET}`,
                 username: env.BROWSER_STACK_USERNAME,
                 video: false
             },
 
-            browsers: (env.TARGET === 'chrome')
-                ? [
-                    'ChromeBrowserStack'
-                ]
-                : (env.TARGET === 'firefox' || env.TARGET === 'firefox-unsupported')
-                    ? [
-                        'FirefoxBrowserStack'
-                    ]
-                    : [
-                        'ChromeBrowserStack',
-                        'FirefoxBrowserStack'
-                    ],
+            browsers:
+                env.TARGET === 'chrome'
+                    ? ['ChromeBrowserStack']
+                    : env.TARGET === 'firefox' || env.TARGET === 'firefox-unsupported'
+                    ? ['FirefoxBrowserStack']
+                    : ['ChromeBrowserStack', 'FirefoxBrowserStack'],
 
             captureTimeout: 120000,
 
@@ -92,13 +78,9 @@ module.exports = (config) => {
                     os_version: '10' // eslint-disable-line camelcase
                 }
             }
-
         });
-
     } else {
-
         config.set({
-
             browsers: [
                 'ChromeCanaryHeadlessWithNoRequiredUserGesture',
                 'ChromeHeadlessWithNoRequiredUserGesture',
@@ -109,16 +91,13 @@ module.exports = (config) => {
             customLaunchers: {
                 ChromeCanaryHeadlessWithNoRequiredUserGesture: {
                     base: 'ChromeCanaryHeadless',
-                    flags: [ '--autoplay-policy=no-user-gesture-required' ]
+                    flags: ['--autoplay-policy=no-user-gesture-required']
                 },
                 ChromeHeadlessWithNoRequiredUserGesture: {
                     base: 'ChromeHeadless',
-                    flags: [ '--autoplay-policy=no-user-gesture-required' ]
+                    flags: ['--autoplay-policy=no-user-gesture-required']
                 }
             }
-
         });
-
     }
-
 };

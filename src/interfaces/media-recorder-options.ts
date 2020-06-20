@@ -1,5 +1,4 @@
 export interface IMediaRecorderOptions {
-
     audioBitsPerSecond?: number;
 
     bitsPerSecond?: number;
@@ -7,5 +6,4 @@ export interface IMediaRecorderOptions {
     mimeType?: string;
 
     videoBitsPerSecond?: number;
-
 }

@@ -2,7 +2,6 @@ import { createReadVariableSizeInteger } from '../../../src/factories/read-varia
 import { readVariableSizeIntegerLength } from '../../../src/functions/read-variable-size-integer-length';
 
 describe('readVariableSizeIntegerLength()', () => {
-
     let dataView;
     let readVariableSizeInteger;
 
@@ -12,7 +11,6 @@ describe('readVariableSizeIntegerLength()', () => {
     });
 
     describe('with a variable size integer encoded in one byte', () => {
-
         beforeEach(() => {
             dataView.setUint8(0, 255);
         });
@@ -20,11 +18,9 @@ describe('readVariableSizeIntegerLength()', () => {
         it('should return the correct length and value', () => {
             expect(readVariableSizeInteger(dataView, 0)).to.deep.equal({ length: 1, value: 127 });
         });
-
     });
 
     describe('with a variable size integer encoded in two bytes', () => {
-
         beforeEach(() => {
             dataView.setUint8(0, 0b01111111);
             dataView.setUint8(1, 255);
@@ -33,11 +29,9 @@ describe('readVariableSizeIntegerLength()', () => {
         it('should return the correct length and value', () => {
             expect(readVariableSizeInteger(dataView, 0)).to.deep.equal({ length: 2, value: 16383 });
         });
-
     });
 
     describe('with a variable size integer encoded in eight bytes', () => {
-
         beforeEach(() => {
             dataView.setUint8(0, 0b00000001);
             dataView.setUint8(1, 255);
@@ -52,11 +46,9 @@ describe('readVariableSizeIntegerLength()', () => {
         it('should return the correct length and value', () => {
             expect(readVariableSizeInteger(dataView, 0)).to.deep.equal({ length: 8, value: -1 });
         });
-
     });
 
     describe('with a variable size integer encoded in nine bytes', () => {
-
         beforeEach(() => {
             dataView.setUint8(0, 0);
             dataView.setUint8(1, 255);
@@ -72,7 +64,5 @@ describe('readVariableSizeIntegerLength()', () => {
         it('should return the correct length and value', () => {
             expect(readVariableSizeInteger(dataView, 0)).to.deep.equal({ length: 9, value: -256 });
         });
-
     });
-
 });
