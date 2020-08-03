@@ -60,7 +60,7 @@ describe('module', () => {
                                 });
 
                                 it('should be assignable to a function', () => {
-                                    const fn = () => {};
+                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
                                     const ondataavailable = (mediaRecorder.ondataavailable = fn); // eslint-disable-line no-multi-assign
 
                                     expect(ondataavailable).to.equal(fn);
@@ -108,7 +108,7 @@ describe('module', () => {
                                 });
 
                                 it('should be assignable to a function', () => {
-                                    const fn = () => {};
+                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
                                     const onerror = (mediaRecorder.onerror = fn); // eslint-disable-line no-multi-assign
 
                                     expect(onerror).to.equal(fn);
