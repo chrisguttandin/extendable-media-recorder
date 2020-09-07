@@ -31,7 +31,7 @@ describe('module', () => {
                             let mediaStream;
 
                             afterEach(function () {
-                                this.timeout(20000);
+                                this.timeout(40000);
 
                                 return audioContext.close();
                             });
@@ -230,7 +230,7 @@ describe('module', () => {
                                 });
 
                                 it('should encode a mediaStream as a whole', function (done) {
-                                    this.timeout(20000);
+                                    this.timeout(40000);
 
                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
                                         expect(event).to.be.an.instanceOf(BlobEvent);
@@ -284,7 +284,7 @@ describe('module', () => {
                                 });
 
                                 it('should encode a mediaStream in chunks', function (done) {
-                                    this.timeout(20000);
+                                    this.timeout(40000);
 
                                     const chunks = [];
 
