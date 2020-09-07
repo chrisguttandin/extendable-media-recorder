@@ -2,7 +2,7 @@ const { env } = require('process');
 
 module.exports = (config) => {
     config.set({
-        browserNoActivityTimeout: 20000,
+        browserNoActivityTimeout: 40000,
 
         files: ['../../test/expectation/firefox/**/*.js'],
 

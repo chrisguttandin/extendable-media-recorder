@@ -3,7 +3,7 @@ const { DefinePlugin } = require('webpack');
 
 module.exports = (config) => {
     config.set({
-        browserNoActivityTimeout: 20000,
+        browserNoActivityTimeout: 40000,
 
         concurrency: 1,
 
