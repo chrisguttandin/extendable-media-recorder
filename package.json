@@ -13,7 +13,7 @@
         "media-encoder-host": "^8.0.29",
         "multi-buffer-data-view": "^2.0.20",
         "recorder-audio-worklet": "^5.0.42",
-        "standardized-audio-context": "^25.1.4",
+        "standardized-audio-context": "^25.1.5",
         "tslib": "^2.0.3"
     },
     "description": "An extendable drop-in replacement for the native MediaRecorder.",
