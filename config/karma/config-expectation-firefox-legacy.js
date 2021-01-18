@@ -1,4 +1,5 @@
 const { env } = require('process');
+const { DefinePlugin } = require('webpack');
 
 module.exports = (config) => {
     config.set({
@@ -9,8 +10,6 @@ module.exports = (config) => {
         browserNoActivityTimeout: 100000,
 
         browsers: ['FirefoxBrowserStack'],
-
-        captureTimeout: 120000,
 
         concurrency: 1,
 
@@ -25,24 +24,11 @@ module.exports = (config) => {
             }
         },
 
-        files: [
-            'test/expectation/firefox/any/**/*.js',
-            'test/expectation/firefox/legacy/**/*.js',
-            {
-                included: false,
-                pattern: 'test/fixtures/**',
-                served: true
-            }
-        ],
+        files: ['test/expectation/firefox/legacy/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
-        mime: {
-            'application/javascript': ['xs']
-        },
-
         preprocessors: {
-            'test/expectation/firefox/any/**/*.js': 'webpack',
             'test/expectation/firefox/legacy/**/*.js': 'webpack'
         },
 
@@ -58,6 +44,13 @@ module.exports = (config) => {
                     }
                 ]
             },
+            plugins: [
+                new DefinePlugin({
+                    'process.env': {
+                        CI: JSON.stringify(env.CI)
+                    }
+                })
+            ],
             resolve: {
                 extensions: ['.js', '.ts']
             }
@@ -68,14 +61,19 @@ module.exports = (config) => {
         }
     });
 
-    if (env.TRAVIS) {
+    if (env.CI) {
         config.set({
             browserStack: {
                 accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.TRAVIS_REPO_SLUG}/${env.TRAVIS_JOB_NUMBER}/expectation-firefox-legacy`,
+                build: `${env.GITHUB_RUN_ID}/expectation-firefox-legacy`,
+                forceLocal: true,
+                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
+                project: env.GITHUB_REPOSITORY,
                 username: env.BROWSER_STACK_USERNAME,
                 video: false
-            }
+            },
+
+            captureTimeout: 300000
         });
     } else {
         const environment = require('../environment/local.json');

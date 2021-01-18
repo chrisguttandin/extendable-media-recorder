@@ -1,3 +1,6 @@
+const { env } = require('process');
+const { DefinePlugin } = require('webpack');
+
 module.exports = (config) => {
     config.set({
         basePath: '../../',
@@ -11,18 +14,18 @@ module.exports = (config) => {
         concurrency: 1,
 
         customLaunchers: {
-            ChromeHeadlessWithNoRequiredUserGesture: {
-                base: 'ChromeHeadless',
+            ChromeCanaryHeadlessWithNoRequiredUserGesture: {
+                base: 'ChromeCanaryHeadless',
                 flags: ['--autoplay-policy=no-user-gesture-required']
             }
         },
 
-        files: ['test/expectation/chrome/developer/**/*.js'],
+        files: ['test/expectation/chrome/canary/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/chrome/developer/**/*.js': 'webpack'
+            'test/expectation/chrome/canary/**/*.js': 'webpack'
         },
 
         webpack: {
@@ -37,6 +40,13 @@ module.exports = (config) => {
                     }
                 ]
             },
+            plugins: [
+                new DefinePlugin({
+                    'process.env': {
+                        CI: JSON.stringify(env.CI)
+                    }
+                })
+            ],
             resolve: {
                 extensions: ['.js', '.ts']
             }

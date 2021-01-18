@@ -9,23 +9,16 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
-        browsers: ['ChromeHeadlessWithNoRequiredUserGesture'],
+        browsers: ['FirefoxDeveloperHeadless'],
 
         concurrency: 1,
 
-        customLaunchers: {
-            ChromeHeadlessWithNoRequiredUserGesture: {
-                base: 'ChromeHeadless',
-                flags: ['--autoplay-policy=no-user-gesture-required']
-            }
-        },
-
-        files: ['test/expectation/chrome/current/**/*.js'],
+        files: ['test/expectation/firefox/developer/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/chrome/current/**/*.js': 'webpack'
+            'test/expectation/firefox/developer/**/*.js': 'webpack'
         },
 
         webpack: {

@@ -1,4 +1,5 @@
 const { env } = require('process');
+const { DefinePlugin } = require('webpack');
 
 module.exports = (config) => {
     config.set({
@@ -30,6 +31,13 @@ module.exports = (config) => {
                     }
                 ]
             },
+            plugins: [
+                new DefinePlugin({
+                    'process.env': {
+                        CI: JSON.stringify(env.CI)
+                    }
+                })
+            ],
             resolve: {
                 extensions: ['.js', '.ts']
             }
@@ -40,23 +48,27 @@ module.exports = (config) => {
         }
     });
 
-    if (env.TRAVIS) {
+    if (env.CI) {
         config.set({
             browserStack: {
                 accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.TRAVIS_REPO_SLUG}/${env.TRAVIS_JOB_NUMBER}/expectation-firefox`,
+                build: `${env.GITHUB_RUN_ID}/expectation-firefox`,
+                forceLocal: true,
+                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
+                project: env.GITHUB_REPOSITORY,
                 username: env.BROWSER_STACK_USERNAME,
                 video: false
             },
 
             browsers: ['FirefoxBrowserStack'],
 
-            captureTimeout: 120000,
+            captureTimeout: 300000,
 
             customLaunchers: {
                 FirefoxBrowserStack: {
                     base: 'BrowserStack',
                     browser: 'firefox',
+                    captureTimeout: 300,
                     os: 'Windows',
                     os_version: '10' // eslint-disable-line camelcase
                 }
@@ -64,7 +76,7 @@ module.exports = (config) => {
         });
     } else {
         config.set({
-            browsers: ['FirefoxDeveloperHeadless', 'FirefoxHeadless']
+            browsers: ['FirefoxHeadless']
         });
     }
 };
