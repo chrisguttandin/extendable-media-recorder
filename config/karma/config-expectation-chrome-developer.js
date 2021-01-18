@@ -6,7 +6,7 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
-        browsers: ['ChromeHeadlessWithNoRequiredUserGesture'],
+        browsers: ['ChromeCanaryHeadlessWithNoRequiredUserGesture'],
 
         concurrency: 1,
 
@@ -17,12 +17,12 @@ module.exports = (config) => {
             }
         },
 
-        files: ['test/expectation/chrome/current/**/*.js'],
+        files: ['test/expectation/chrome/developer/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/chrome/current/**/*.js': 'webpack'
+            'test/expectation/chrome/developer/**/*.js': 'webpack'
         },
 
         webpack: {

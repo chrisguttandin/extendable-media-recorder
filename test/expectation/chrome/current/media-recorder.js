@@ -1,5 +1,5 @@
-import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
-import { createMediaStreamWithVideoTrack } from '../../helpers/create-media-stream-with-video-track';
+import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
+import { createMediaStreamWithVideoTrack } from '../../../helpers/create-media-stream-with-video-track';
 import { spy } from 'sinon';
 
 describe('module', () => {
