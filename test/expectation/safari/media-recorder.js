@@ -1,9 +1,9 @@
 describe('MediaRecorder', () => {
     describe('isTypeSupported', () => {
-        // bug #10
+        // bug #11
 
         it('should not be implemented', () => {
-            expect(MediaRecorder.isTypeSupported).to.be.undefined;
+            expect(typeof MediaRecorder).to.equal('undefined');
         });
     });
 });

@@ -1,12 +1,24 @@
 import { TIsSupportedPromiseFactory } from '../types';
 
 export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => {
-    if (window !== null && window.hasOwnProperty('MediaStream')) {
+    if (
+        window !== null &&
+        window.hasOwnProperty('MediaStream') &&
+        /*
+         * Bug #10: An early experimental implemenation in Safari did not provide the isTypeSupported() function.
+         */
+        (!window.hasOwnProperty('MediaRecorder') || MediaRecorder.isTypeSupported !== undefined)
+    ) {
         /*
          * Bug #5: Up until v70 Firefox did emit a blob of type video/webm when asked to encode a MediaStream with a video track into an
          * audio codec.
          */
         return new Promise((resolve) => {
+            // Bug #11 Safari does not yet support the MediaRecorder but that isn't tested here.
+            if (!window.hasOwnProperty('MediaRecorder')) {
+                resolve(true);
+            }
+
             const canvasElement = document.createElement('canvas');
 
             // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
