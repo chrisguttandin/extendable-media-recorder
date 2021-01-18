@@ -1,0 +1,87 @@
+const { env } = require('process');
+
+module.exports = (config) => {
+    config.set({
+        basePath: '../../',
+
+        browserDisconnectTimeout: 100000,
+
+        browserNoActivityTimeout: 100000,
+
+        browsers: ['FirefoxBrowserStack'],
+
+        captureTimeout: 120000,
+
+        concurrency: 1,
+
+        customLaunchers: {
+            FirefoxBrowserStack: {
+                base: 'BrowserStack',
+                browser: 'firefox',
+                browser_version: '83', // eslint-disable-line camelcase
+                captureTimeout: 300,
+                os: 'Windows',
+                os_version: '10' // eslint-disable-line camelcase
+            }
+        },
+
+        files: [
+            'test/expectation/firefox/any/**/*.js',
+            'test/expectation/firefox/legacy/**/*.js',
+            {
+                included: false,
+                pattern: 'test/fixtures/**',
+                served: true
+            }
+        ],
+
+        frameworks: ['mocha', 'sinon-chai'],
+
+        mime: {
+            'application/javascript': ['xs']
+        },
+
+        preprocessors: {
+            'test/expectation/firefox/any/**/*.js': 'webpack',
+            'test/expectation/firefox/legacy/**/*.js': 'webpack'
+        },
+
+        webpack: {
+            mode: 'development',
+            module: {
+                rules: [
+                    {
+                        test: /\.ts?$/,
+                        use: {
+                            loader: 'ts-loader'
+                        }
+                    }
+                ]
+            },
+            resolve: {
+                extensions: ['.js', '.ts']
+            }
+        },
+
+        webpackMiddleware: {
+            noInfo: true
+        }
+    });
+
+    if (env.TRAVIS) {
+        config.set({
+            browserStack: {
+                accessKey: env.BROWSER_STACK_ACCESS_KEY,
+                build: `${env.TRAVIS_REPO_SLUG}/${env.TRAVIS_JOB_NUMBER}/expectation-firefox-legacy`,
+                username: env.BROWSER_STACK_USERNAME,
+                video: false
+            }
+        });
+    } else {
+        const environment = require('../environment/local.json');
+
+        config.set({
+            browserStack: environment.browserStack
+        });
+    }
+};

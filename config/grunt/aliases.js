@@ -13,6 +13,7 @@ module.exports = {
             isType('expectation'),
             ...filter(isTarget(), 'sh:test-expectation-chrome'),
             ...filter(isTarget('firefox'), 'sh:test-expectation-firefox'),
+            ...filter(isTarget('firefox-legacy'), 'sh:test-expectation-firefox-legacy'),
             ...filter(isTarget(), 'sh:test-expectation-safari')
         ),
         ...filter(isType('integration'), 'sh:test-integration'),

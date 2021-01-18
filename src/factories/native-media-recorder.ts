@@ -32,6 +32,8 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                                     nativeMediaRecorder,
                                     new ErrorEvent('error', { error: createInvalidModificationError(message) })
                                 );
+                            } else if (!(event instanceof ErrorEvent)) {
+                                listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: (<ErrorEvent>event).error }));
                             } else {
                                 listener.call(nativeMediaRecorder, event);
                             }

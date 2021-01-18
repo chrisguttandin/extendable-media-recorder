@@ -2,14 +2,20 @@ const { env } = require('process');
 
 module.exports = (config) => {
     config.set({
-        browserNoActivityTimeout: 40000,
+        basePath: '../../',
 
-        files: ['../../test/expectation/firefox/**/*.js'],
+        browserDisconnectTimeout: 100000,
+
+        browserNoActivityTimeout: 100000,
+
+        concurrency: 1,
+
+        files: ['test/expectation/firefox/current/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            '../../test/expectation/firefox/**/*.js': 'webpack'
+            'test/expectation/firefox/current/**/*.js': 'webpack'
         },
 
         webpack: {

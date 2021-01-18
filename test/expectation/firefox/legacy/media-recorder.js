@@ -1,4 +1,4 @@
-import { createMediaStreamWithAudioTrack } from '../../helpers/create-media-stream-with-audio-track';
+import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 
 describe('module', () => {
     describe('with a MediaStream which contains an audio track', () => {
@@ -19,9 +19,9 @@ describe('module', () => {
         it('should fire an error event with an UnknownError when adding a track', function (done) {
             this.timeout(10000);
 
-            mediaRecorder.addEventListener('error', (err) => {
-                expect(err.type).to.equal('error');
-                expect(err.error.name).to.equal('UnknownError');
+            mediaRecorder.addEventListener('error', (event) => {
+                expect(event.type).to.equal('error');
+                expect(event.error.name).to.equal('UnknownError');
 
                 done();
             });
@@ -37,9 +37,9 @@ describe('module', () => {
         it('should fire an error event with an UnknownError when removing a track', function (done) {
             this.timeout(10000);
 
-            mediaRecorder.addEventListener('error', (err) => {
-                expect(err.type).to.equal('error');
-                expect(err.error.name).to.equal('UnknownError');
+            mediaRecorder.addEventListener('error', (event) => {
+                expect(event.type).to.equal('error');
+                expect(event.error.name).to.equal('UnknownError');
 
                 done();
             });
