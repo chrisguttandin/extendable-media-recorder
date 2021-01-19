@@ -28,7 +28,7 @@
         "chai": "^4.2.0",
         "commitizen": "^4.2.3",
         "cz-conventional-changelog": "^3.3.0",
-        "eslint": "^7.15.0",
+        "eslint": "^7.18.0",
         "eslint-config-holy-grail": "^48.0.3",
         "extendable-media-recorder-wav-encoder": "^7.0.32",
         "grunt": "^1.3.0",
