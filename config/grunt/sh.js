@@ -21,11 +21,16 @@ module.exports = (grunt) => {
         'test-expectation-chrome': {
             cmd: `karma start config/karma/config-expectation-chrome.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
         },
-        'test-expectation-chrome-developer': {
-            cmd: `karma start config/karma/config-expectation-chrome-developer.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
+        'test-expectation-chrome-canary': {
+            cmd: `karma start config/karma/config-expectation-chrome-canary.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
         },
         'test-expectation-firefox': {
             cmd: `karma start config/karma/config-expectation-firefox.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
+        },
+        'test-expectation-firefox-developer': {
+            cmd: `karma start config/karma/config-expectation-firefox-developer.js ${
+                continuous ? '--concurrency Infinity' : '--single-run'
+            }`
         },
         'test-expectation-firefox-legacy': {
             cmd: `karma start config/karma/config-expectation-firefox-legacy.js ${continuous ? '--concurrency Infinity' : '--single-run'}`

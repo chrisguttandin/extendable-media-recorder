@@ -12,10 +12,11 @@ module.exports = {
         ...filter(
             isType('expectation'),
             ...filter(isTarget(), 'sh:test-expectation-chrome'),
-            ...filter(isTarget(), 'sh:test-expectation-chrome-developer'),
+            ...filter(isTarget(), 'sh:test-expectation-chrome-canary'),
             ...filter(isTarget('firefox'), 'sh:test-expectation-firefox'),
+            ...filter(isTarget(), 'sh:test-expectation-firefox-developer'),
             ...filter(isTarget('firefox-legacy'), 'sh:test-expectation-firefox-legacy'),
-            ...filter(isTarget(), 'sh:test-expectation-safari')
+            ...filter(isTarget('safari'), 'sh:test-expectation-safari')
         ),
         ...filter(isType('integration'), 'sh:test-integration'),
         ...filter(isType('unit'), 'sh:test-unit')
