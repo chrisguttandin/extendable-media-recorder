@@ -15,15 +15,19 @@ describe('module', () => {
                 await register(port);
             });
 
+            const mimeTypes = [
+                // Bug #11 Safari does not yet support the MediaRecorder which means it can't be used to record webm encoded files.
+                ...(!/Chrome/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) ? [] : ['audio/webm']),
+                'audio/wav'
+            ];
+
             // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
             // eslint-disable-next-line no-undef
-            if (!(process.env.TRAVIS && /Chrome/.test(navigator.userAgent))) {
-                for (const [channelCount, mimeType] of [
-                    [1, 'audio/wav'],
-                    [2, 'audio/wav'],
-                    [1, 'audio/webm'],
-                    [2, 'audio/webm']
-                ]) {
+            if (!(process.env.CI && /Chrome/.test(navigator.userAgent))) {
+                for (const [channelCount, mimeType] of mimeTypes.flatMap((...args) => [
+                    [1, ...args],
+                    [2, ...args]
+                ])) {
                     describe(`with a channelCount of ${channelCount} and a mimeType of ${mimeType}`, () => {
                         describe('with a MediaStream which contains an audio track', () => {
                             let audioContext;
