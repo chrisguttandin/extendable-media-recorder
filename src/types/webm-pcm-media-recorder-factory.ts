@@ -1,10 +1,9 @@
-import { IMediaRecorder } from '../interfaces';
+import { IMediaRecorder, IMediaRecorderConstructor } from '../interfaces';
 import { TNativeEventTarget } from './native-event-target';
-import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 
 export type TWebmPcmMediaRecorderFactory = (
     eventTarget: TNativeEventTarget,
-    nativeMediaRecorderConstructor: TNativeMediaRecorderConstructor,
+    nativeMediaRecorderConstructor: IMediaRecorderConstructor,
     mediaStream: MediaStream,
     mimeType: string
 ) => Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | keyof TNativeEventTarget>;

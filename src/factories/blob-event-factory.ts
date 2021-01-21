@@ -1,3 +1,4 @@
+import { IBlobEvent } from '../interfaces';
 import { TBlobEventFactoryFactory } from '../types';
 
 export const createBlobEventFactory: TBlobEventFactoryFactory = (nativeBlobEventConstructor) => {
@@ -5,9 +6,9 @@ export const createBlobEventFactory: TBlobEventFactoryFactory = (nativeBlobEvent
         // Bug #14: Safari does not yet support the BlobEvent.
         if (nativeBlobEventConstructor === null) {
             const { data, ...eventInit } = blobEventInit;
-            const fakeBlobEvent = <BlobEvent>new Event(type, eventInit);
+            const fakeBlobEvent = <IBlobEvent>new Event(type, eventInit);
 
-            (<Omit<BlobEvent, 'data'> & { -readonly [P in 'data']: BlobEvent[P] }>fakeBlobEvent).data = data;
+            (<Omit<IBlobEvent, 'data'> & { -readonly [P in 'data']: IBlobEvent[P] }>fakeBlobEvent).data = data;
 
             return fakeBlobEvent;
         }

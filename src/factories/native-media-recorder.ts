@@ -1,12 +1,13 @@
-import { TNativeMediaRecorder, TNativeMediaRecorderFactoryFactory } from '../types';
+import { IMediaRecorder } from '../interfaces';
+import { TNativeMediaRecorderFactoryFactory } from '../types';
 
 export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (
     createInvalidModificationError,
     createNotSupportedError
 ) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
-        const dataAvailableListeners = new WeakMap<any, (this: TNativeMediaRecorder, event: Event) => any>();
-        const errorListeners = new WeakMap<any, (this: TNativeMediaRecorder, event: Event) => any>();
+        const dataAvailableListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
+        const errorListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {

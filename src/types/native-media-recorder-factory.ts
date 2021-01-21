@@ -1,9 +1,7 @@
-import { TNativeMediaRecorder } from './native-media-recorder';
-import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
-import { TNativeMediaRecorderOptions } from './native-media-recorder-options';
+import { IMediaRecorder, IMediaRecorderConstructor, IMediaRecorderOptions } from '../interfaces';
 
 export type TNativeMediaRecorderFactory = (
-    nativeMediaRecorderConstructor: TNativeMediaRecorderConstructor,
+    nativeMediaRecorderConstructor: IMediaRecorderConstructor,
     mediaStream: MediaStream,
-    options: TNativeMediaRecorderOptions
-) => TNativeMediaRecorder;
+    options: IMediaRecorderOptions
+) => IMediaRecorder;
