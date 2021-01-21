@@ -1,3 +1,4 @@
+import { AudioContext } from 'standardized-audio-context';
 import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 
 describe('module', () => {

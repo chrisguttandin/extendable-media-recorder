@@ -1,3 +1,5 @@
+import { MediaStreamAudioDestinationNode, OscillatorNode } from 'standardized-audio-context';
+
 export const createMediaStreamWithAudioTrack = (audioContext, channelCount = 2, frequency = 440) => {
     const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext, { channelCount });
     const oscillatorNode = new OscillatorNode(audioContext, { frequency });

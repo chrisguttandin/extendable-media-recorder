@@ -1,4 +1,5 @@
 import { MediaRecorder, isSupported, register } from '../../src/module';
+import { AudioContext } from 'standardized-audio-context';
 import { connect } from 'extendable-media-recorder-wav-encoder';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
