@@ -39,6 +39,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (audioContext: IMinimalAu
 };
 
 export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (
+    createBlobEvent,
     createInvalidModificationError,
     createInvalidStateError,
     createNotSupportedError
@@ -53,7 +54,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
-            eventTarget.dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
+            eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
         const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {

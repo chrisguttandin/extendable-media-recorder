@@ -1,4 +1,6 @@
 export * from './blob-event-handler';
+export * from './blob-event-factory';
+export * from './blob-event-factory-factory';
 export * from './decode-web-m-chunk-factory';
 export * from './decode-web-m-chunk-function';
 export * from './element-type';
@@ -12,6 +14,8 @@ export * from './invalid-modification-error-factory';
 export * from './invalid-state-error-factory';
 export * from './is-supported-promise-factory';
 export * from './media-recorder-constructor-factory';
+export * from './native-blob-event-constructor';
+export * from './native-blob-event-factory';
 export * from './native-event-target';
 export * from './native-media-recorder';
 export * from './native-media-recorder-constructor';

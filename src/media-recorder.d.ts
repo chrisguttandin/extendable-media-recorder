@@ -83,5 +83,7 @@ declare var MediaRecorder: {
 
 // tslint:disable-next-line:interface-name
 interface Window {
+    BlobEvent: typeof BlobEvent;
+
     MediaRecorder: typeof MediaRecorder;
 }

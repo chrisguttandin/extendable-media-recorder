@@ -160,7 +160,13 @@ describe('module', () => {
                                     let err = null;
 
                                     mediaRecorder.addEventListener('dataavailable', function (event) {
-                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        // Bug #14: Safari does not yet support the BlobEvent.
+                                        if (typeof BlobEvent === 'undefined') {
+                                            expect(event).to.be.an.instanceOf(Event);
+                                        } else {
+                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                        }
+
                                         expect(event.currentTarget).to.equal(mediaRecorder);
                                         expect(event.target).to.equal(mediaRecorder);
                                         expect(event.type).to.equal('dataavailable');
@@ -199,7 +205,13 @@ describe('module', () => {
                                     let err = null;
 
                                     mediaRecorder.addEventListener('dataavailable', function (event) {
-                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        // Bug #14: Safari does not yet support the BlobEvent.
+                                        if (typeof BlobEvent === 'undefined') {
+                                            expect(event).to.be.an.instanceOf(Event);
+                                        } else {
+                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                        }
+
                                         expect(event.currentTarget).to.equal(mediaRecorder);
                                         expect(event.target).to.equal(mediaRecorder);
                                         expect(event.type).to.equal('dataavailable');
@@ -234,7 +246,13 @@ describe('module', () => {
                                     this.timeout(40000);
 
                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
-                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        // Bug #14: Safari does not yet support the BlobEvent.
+                                        if (typeof BlobEvent === 'undefined') {
+                                            expect(event).to.be.an.instanceOf(Event);
+                                        } else {
+                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                        }
+
                                         expect(event.currentTarget).to.equal(mediaRecorder);
                                         expect(event.target).to.equal(mediaRecorder);
                                         expect(event.type).to.equal('dataavailable');
@@ -290,7 +308,13 @@ describe('module', () => {
                                     const chunks = [];
 
                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
-                                        expect(event).to.be.an.instanceOf(BlobEvent);
+                                        // Bug #14: Safari does not yet support the BlobEvent.
+                                        if (typeof BlobEvent === 'undefined') {
+                                            expect(event).to.be.an.instanceOf(Event);
+                                        } else {
+                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                        }
+
                                         expect(event.currentTarget).to.equal(mediaRecorder);
                                         expect(event.target).to.equal(mediaRecorder);
                                         expect(event.type).to.equal('dataavailable');

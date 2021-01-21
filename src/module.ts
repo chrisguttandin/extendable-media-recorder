@@ -1,4 +1,5 @@
 import { register as rgstr } from 'media-encoder-host';
+import { createBlobEventFactory } from './factories/blob-event-factory';
 import { createDecodeWebMChunk } from './factories/decode-web-m-chunk';
 import { createEventTargetConstructor } from './factories/event-target-constructor';
 import { createEventTargetFactory } from './factories/event-target-factory';
@@ -6,6 +7,7 @@ import { createInvalidModificationError } from './factories/invalid-modification
 import { createInvalidStateError } from './factories/invalid-state-error';
 import { createIsSupportedPromise } from './factories/is-supported-promise';
 import { createMediaRecorderConstructor } from './factories/media-recorder-constructor';
+import { createNativeBlobEventConstructor } from './factories/native-blob-event-constructor';
 import { createNativeMediaRecorderFactory } from './factories/native-media-recorder';
 import { createNativeMediaRecorderConstructor } from './factories/native-media-recorder-constructor';
 import { createNotSupportedError } from './factories/not-supported-error';
@@ -28,8 +30,11 @@ export * from './types/index';
 
 const encoderRegexes: RegExp[] = [];
 
-const createNativeMediaRecorder = createNativeMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
+const window = createWindow();
+const nativeBlobEventConstructor = createNativeBlobEventConstructor(window);
+const createBlobEvent = createBlobEventFactory(nativeBlobEventConstructor);
 const createWebAudioMediaRecorder = createWebAudioMediaRecorderFactory(
+    createBlobEvent,
     createInvalidModificationError,
     createInvalidStateError,
     createNotSupportedError
@@ -39,14 +44,15 @@ const readElementContent = createReadElementContent(readVariableSizeInteger);
 const readElementType = createReadElementType(readVariableSizeInteger);
 const decodeWebMChunk = createDecodeWebMChunk(readElementContent, readElementType);
 const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(
+    createBlobEvent,
     createInvalidModificationError,
     createNotSupportedError,
     decodeWebMChunk
 );
-const window = createWindow();
 const createEventTarget = createEventTargetFactory(window);
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 
+const createNativeMediaRecorder = createNativeMediaRecorderFactory(createInvalidModificationError, createNotSupportedError);
 const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
     createNativeMediaRecorder,
     createNotSupportedError,

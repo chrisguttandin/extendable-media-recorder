@@ -3,6 +3,7 @@ import { MultiBufferDataView } from 'multi-buffer-data-view';
 import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
+    createBlobEvent,
     createInvalidModificationError,
     createNotSupportedError,
     decodeWebMChunk
@@ -18,7 +19,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
-            eventTarget.dispatchEvent(new BlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
+            eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
         const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
