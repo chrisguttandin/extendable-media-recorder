@@ -20,136 +20,135 @@ describe('module', () => {
                 ...(!/Chrome/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) ? [] : ['audio/webm']),
                 'audio/wav'
             ];
-
-            // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
             // eslint-disable-next-line no-undef
-            if (!(process.env.CI && /Chrome/.test(navigator.userAgent))) {
-                for (const [channelCount, mimeType] of mimeTypes.flatMap((...args) => [
-                    [1, ...args],
-                    [2, ...args]
-                ])) {
-                    describe(`with a channelCount of ${channelCount} and a mimeType of ${mimeType}`, () => {
-                        describe('with a MediaStream which contains an audio track', () => {
-                            let audioContext;
-                            let bufferLength;
-                            let mediaRecorder;
-                            let mediaStream;
+            const channelCounts = process.env.CI && /Chrome/.test(navigator.userAgent) ? [2] : [1, 2];
 
-                            afterEach(function () {
-                                this.timeout(40000);
+            for (const [channelCount, mimeType] of channelCounts.flatMap((c) => mimeTypes.map((m) => [c, m]))) {
+                describe(`with a channelCount of ${channelCount} and a mimeType of ${mimeType}`, () => {
+                    describe('with a MediaStream which contains an audio track', () => {
+                        let audioContext;
+                        let bufferLength;
+                        let mediaRecorder;
+                        let mediaStream;
 
-                                return audioContext.close();
+                        afterEach(function () {
+                            this.timeout(40000);
+
+                            return audioContext.close();
+                        });
+
+                        beforeEach(async () => {
+                            audioContext = new AudioContext();
+                            bufferLength = 100;
+
+                            mediaStream = await createMediaStreamWithAudioTrack(
+                                audioContext,
+                                channelCount,
+                                audioContext.sampleRate / bufferLength
+                            );
+                            mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+                        });
+
+                        describe('mimeType', () => {
+                            it('should expose the given mimeType', () => {
+                                expect(mediaRecorder.mimeType).to.equal(mimeType);
+                            });
+                        });
+
+                        describe('ondataavailable', () => {
+                            it('should be null', () => {
+                                expect(mediaRecorder.ondataavailable).to.be.null;
                             });
 
-                            beforeEach(async () => {
-                                audioContext = new AudioContext();
-                                bufferLength = 100;
+                            it('should be assignable to a function', () => {
+                                const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                const ondataavailable = (mediaRecorder.ondataavailable = fn); // eslint-disable-line no-multi-assign
 
-                                mediaStream = await createMediaStreamWithAudioTrack(
-                                    audioContext,
-                                    channelCount,
-                                    audioContext.sampleRate / bufferLength
-                                );
-                                mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+                                expect(ondataavailable).to.equal(fn);
+                                expect(mediaRecorder.ondataavailable).to.equal(fn);
                             });
 
-                            describe('mimeType', () => {
-                                it('should expose the given mimeType', () => {
-                                    expect(mediaRecorder.mimeType).to.equal(mimeType);
-                                });
+                            it('should be assignable to null', () => {
+                                const ondataavailable = (mediaRecorder.ondataavailable = null); // eslint-disable-line no-multi-assign
+
+                                expect(ondataavailable).to.be.null;
+                                expect(mediaRecorder.ondataavailable).to.be.null;
                             });
 
-                            describe('ondataavailable', () => {
-                                it('should be null', () => {
-                                    expect(mediaRecorder.ondataavailable).to.be.null;
-                                });
+                            it('should not be assignable to something else', () => {
+                                const string = 'no function or null value';
 
-                                it('should be assignable to a function', () => {
-                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
-                                    const ondataavailable = (mediaRecorder.ondataavailable = fn); // eslint-disable-line no-multi-assign
+                                mediaRecorder.ondataavailable = () => {};
 
-                                    expect(ondataavailable).to.equal(fn);
-                                    expect(mediaRecorder.ondataavailable).to.equal(fn);
-                                });
+                                const ondataavailable = (mediaRecorder.ondataavailable = string); // eslint-disable-line no-multi-assign
 
-                                it('should be assignable to null', () => {
-                                    const ondataavailable = (mediaRecorder.ondataavailable = null); // eslint-disable-line no-multi-assign
-
-                                    expect(ondataavailable).to.be.null;
-                                    expect(mediaRecorder.ondataavailable).to.be.null;
-                                });
-
-                                it('should not be assignable to something else', () => {
-                                    const string = 'no function or null value';
-
-                                    mediaRecorder.ondataavailable = () => {};
-
-                                    const ondataavailable = (mediaRecorder.ondataavailable = string); // eslint-disable-line no-multi-assign
-
-                                    expect(ondataavailable).to.equal(string);
-                                    expect(mediaRecorder.ondataavailable).to.be.null;
-                                });
-
-                                it('should register an independent event listener', (done) => {
-                                    const ondataavailable = spy();
-
-                                    mediaRecorder.ondataavailable = ondataavailable;
-                                    mediaRecorder.addEventListener('dataavailable', ondataavailable);
-
-                                    mediaRecorder.dispatchEvent(new Event('dataavailable'));
-
-                                    // Bug #7 & 8: The dataavailable event is currently delayed.
-                                    setTimeout(() => {
-                                        expect(ondataavailable).to.have.been.calledTwice;
-
-                                        done();
-                                    });
-                                });
+                                expect(ondataavailable).to.equal(string);
+                                expect(mediaRecorder.ondataavailable).to.be.null;
                             });
 
-                            describe('onerror', () => {
-                                it('should be null', () => {
-                                    expect(mediaRecorder.onerror).to.be.null;
-                                });
+                            it('should register an independent event listener', (done) => {
+                                const ondataavailable = spy();
 
-                                it('should be assignable to a function', () => {
-                                    const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
-                                    const onerror = (mediaRecorder.onerror = fn); // eslint-disable-line no-multi-assign
+                                mediaRecorder.ondataavailable = ondataavailable;
+                                mediaRecorder.addEventListener('dataavailable', ondataavailable);
 
-                                    expect(onerror).to.equal(fn);
-                                    expect(mediaRecorder.onerror).to.equal(fn);
-                                });
+                                mediaRecorder.dispatchEvent(new Event('dataavailable'));
 
-                                it('should be assignable to null', () => {
-                                    const onerror = (mediaRecorder.onerror = null); // eslint-disable-line no-multi-assign
+                                // Bug #7 & 8: The dataavailable event is currently delayed.
+                                setTimeout(() => {
+                                    expect(ondataavailable).to.have.been.calledTwice;
 
-                                    expect(onerror).to.be.null;
-                                    expect(mediaRecorder.onerror).to.be.null;
-                                });
-
-                                it('should not be assignable to something else', () => {
-                                    const string = 'no function or null value';
-
-                                    mediaRecorder.onerror = () => {};
-
-                                    const onerror = (mediaRecorder.onerror = string); // eslint-disable-line no-multi-assign
-
-                                    expect(onerror).to.equal(string);
-                                    expect(mediaRecorder.onerror).to.be.null;
-                                });
-
-                                it('should register an independent event listener', () => {
-                                    const onerror = spy();
-
-                                    mediaRecorder.onerror = onerror;
-                                    mediaRecorder.addEventListener('error', onerror);
-
-                                    mediaRecorder.dispatchEvent(new Event('error'));
-
-                                    expect(onerror).to.have.been.calledTwice;
+                                    done();
                                 });
                             });
+                        });
 
+                        describe('onerror', () => {
+                            it('should be null', () => {
+                                expect(mediaRecorder.onerror).to.be.null;
+                            });
+
+                            it('should be assignable to a function', () => {
+                                const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                const onerror = (mediaRecorder.onerror = fn); // eslint-disable-line no-multi-assign
+
+                                expect(onerror).to.equal(fn);
+                                expect(mediaRecorder.onerror).to.equal(fn);
+                            });
+
+                            it('should be assignable to null', () => {
+                                const onerror = (mediaRecorder.onerror = null); // eslint-disable-line no-multi-assign
+
+                                expect(onerror).to.be.null;
+                                expect(mediaRecorder.onerror).to.be.null;
+                            });
+
+                            it('should not be assignable to something else', () => {
+                                const string = 'no function or null value';
+
+                                mediaRecorder.onerror = () => {};
+
+                                const onerror = (mediaRecorder.onerror = string); // eslint-disable-line no-multi-assign
+
+                                expect(onerror).to.equal(string);
+                                expect(mediaRecorder.onerror).to.be.null;
+                            });
+
+                            it('should register an independent event listener', () => {
+                                const onerror = spy();
+
+                                mediaRecorder.onerror = onerror;
+                                mediaRecorder.addEventListener('error', onerror);
+
+                                mediaRecorder.dispatchEvent(new Event('error'));
+
+                                expect(onerror).to.have.been.calledTwice;
+                            });
+                        });
+
+                        // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
+                        // eslint-disable-next-line no-undef
+                        if (!process.env.CI) {
                             describe('start()', () => {
                                 beforeEach(function (done) {
                                     this.timeout(3000);
@@ -376,32 +375,32 @@ describe('module', () => {
                                     setTimeout(() => mediaRecorder.stop(), 1000);
                                 });
                             });
+                        }
+                    });
+
+                    describe('with a MediaStream which contains a video track', () => {
+                        let mediaRecorder;
+
+                        beforeEach(() => {
+                            const mediaStream = createMediaStreamWithVideoTrack();
+
+                            mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                         });
 
-                        describe('with a MediaStream which contains a video track', () => {
-                            let mediaRecorder;
+                        describe('start()', () => {
+                            it('should throw a NotSupportedError', (done) => {
+                                try {
+                                    mediaRecorder.start();
+                                } catch (err) {
+                                    expect(err.code).to.equal(9);
+                                    expect(err.name).to.equal('NotSupportedError');
 
-                            beforeEach(() => {
-                                const mediaStream = createMediaStreamWithVideoTrack();
-
-                                mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
-                            });
-
-                            describe('start()', () => {
-                                it('should throw a NotSupportedError', (done) => {
-                                    try {
-                                        mediaRecorder.start();
-                                    } catch (err) {
-                                        expect(err.code).to.equal(9);
-                                        expect(err.name).to.equal('NotSupportedError');
-
-                                        done();
-                                    }
-                                });
+                                    done();
+                                }
                             });
                         });
                     });
-                }
+                });
             }
 
             describe('with the mimeType of audio/anything', () => {
