@@ -16,7 +16,7 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
         return new Promise((resolve) => {
             // Bug #11 Safari does not yet support the MediaRecorder but that isn't tested here.
             if (window.MediaRecorder === undefined) {
-                resolve(true);
+                return resolve(true);
             }
 
             // @todo captureStream() is not defined yet.
