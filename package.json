@@ -25,7 +25,7 @@
         "@commitlint/cli": "^11.0.0",
         "@commitlint/config-angular": "^11.0.0",
         "@rollup/plugin-babel": "^5.2.3",
-        "chai": "^4.2.0",
+        "chai": "^4.3.0",
         "commitizen": "^4.2.3",
         "cz-conventional-changelog": "^3.3.0",
         "eslint": "^7.19.0",
