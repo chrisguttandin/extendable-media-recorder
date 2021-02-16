@@ -39,7 +39,13 @@ module.exports = (config) => {
                     {
                         test: /\.ts?$/,
                         use: {
-                            loader: 'ts-loader'
+                            loader: 'ts-loader',
+                            options: {
+                                compilerOptions: {
+                                    declaration: false,
+                                    declarationMap: false
+                                }
+                            }
                         }
                     }
                 ]
@@ -52,7 +58,8 @@ module.exports = (config) => {
                 })
             ],
             resolve: {
-                extensions: ['.js', '.ts']
+                extensions: ['.js', '.ts'],
+                fallback: { util: false }
             }
         },
 
