@@ -30,7 +30,7 @@ const mediaRecoder = new MediaRecorder(stream);
 `extendable-media-recorder` also exports a `register()` function which can be used to define custom encoders. One predefined encoder is available as the [`extendable-media-recorder-wav-encoder` package](https://github.com/chrisguttandin/extendable-media-recorder-wav-encoder). It can be used as shown here.
 
 ```js
-import { register } from 'extendable-media-recorder';
+import { MediaRecorder, register } from 'extendable-media-recorder';
 import { connect } from 'extendable-media-recorder-wav-encoder';
 
 await register(await connect());
