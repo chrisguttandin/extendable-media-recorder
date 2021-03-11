@@ -28,6 +28,8 @@ module.exports = (config) => {
             'test/expectation/chrome/canary/**/*.js': 'webpack'
         },
 
+        reporters: ['dots'],
+
         webpack: {
             mode: 'development',
             module: {

@@ -32,6 +32,8 @@ module.exports = (config) => {
             'test/expectation/firefox/legacy/**/*.js': 'webpack'
         },
 
+        reporters: ['dots'],
+
         webpack: {
             mode: 'development',
             module: {
