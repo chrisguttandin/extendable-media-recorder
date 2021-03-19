@@ -31,11 +31,11 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
 
             const mediaStream = canvasElement.captureStream();
             const mimeType = 'audio/webm';
-            const mediaRecorder = new window.MediaRecorder(mediaStream, { mimeType });
-
-            mediaRecorder.addEventListener('dataavailable', ({ data }) => resolve(data.type === mimeType));
 
             try {
+                const mediaRecorder = new window.MediaRecorder(mediaStream, { mimeType });
+
+                mediaRecorder.addEventListener('dataavailable', ({ data }) => resolve(data.type === mimeType));
                 mediaRecorder.start();
 
                 setTimeout(() => mediaRecorder.stop(), 10);
