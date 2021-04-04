@@ -14,8 +14,6 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         const channelCount = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().channelCount;
         const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
-        let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort =
-            sampleRate !== undefined ? instantiate(mimeType, sampleRate) : null;
         let promisedPartialRecording: null | Promise<void> = null;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
@@ -39,6 +37,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 promisedPartialRecording.catch(() => {
                     /* @todo Only catch the errors caused by a duplicate call to encode. */
                 });
+                promisedPartialRecording = null;
             }
 
             nativeMediaRecorder.stop();
@@ -69,6 +68,12 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 }
 
                 if (nativeMediaRecorder.state === 'inactive') {
+                    let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort = null;
+
+                    if (sampleRate !== undefined) {
+                        promisedDataViewElementTypeEncoderIdAndPort = instantiate(mimeType, sampleRate);
+                    }
+
                     nativeMediaRecorder.addEventListener('dataavailable', ({ data }) => {
                         if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
                             promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(

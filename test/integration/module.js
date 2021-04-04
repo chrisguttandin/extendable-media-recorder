@@ -150,230 +150,258 @@ describe('module', () => {
                         // eslint-disable-next-line no-undef
                         if (!process.env.CI) {
                             describe('start()', () => {
-                                beforeEach(function (done) {
-                                    this.timeout(3000);
+                                for (const wasStartedBefore of [true, false]) {
+                                    describe(`with a MediaRecorder that was${wasStartedBefore ? ' ' : ' not '}started before`, () => {
+                                        if (wasStartedBefore) {
+                                            beforeEach((done) => {
+                                                mediaRecorder.ondataavailable = () => {
+                                                    mediaRecorder.ondataavailable = null;
 
-                                    // Wait two seconds before starting the recording.
-                                    setTimeout(done, 2000);
-                                });
-
-                                it('should abort the encoding when adding a track', function (done) {
-                                    this.timeout(10000);
-
-                                    let err = null;
-
-                                    mediaRecorder.addEventListener('dataavailable', function (event) {
-                                        // Bug #14: Safari does not yet support the BlobEvent.
-                                        if (typeof BlobEvent === 'undefined') {
-                                            expect(event).to.be.an.instanceOf(Event);
-                                        } else {
-                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                                    done();
+                                                };
+                                                mediaRecorder.start();
+                                                mediaRecorder.stop();
+                                            });
                                         }
 
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('dataavailable');
+                                        beforeEach(function (done) {
+                                            this.timeout(3000);
 
-                                        expect(this).to.equal(mediaRecorder);
+                                            // Wait two seconds before starting the recording.
+                                            setTimeout(done, 2000);
+                                        });
 
-                                        expect(err.code).to.equal(13);
-                                        expect(err.name).to.equal('InvalidModificationError');
+                                        it('should abort the encoding when adding a track', function (done) {
+                                            this.timeout(10000);
 
-                                        done();
-                                    });
+                                            let err = null;
 
-                                    mediaRecorder.addEventListener('error', function (event) {
-                                        expect(event).to.be.an.instanceOf(ErrorEvent);
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('error');
+                                            mediaRecorder.addEventListener('dataavailable', function (event) {
+                                                // Bug #14: Safari does not yet support the BlobEvent.
+                                                if (typeof BlobEvent === 'undefined') {
+                                                    expect(event).to.be.an.instanceOf(Event);
+                                                } else {
+                                                    expect(event).to.be.an.instanceOf(BlobEvent);
+                                                }
 
-                                        expect(this).to.equal(mediaRecorder);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('dataavailable');
 
-                                        err = event.error;
-                                    });
+                                                expect(this).to.equal(mediaRecorder);
 
-                                    mediaRecorder.start();
+                                                expect(err.code).to.equal(13);
+                                                expect(err.name).to.equal('InvalidModificationError');
 
-                                    setTimeout(() => {
-                                        createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
-                                            mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
-                                        );
-                                    }, 1000);
-                                });
+                                                done();
+                                            });
 
-                                it('should abort the encoding when removing a track', function (done) {
-                                    this.timeout(10000);
+                                            mediaRecorder.addEventListener('error', function (event) {
+                                                expect(event).to.be.an.instanceOf(ErrorEvent);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('error');
 
-                                    let err = null;
+                                                expect(this).to.equal(mediaRecorder);
 
-                                    mediaRecorder.addEventListener('dataavailable', function (event) {
-                                        // Bug #14: Safari does not yet support the BlobEvent.
-                                        if (typeof BlobEvent === 'undefined') {
-                                            expect(event).to.be.an.instanceOf(Event);
-                                        } else {
-                                            expect(event).to.be.an.instanceOf(BlobEvent);
-                                        }
+                                                err = event.error;
+                                            });
 
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('dataavailable');
+                                            mediaRecorder.start();
 
-                                        expect(this).to.equal(mediaRecorder);
+                                            setTimeout(() => {
+                                                createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
+                                                    mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
+                                                );
+                                            }, 1000);
+                                        });
 
-                                        expect(err.code).to.equal(13);
-                                        expect(err.name).to.equal('InvalidModificationError');
+                                        it('should abort the encoding when removing a track', function (done) {
+                                            this.timeout(10000);
 
-                                        done();
-                                    });
+                                            let err = null;
 
-                                    mediaRecorder.addEventListener('error', function (event) {
-                                        expect(event).to.be.an.instanceOf(ErrorEvent);
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('error');
+                                            mediaRecorder.addEventListener('dataavailable', function (event) {
+                                                // Bug #14: Safari does not yet support the BlobEvent.
+                                                if (typeof BlobEvent === 'undefined') {
+                                                    expect(event).to.be.an.instanceOf(Event);
+                                                } else {
+                                                    expect(event).to.be.an.instanceOf(BlobEvent);
+                                                }
 
-                                        expect(this).to.equal(mediaRecorder);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('dataavailable');
 
-                                        err = event.error;
-                                    });
+                                                expect(this).to.equal(mediaRecorder);
 
-                                    mediaRecorder.start();
+                                                expect(err.code).to.equal(13);
+                                                expect(err.name).to.equal('InvalidModificationError');
 
-                                    setTimeout(() => {
-                                        mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
-                                    }, 1000);
-                                });
+                                                done();
+                                            });
 
-                                it('should encode a mediaStream as a whole', function (done) {
-                                    this.timeout(40000);
+                                            mediaRecorder.addEventListener('error', function (event) {
+                                                expect(event).to.be.an.instanceOf(ErrorEvent);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('error');
 
-                                    mediaRecorder.addEventListener('dataavailable', async function (event) {
-                                        // Bug #14: Safari does not yet support the BlobEvent.
-                                        if (typeof BlobEvent === 'undefined') {
-                                            expect(event).to.be.an.instanceOf(Event);
-                                        } else {
-                                            expect(event).to.be.an.instanceOf(BlobEvent);
-                                        }
+                                                expect(this).to.equal(mediaRecorder);
 
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('dataavailable');
+                                                err = event.error;
+                                            });
 
-                                        expect(this).to.equal(mediaRecorder);
+                                            mediaRecorder.start();
 
-                                        // Test if the arrayBuffer is decodable.
-                                        const audioBuffer = await audioContext.decodeAudioData(await event.data.arrayBuffer());
+                                            setTimeout(() => {
+                                                mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+                                            }, 1000);
+                                        });
 
-                                        // Test if the audioBuffer is at least half a second long.
-                                        expect(audioBuffer.duration).to.be.above(0.5);
+                                        it('should encode a mediaStream as a whole', function (done) {
+                                            this.timeout(40000);
 
-                                        // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
-                                        if (mimeType === 'audio/wav') {
-                                            const rotatingBuffers = [new Float32Array(bufferLength), new Float32Array(bufferLength)];
+                                            mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                // Bug #14: Safari does not yet support the BlobEvent.
+                                                if (typeof BlobEvent === 'undefined') {
+                                                    expect(event).to.be.an.instanceOf(Event);
+                                                } else {
+                                                    expect(event).to.be.an.instanceOf(BlobEvent);
+                                                }
 
-                                            for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
-                                                audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('dataavailable');
 
-                                                for (
-                                                    let startInChannel = bufferLength;
-                                                    startInChannel < audioBuffer.length - bufferLength;
-                                                    startInChannel += bufferLength
-                                                ) {
-                                                    audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+                                                expect(this).to.equal(mediaRecorder);
 
-                                                    for (let j = 0; j < bufferLength; j += 1) {
-                                                        try {
-                                                            expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                                            expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
-                                                        } catch (err) {
-                                                            done(err);
+                                                // Test if the arrayBuffer is decodable.
+                                                const audioBuffer = await audioContext.decodeAudioData(await event.data.arrayBuffer());
 
-                                                            return;
+                                                // Test if the audioBuffer is at least half a second long.
+                                                expect(audioBuffer.duration).to.be.above(0.5);
+
+                                                // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                                if (mimeType === 'audio/wav') {
+                                                    const rotatingBuffers = [
+                                                        new Float32Array(bufferLength),
+                                                        new Float32Array(bufferLength)
+                                                    ];
+
+                                                    for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                                        audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+
+                                                        for (
+                                                            let startInChannel = bufferLength;
+                                                            startInChannel < audioBuffer.length - bufferLength;
+                                                            startInChannel += bufferLength
+                                                        ) {
+                                                            audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+
+                                                            for (let j = 0; j < bufferLength; j += 1) {
+                                                                try {
+                                                                    expect(rotatingBuffers[0][j]).to.not.equal(0);
+                                                                    expect(rotatingBuffers[0][j]).to.be.closeTo(
+                                                                        rotatingBuffers[1][j],
+                                                                        0.0001
+                                                                    );
+                                                                } catch (err) {
+                                                                    done(err);
+
+                                                                    return;
+                                                                }
+                                                            }
+
+                                                            rotatingBuffers.push(rotatingBuffers.shift());
                                                         }
                                                     }
-
-                                                    rotatingBuffers.push(rotatingBuffers.shift());
                                                 }
-                                            }
-                                        }
 
-                                        done();
-                                    });
-                                    mediaRecorder.start();
+                                                done();
+                                            });
+                                            mediaRecorder.start();
 
-                                    setTimeout(() => mediaRecorder.stop(), 1000);
-                                });
+                                            setTimeout(() => mediaRecorder.stop(), 1000);
+                                        });
 
-                                it('should encode a mediaStream in chunks', function (done) {
-                                    this.timeout(40000);
+                                        it('should encode a mediaStream in chunks', function (done) {
+                                            this.timeout(40000);
 
-                                    const chunks = [];
+                                            const chunks = [];
 
-                                    mediaRecorder.addEventListener('dataavailable', async function (event) {
-                                        // Bug #14: Safari does not yet support the BlobEvent.
-                                        if (typeof BlobEvent === 'undefined') {
-                                            expect(event).to.be.an.instanceOf(Event);
-                                        } else {
-                                            expect(event).to.be.an.instanceOf(BlobEvent);
-                                        }
+                                            mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                // Bug #14: Safari does not yet support the BlobEvent.
+                                                if (typeof BlobEvent === 'undefined') {
+                                                    expect(event).to.be.an.instanceOf(Event);
+                                                } else {
+                                                    expect(event).to.be.an.instanceOf(BlobEvent);
+                                                }
 
-                                        expect(event.currentTarget).to.equal(mediaRecorder);
-                                        expect(event.target).to.equal(mediaRecorder);
-                                        expect(event.type).to.equal('dataavailable');
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('dataavailable');
 
-                                        expect(this).to.equal(mediaRecorder);
+                                                expect(this).to.equal(mediaRecorder);
 
-                                        chunks.push(event.data);
+                                                chunks.push(event.data);
 
-                                        if (mediaRecorder.state === 'inactive') {
-                                            expect(chunks.length).to.be.above(5);
+                                                if (mediaRecorder.state === 'inactive') {
+                                                    expect(chunks.length).to.be.above(5);
 
-                                            // Test if the arrayBuffer is decodable.
-                                            const audioBuffer = await audioContext.decodeAudioData(
-                                                await new Blob(chunks, { mimeType }).arrayBuffer()
-                                            );
+                                                    // Test if the arrayBuffer is decodable.
+                                                    const audioBuffer = await audioContext.decodeAudioData(
+                                                        await new Blob(chunks, { mimeType }).arrayBuffer()
+                                                    );
 
-                                            // Test if the audioBuffer is at least half a second long.
-                                            expect(audioBuffer.duration).to.be.above(0.5);
+                                                    // Test if the audioBuffer is at least half a second long.
+                                                    expect(audioBuffer.duration).to.be.above(0.5);
 
-                                            // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
-                                            if (mimeType === 'audio/wav') {
-                                                const rotatingBuffers = [new Float32Array(bufferLength), new Float32Array(bufferLength)];
+                                                    // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                                    if (mimeType === 'audio/wav') {
+                                                        const rotatingBuffers = [
+                                                            new Float32Array(bufferLength),
+                                                            new Float32Array(bufferLength)
+                                                        ];
 
-                                                for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
-                                                    audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+                                                        for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                                            audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
-                                                    for (
-                                                        let startInChannel = bufferLength;
-                                                        startInChannel < audioBuffer.length - bufferLength;
-                                                        startInChannel += bufferLength
-                                                    ) {
-                                                        audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+                                                            for (
+                                                                let startInChannel = bufferLength;
+                                                                startInChannel < audioBuffer.length - bufferLength;
+                                                                startInChannel += bufferLength
+                                                            ) {
+                                                                audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
 
-                                                        for (let j = 0; j < bufferLength; j += 1) {
-                                                            try {
-                                                                expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                                                expect(rotatingBuffers[0][j]).to.be.closeTo(rotatingBuffers[1][j], 0.0001);
-                                                            } catch (err) {
-                                                                done(err);
+                                                                for (let j = 0; j < bufferLength; j += 1) {
+                                                                    try {
+                                                                        expect(rotatingBuffers[0][j]).to.not.equal(0);
+                                                                        expect(rotatingBuffers[0][j]).to.be.closeTo(
+                                                                            rotatingBuffers[1][j],
+                                                                            0.0001
+                                                                        );
+                                                                    } catch (err) {
+                                                                        done(err);
 
-                                                                return;
+                                                                        return;
+                                                                    }
+                                                                }
+
+                                                                rotatingBuffers.push(rotatingBuffers.shift());
                                                             }
                                                         }
-
-                                                        rotatingBuffers.push(rotatingBuffers.shift());
                                                     }
+
+                                                    done();
                                                 }
-                                            }
+                                            });
+                                            mediaRecorder.start(100);
 
-                                            done();
-                                        }
+                                            setTimeout(() => mediaRecorder.stop(), 1000);
+                                        });
                                     });
-                                    mediaRecorder.start(100);
-
-                                    setTimeout(() => mediaRecorder.stop(), 1000);
-                                });
+                                }
                             });
                         }
                     });
