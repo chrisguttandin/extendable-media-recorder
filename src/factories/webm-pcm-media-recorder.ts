@@ -1,5 +1,6 @@
 import { encode, instantiate } from 'media-encoder-host';
 import { MultiBufferDataView } from 'multi-buffer-data-view';
+import { on } from 'subscribable-things';
 import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
@@ -74,7 +75,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                         promisedDataViewElementTypeEncoderIdAndPort = instantiate(mimeType, sampleRate);
                     }
 
-                    nativeMediaRecorder.addEventListener('dataavailable', ({ data }) => {
+                    const removeEventListener = on(
+                        nativeMediaRecorder,
+                        'dataavailable'
+                    )(({ data }) => {
                         if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
                             promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
                                 async ({ dataView = null, elementType = null, encoderId, port }) => {
@@ -114,6 +118,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                                         port.postMessage([]);
                                         port.close();
+
+                                        removeEventListener();
                                     }
 
                                     return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
