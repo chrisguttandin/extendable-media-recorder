@@ -86,6 +86,35 @@ describe('module', () => {
             mediaRecorder.start();
             mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
         });
+
+        // bug #9
+        it('should fire another dataavailable event after being inactive', async function () {
+            this.timeout(10000);
+
+            const recordAboutASecondOfAudio = () =>
+                new Promise(async (resolve) => {
+                    mediaStream = await createMediaStreamWithAudioTrack(audioContext);
+
+                    const recorder = new MediaRecorder(mediaStream);
+
+                    recorder.start(1);
+
+                    setTimeout(() => {
+                        let callsWhileBeingInactive = 0;
+
+                        recorder.ondataavailable = () => {
+                            if (recorder.state === 'inactive') {
+                                callsWhileBeingInactive += 1;
+                            }
+                        };
+                        recorder.stop();
+
+                        setTimeout(() => resolve(callsWhileBeingInactive), 1000);
+                    }, Math.random() * 1000);
+                });
+
+            expect((await Promise.all(Array.from({ length: 50 }, recordAboutASecondOfAudio))).sort().pop()).to.be.above(1);
+        });
     });
 
     describe('with a MediaStream which contains a video track', () => {

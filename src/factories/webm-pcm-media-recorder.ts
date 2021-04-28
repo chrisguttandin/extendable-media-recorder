@@ -75,10 +75,15 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                         promisedDataViewElementTypeEncoderIdAndPort = instantiate(mimeType, sampleRate);
                     }
 
+                    // Bug #9: Chrome sometimes fires more than one dataavailable event while being inactive.
+                    let pendingInvocations = 0;
+
                     const removeEventListener = on(
                         nativeMediaRecorder,
                         'dataavailable'
                     )(({ data }) => {
+                        pendingInvocations += 1;
+
                         if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
                             promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
                                 async ({ dataView = null, elementType = null, encoderId, port }) => {
@@ -113,7 +118,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                         )
                                     );
 
-                                    if (nativeMediaRecorder.state === 'inactive') {
+                                    pendingInvocations -= 1;
+
+                                    if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
                                         encode(encoderId, null).then(dispatchDataAvailableEvent);
 
                                         port.postMessage([]);
