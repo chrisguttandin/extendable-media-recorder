@@ -97,18 +97,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                         elementType,
                                         channelCount
                                     );
-
+                                    const buffers =
+                                        'buffer' in multiOrSingleBufferDataView
+                                            ? [multiOrSingleBufferDataView.buffer]
+                                            : multiOrSingleBufferDataView.buffers;
                                     const remainingDataView =
                                         offset < multiOrSingleBufferDataView.byteLength
-                                            ? 'buffer' in multiOrSingleBufferDataView
-                                                ? new MultiBufferDataView(
-                                                      [multiOrSingleBufferDataView.buffer],
-                                                      multiOrSingleBufferDataView.byteOffset + offset
-                                                  )
-                                                : new MultiBufferDataView(
-                                                      multiOrSingleBufferDataView.buffers,
-                                                      multiOrSingleBufferDataView.byteOffset + offset
-                                                  )
+                                            ? new MultiBufferDataView(buffers, multiOrSingleBufferDataView.byteOffset + offset)
                                             : null;
 
                                     contents.forEach((content) =>
