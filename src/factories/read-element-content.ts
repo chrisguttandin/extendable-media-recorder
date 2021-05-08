@@ -14,7 +14,7 @@ export const createReadElementContent: TReadElementContentFactory = (readVariabl
             return { content: null, length };
         }
 
-        if (offset + length + value > dataView.byteOffset + dataView.byteLength) {
+        if (offset + length + value > dataView.byteLength) {
             return null;
         }
 
