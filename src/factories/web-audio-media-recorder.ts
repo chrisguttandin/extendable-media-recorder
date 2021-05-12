@@ -13,6 +13,8 @@ import {
 import { IAudioNodesAndEncoderId } from '../interfaces';
 import { TRecordingState, TWebAudioMediaRecorderFactoryFactory } from '../types';
 
+const ERROR_MESSAGE = 'Missing AudioWorklet support. Maybe this is not running in a secure context.';
+
 // @todo This should live in a separate file.
 const createPromisedAudioNodesEncoderIdAndPort = async (
     audioBuffer: IAudioBuffer,
@@ -21,18 +23,9 @@ const createPromisedAudioNodesEncoderIdAndPort = async (
     mimeType: string
 ) => {
     const { encoderId, port } = await instantiate(mimeType, audioContext.sampleRate);
-    const message = 'Missing AudioWorklet support. Maybe this is not running in a secure context.';
-
-    await addRecorderAudioWorkletModule((url: string) => {
-        if (addAudioWorkletModule === undefined) {
-            throw new Error(message);
-        }
-
-        return addAudioWorkletModule(audioContext, url);
-    });
 
     if (AudioWorkletNode === undefined) {
-        throw new Error(message);
+        throw new Error(ERROR_MESSAGE);
     }
 
     const audioBufferSourceNode = new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
@@ -52,6 +45,13 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
         const length = Math.max(512, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
         const audioBuffer = new AudioBuffer({ length, sampleRate: audioContext.sampleRate });
+        const promisedAudioWorkletModule = addRecorderAudioWorkletModule((url: string) => {
+            if (addAudioWorkletModule === undefined) {
+                throw new Error(ERROR_MESSAGE);
+            }
+
+            return addAudioWorkletModule(audioContext, url);
+        });
 
         let abortRecording: null | (() => void) = null;
         let intervalId: null | number = null;
@@ -122,7 +122,9 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 promisedAudioNodesAndEncoderId = Promise.all([
                     audioContext.resume(),
-                    createPromisedAudioNodesEncoderIdAndPort(audioBuffer, audioContext, mediaStream, mimeType)
+                    promisedAudioWorkletModule.then(() =>
+                        createPromisedAudioNodesEncoderIdAndPort(audioBuffer, audioContext, channelCount, mediaStream, mimeType)
+                    )
                 ]).then(async ([, { audioBufferSourceNode, encoderId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode }]) => {
                     mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
 
