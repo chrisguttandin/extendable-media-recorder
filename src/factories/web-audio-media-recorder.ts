@@ -19,6 +19,7 @@ const ERROR_MESSAGE = 'Missing AudioWorklet support. Maybe this is not running i
 const createPromisedAudioNodesEncoderIdAndPort = async (
     audioBuffer: IAudioBuffer,
     audioContext: IMinimalAudioContext,
+    channelCount: number,
     mediaStream: MediaStream,
     mimeType: string
 ) => {
@@ -30,7 +31,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (
 
     const audioBufferSourceNode = new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(audioContext, { mediaStream });
-    const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext);
+    const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext, { channelCount });
 
     return { audioBufferSourceNode, encoderId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode };
 };
@@ -119,6 +120,9 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 if (mediaStream.getVideoTracks().length > 0) {
                     throw createNotSupportedError();
                 }
+
+                const audioTracks = mediaStream.getAudioTracks();
+                const channelCount = audioTracks.length === 0 ? 2 : audioTracks[0].getSettings().channelCount ?? 2;
 
                 promisedAudioNodesAndEncoderId = Promise.all([
                     audioContext.resume(),

@@ -46,6 +46,17 @@ describe('module', () => {
                                 channelCount,
                                 audioContext.sampleRate / bufferLength
                             );
+
+                            const [firstAudioTrack] = mediaStream.getAudioTracks();
+
+                            // Bug #15: Firefox and Safari do not expose the channelCount yet.
+                            if (firstAudioTrack.getSettings().channelCount === undefined) {
+                                firstAudioTrack.getSettings = ((getSettings) => () => ({
+                                    channelCount,
+                                    ...getSettings.call(firstAudioTrack)
+                                }))(firstAudioTrack.getSettings);
+                            }
+
                             mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                         });
 
@@ -279,6 +290,8 @@ describe('module', () => {
                                                 // Test if the arrayBuffer is decodable.
                                                 const audioBuffer = await audioContext.decodeAudioData(await event.data.arrayBuffer());
 
+                                                expect(audioBuffer.numberOfChannels).to.equal(channelCount);
+
                                                 // Test if the audioBuffer is at least half a second long.
                                                 expect(audioBuffer.duration).to.be.above(0.5);
 
@@ -353,6 +366,8 @@ describe('module', () => {
                                                     const audioBuffer = await audioContext.decodeAudioData(
                                                         await new Blob(chunks, { mimeType }).arrayBuffer()
                                                     );
+
+                                                    expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
                                                     // Test if the audioBuffer is at least half a second long.
                                                     expect(audioBuffer.duration).to.be.above(0.5);
