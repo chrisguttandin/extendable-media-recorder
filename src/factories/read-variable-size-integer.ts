@@ -10,7 +10,7 @@ export const createReadVariableSizeInteger: TReadVariableSizeIntegerFactory = (r
 
         const firstDataByteOffset = offset + Math.floor((length - 1) / 8);
 
-        if (firstDataByteOffset + length > dataView.byteOffset + dataView.byteLength) {
+        if (firstDataByteOffset + length > dataView.byteLength) {
             return null;
         }
 
