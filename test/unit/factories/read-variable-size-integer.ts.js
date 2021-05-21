@@ -1,7 +1,7 @@
 import { createReadVariableSizeInteger } from '../../../src/factories/read-variable-size-integer';
 import { readVariableSizeIntegerLength } from '../../../src/functions/read-variable-size-integer-length';
 
-describe('readVariableSizeIntegerLength()', () => {
+describe('readVariableSizeInteger()', () => {
     let dataView;
     let readVariableSizeInteger;
 
