@@ -116,7 +116,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                     pendingInvocations -= 1;
 
                                     if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
-                                        encode(encoderId, null).then(dispatchDataAvailableEvent);
+                                        encode(encoderId, null).then((arrayBuffers) => {
+                                            dispatchDataAvailableEvent(arrayBuffers);
+                                            eventTarget.dispatchEvent(new Event('stop'));
+                                        });
 
                                         port.postMessage([]);
                                         port.close();

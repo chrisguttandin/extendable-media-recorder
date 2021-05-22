@@ -1,5 +1,12 @@
 import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
-import { TBlobEventHandler, TErrorEventHandler, TMediaRecorderConstructorFactory, TNativeEventTarget, TRecordingState } from '../types';
+import {
+    TBlobEventHandler,
+    TErrorEventHandler,
+    TEventHandler,
+    TMediaRecorderConstructorFactory,
+    TNativeEventTarget,
+    TRecordingState
+} from '../types';
 
 export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = (
     createNativeMediaRecorder,
@@ -11,11 +18,13 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     nativeMediaRecorderConstructor
 ) => {
     return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
-        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | keyof TNativeEventTarget>;
+        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | 'onstop' | keyof TNativeEventTarget>;
 
         private _ondataavailable: null | [TBlobEventHandler<this>, TBlobEventHandler<this>];
 
         private _onerror: null | [TErrorEventHandler<this>, TErrorEventHandler<this>];
+
+        private _onstop: null | [TEventHandler<this>, TEventHandler<this>];
 
         constructor(stream: MediaStream, options: IMediaRecorderOptions = {}) {
             const { mimeType } = options;
@@ -56,6 +65,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
             this._ondataavailable = null;
             this._onerror = null;
+            this._onstop = null;
         }
 
         get mimeType(): string {
@@ -99,6 +109,26 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 this._onerror = [value, boundListener];
             } else {
                 this._onerror = null;
+            }
+        }
+
+        get onstop(): null | TEventHandler<this> {
+            return this._onstop === null ? this._onstop : this._onstop[0];
+        }
+
+        set onstop(value) {
+            if (this._onstop !== null) {
+                (<IMediaRecorder>this).removeEventListener('stop', this._onstop[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                (<IMediaRecorder>this).addEventListener('stop', boundListener);
+
+                this._onstop = [value, boundListener];
+            } else {
+                this._onstop = null;
             }
         }
 

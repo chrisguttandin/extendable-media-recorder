@@ -52,17 +52,20 @@ describe('module', () => {
 
         // bug #7
 
-        it('should fire an error event after the dataavailable event when adding a track', function (done) {
+        it('should fire an error event after the dataavailable and stop events when adding a track', function (done) {
             this.timeout(10000);
 
             const ondataavailable = spy();
+            const onstop = spy();
 
             mediaRecorder.addEventListener('dataavailable', ondataavailable);
             mediaRecorder.addEventListener('error', () => {
                 expect(ondataavailable).to.have.been.calledOnce;
+                expect(onstop).to.have.been.calledOnce;
 
                 done();
             });
+            mediaRecorder.addEventListener('stop', onstop);
             mediaRecorder.start();
 
             createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
@@ -72,17 +75,20 @@ describe('module', () => {
 
         // bug #8
 
-        it('should fire an error event after the dataavailable event when removing a track', function (done) {
+        it('should fire an error event after the dataavailable and stop events when removing a track', function (done) {
             this.timeout(10000);
 
             const ondataavailable = spy();
+            const onstop = spy();
 
             mediaRecorder.addEventListener('dataavailable', ondataavailable);
             mediaRecorder.addEventListener('error', () => {
                 expect(ondataavailable).to.have.been.calledOnce;
+                expect(onstop).to.have.been.calledOnce;
 
                 done();
             });
+            mediaRecorder.addEventListener('stop', onstop);
             mediaRecorder.start();
             mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
         });

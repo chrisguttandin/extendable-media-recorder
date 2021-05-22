@@ -98,6 +98,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
                 dispatchDataAvailableEvent(await encode(encoderId, null));
+                eventTarget.dispatchEvent(new Event('stop'));
             });
 
             promisedAudioNodesAndEncoderId = null;

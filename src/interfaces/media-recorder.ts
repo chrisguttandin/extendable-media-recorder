@@ -9,6 +9,8 @@ export interface IMediaRecorder extends TNativeEventTarget {
 
     onerror: null | TErrorEventHandler<this>;
 
+    onstop: null | TErrorEventHandler<this>;
+
     readonly state: TRecordingState;
 
     addEventListener<K extends keyof IMediaRecorderEventMap>(

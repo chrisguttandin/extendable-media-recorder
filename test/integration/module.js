@@ -157,6 +157,54 @@ describe('module', () => {
                             });
                         });
 
+                        describe('onstop', () => {
+                            it('should be null', () => {
+                                expect(mediaRecorder.onstop).to.be.null;
+                            });
+
+                            it('should be assignable to a function', () => {
+                                const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                const onstop = (mediaRecorder.onstop = fn); // eslint-disable-line no-multi-assign
+
+                                expect(onstop).to.equal(fn);
+                                expect(mediaRecorder.onstop).to.equal(fn);
+                            });
+
+                            it('should be assignable to null', () => {
+                                const onstop = (mediaRecorder.onstop = null); // eslint-disable-line no-multi-assign
+
+                                expect(onstop).to.be.null;
+                                expect(mediaRecorder.onstop).to.be.null;
+                            });
+
+                            it('should not be assignable to something else', () => {
+                                const string = 'no function or null value';
+
+                                mediaRecorder.onstop = () => {};
+
+                                const onstop = (mediaRecorder.onstop = string); // eslint-disable-line no-multi-assign
+
+                                expect(onstop).to.equal(string);
+                                expect(mediaRecorder.onstop).to.be.null;
+                            });
+
+                            it('should register an independent event listener', (done) => {
+                                const onstop = spy();
+
+                                mediaRecorder.onstop = onstop;
+                                mediaRecorder.addEventListener('stop', onstop);
+
+                                mediaRecorder.dispatchEvent(new Event('stop'));
+
+                                // Bug #7 & 8: The stop event is currently delayed.
+                                setTimeout(() => {
+                                    expect(onstop).to.have.been.calledTwice;
+
+                                    done();
+                                });
+                            });
+                        });
+
                         // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
                         // eslint-disable-next-line no-undef
                         if (!process.env.CI) {
@@ -185,9 +233,13 @@ describe('module', () => {
                                         it('should abort the encoding when adding a track', function (done) {
                                             this.timeout(10000);
 
-                                            let err = null;
+                                            let firedDataavailable = false;
+                                            let firedError = false;
 
                                             mediaRecorder.addEventListener('dataavailable', function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedError).to.be.true;
+
                                                 // Bug #14: Safari does not yet support the BlobEvent.
                                                 if (typeof BlobEvent === 'undefined') {
                                                     expect(event).to.be.an.instanceOf(Event);
@@ -201,13 +253,12 @@ describe('module', () => {
 
                                                 expect(this).to.equal(mediaRecorder);
 
-                                                expect(err.code).to.equal(13);
-                                                expect(err.name).to.equal('InvalidModificationError');
-
-                                                done();
+                                                firedDataavailable = true;
                                             });
-
                                             mediaRecorder.addEventListener('error', function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedError).to.be.false;
+
                                                 expect(event).to.be.an.instanceOf(ErrorEvent);
                                                 expect(event.currentTarget).to.equal(mediaRecorder);
                                                 expect(event.target).to.equal(mediaRecorder);
@@ -215,9 +266,24 @@ describe('module', () => {
 
                                                 expect(this).to.equal(mediaRecorder);
 
-                                                err = event.error;
-                                            });
+                                                expect(event.error.code).to.equal(13);
+                                                expect(event.error.name).to.equal('InvalidModificationError');
 
+                                                firedError = true;
+                                            });
+                                            mediaRecorder.addEventListener('stop', function (event) {
+                                                expect(firedDataavailable).to.be.true;
+                                                expect(firedError).to.be.true;
+
+                                                expect(event).to.be.an.instanceOf(Event);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('stop');
+
+                                                expect(this).to.equal(mediaRecorder);
+
+                                                done();
+                                            });
                                             mediaRecorder.start();
 
                                             setTimeout(() => {
@@ -230,9 +296,13 @@ describe('module', () => {
                                         it('should abort the encoding when removing a track', function (done) {
                                             this.timeout(10000);
 
-                                            let err = null;
+                                            let firedDataavailable = false;
+                                            let firedError = false;
 
                                             mediaRecorder.addEventListener('dataavailable', function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedError).to.be.true;
+
                                                 // Bug #14: Safari does not yet support the BlobEvent.
                                                 if (typeof BlobEvent === 'undefined') {
                                                     expect(event).to.be.an.instanceOf(Event);
@@ -246,13 +316,12 @@ describe('module', () => {
 
                                                 expect(this).to.equal(mediaRecorder);
 
-                                                expect(err.code).to.equal(13);
-                                                expect(err.name).to.equal('InvalidModificationError');
-
-                                                done();
+                                                firedDataavailable = true;
                                             });
-
                                             mediaRecorder.addEventListener('error', function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedError).to.be.false;
+
                                                 expect(event).to.be.an.instanceOf(ErrorEvent);
                                                 expect(event.currentTarget).to.equal(mediaRecorder);
                                                 expect(event.target).to.equal(mediaRecorder);
@@ -260,9 +329,24 @@ describe('module', () => {
 
                                                 expect(this).to.equal(mediaRecorder);
 
-                                                err = event.error;
-                                            });
+                                                expect(event.error.code).to.equal(13);
+                                                expect(event.error.name).to.equal('InvalidModificationError');
 
+                                                firedError = true;
+                                            });
+                                            mediaRecorder.addEventListener('stop', function (event) {
+                                                expect(firedDataavailable).to.be.true;
+                                                expect(firedError).to.be.true;
+
+                                                expect(event).to.be.an.instanceOf(Event);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('stop');
+
+                                                expect(this).to.equal(mediaRecorder);
+
+                                                done();
+                                            });
                                             mediaRecorder.start();
 
                                             setTimeout(() => {
@@ -273,7 +357,13 @@ describe('module', () => {
                                         it('should encode a mediaStream as a whole', function (done) {
                                             this.timeout(40000);
 
+                                            let firedDataavailable = false;
+                                            let firedStop = false;
+
                                             mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedStop).to.be.false;
+
                                                 // Bug #14: Safari does not yet support the BlobEvent.
                                                 if (typeof BlobEvent === 'undefined') {
                                                     expect(event).to.be.an.instanceOf(Event);
@@ -286,6 +376,8 @@ describe('module', () => {
                                                 expect(event.type).to.equal('dataavailable');
 
                                                 expect(this).to.equal(mediaRecorder);
+
+                                                firedDataavailable = true;
 
                                                 // Test if the arrayBuffer is decodable.
                                                 const audioBuffer = await audioContext.decodeAudioData(await event.data.arrayBuffer());
@@ -331,7 +423,23 @@ describe('module', () => {
                                                     }
                                                 }
 
+                                                expect(firedDataavailable).to.be.true;
+                                                expect(firedStop).to.be.true;
+
                                                 done();
+                                            });
+                                            mediaRecorder.addEventListener('stop', function (event) {
+                                                expect(firedDataavailable).to.be.true;
+                                                expect(firedStop).to.be.false;
+
+                                                expect(event).to.be.an.instanceOf(Event);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('stop');
+
+                                                expect(this).to.equal(mediaRecorder);
+
+                                                firedStop = true;
                                             });
                                             mediaRecorder.start();
 
@@ -343,7 +451,13 @@ describe('module', () => {
 
                                             const chunks = [];
 
+                                            let firedDataavailable = false;
+                                            let firedStop = false;
+
                                             mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                expect(firedDataavailable).to.be.false;
+                                                expect(firedStop).to.be.false;
+
                                                 // Bug #14: Safari does not yet support the BlobEvent.
                                                 if (typeof BlobEvent === 'undefined') {
                                                     expect(event).to.be.an.instanceOf(Event);
@@ -360,6 +474,8 @@ describe('module', () => {
                                                 chunks.push(event.data);
 
                                                 if (mediaRecorder.state === 'inactive') {
+                                                    firedDataavailable = true;
+
                                                     expect(chunks.length).to.be.above(5);
 
                                                     // Test if the arrayBuffer is decodable.
@@ -408,8 +524,24 @@ describe('module', () => {
                                                         }
                                                     }
 
+                                                    expect(firedDataavailable).to.be.true;
+                                                    expect(firedStop).to.be.true;
+
                                                     done();
                                                 }
+                                            });
+                                            mediaRecorder.addEventListener('stop', function (event) {
+                                                expect(firedDataavailable).to.be.true;
+                                                expect(firedStop).to.be.false;
+
+                                                expect(event).to.be.an.instanceOf(Event);
+                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                expect(event.target).to.equal(mediaRecorder);
+                                                expect(event.type).to.equal('stop');
+
+                                                expect(this).to.equal(mediaRecorder);
+
+                                                firedStop = true;
                                             });
                                             mediaRecorder.start(100);
 
