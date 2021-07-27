@@ -17,4 +17,10 @@ describe('MediaStream', () => {
     it('should not expose the channelCount as part of the settings', () => {
         expect(mediaStream.getAudioTracks()[0].getSettings().channelCount).to.be.undefined;
     });
+
+    // bug #16
+
+    it('should not expose the sampleRate as part of the settings', () => {
+        expect(mediaStream.getAudioTracks()[0].getSettings().sampleRate).to.be.undefined;
+    });
 });
