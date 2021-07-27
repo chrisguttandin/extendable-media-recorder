@@ -213,11 +213,12 @@ describe('module', () => {
                                     describe(`with a MediaRecorder that was${wasStartedBefore ? ' ' : ' not '}started before`, () => {
                                         if (wasStartedBefore) {
                                             beforeEach((done) => {
-                                                mediaRecorder.ondataavailable = () => {
-                                                    mediaRecorder.ondataavailable = null;
+                                                mediaRecorder.onstop = () => {
+                                                    mediaRecorder.onstop = null;
 
                                                     done();
                                                 };
+
                                                 mediaRecorder.start();
                                                 mediaRecorder.stop();
                                             });
