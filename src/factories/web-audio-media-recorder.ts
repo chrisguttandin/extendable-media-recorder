@@ -44,7 +44,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 ) => {
     return (eventTarget, mediaStream, mimeType) => {
         const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
-        const length = Math.max(512, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
+        const length = Math.max(1024, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
         const audioBuffer = new AudioBuffer({ length, sampleRate: audioContext.sampleRate });
         const promisedAudioWorkletModule = addRecorderAudioWorkletModule((url: string) => {
             if (addAudioWorkletModule === undefined) {
