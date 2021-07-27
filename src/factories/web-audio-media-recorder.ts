@@ -102,7 +102,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                const arrayBuffers = await encode(encoderId, null);
+                const [arrayBuffers] = await Promise.all([encode(encoderId, null), audioContext.suspend()]);
 
                 dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
@@ -113,6 +113,8 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
             promisedAudioNodesAndEncoderId = null;
         };
+
+        audioContext.suspend();
 
         return {
             get mimeType(): string {
