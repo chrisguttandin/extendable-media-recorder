@@ -85,14 +85,14 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 clearTimeout(intervalId);
             }
 
-            if (promisedPartialRecording !== null) {
-                promisedPartialRecording.catch(() => {
-                    /* @todo Only catch the errors caused by a duplicate call to encode. */
-                });
-                promisedPartialRecording = null;
-            }
-
             promisedAudioNodesAndEncoderId.then(async ({ encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
+                if (promisedPartialRecording !== null) {
+                    promisedPartialRecording.catch(() => {
+                        /* @todo Only catch the errors caused by a duplicate call to encode. */
+                    });
+                    promisedPartialRecording = null;
+                }
+
                 await recorderAudioWorkletNode.stop();
 
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
