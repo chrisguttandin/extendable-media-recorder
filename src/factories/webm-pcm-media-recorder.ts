@@ -10,9 +10,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     decodeWebMChunk
 ) => {
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
-        const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const audioTracks = mediaStream.getAudioTracks();
+        const bufferedArrayBuffers: ArrayBuffer[] = [];
         const channelCount = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().channelCount;
+        const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
         let promisedPartialRecording: null | Promise<void> = null;
@@ -22,9 +23,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         };
 
         const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
-            dispatchDataAvailableEvent(await encode(encoderId, timeslice));
+            const arrayBuffers = await encode(encoderId, timeslice);
 
-            if (nativeMediaRecorder.state !== 'inactive') {
+            if (nativeMediaRecorder.state === 'inactive') {
+                bufferedArrayBuffers.push(...arrayBuffers);
+            } else {
+                dispatchDataAvailableEvent(arrayBuffers);
+
                 promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
             }
         };
@@ -117,7 +122,10 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                                     if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
                                         encode(encoderId, null).then((arrayBuffers) => {
-                                            dispatchDataAvailableEvent(arrayBuffers);
+                                            dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
+
+                                            bufferedArrayBuffers.length = 0;
+
                                             eventTarget.dispatchEvent(new Event('stop'));
                                         });
 

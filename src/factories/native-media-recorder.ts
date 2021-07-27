@@ -1,4 +1,4 @@
-import { IMediaRecorder } from '../interfaces';
+import { IBlobEvent, IMediaRecorder } from '../interfaces';
 import { TNativeMediaRecorderFactoryFactory } from '../types';
 
 export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (
@@ -6,18 +6,40 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
     createNotSupportedError
 ) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
+        const bufferedBlobs: Blob[] = [];
         const dataAvailableListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
         const errorListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
+        const stopListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
+
+        let isActive = true;
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {
             return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {
-                    if (type === 'dataavailable' || type === 'stop') {
+                    if (type === 'dataavailable') {
                         // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
-                        patchedEventListener = (event: Event) => setTimeout(() => listener.call(nativeMediaRecorder, event));
+                        patchedEventListener = (event: Event) => {
+                            setTimeout(() => {
+                                if (isActive && nativeMediaRecorder.state === 'inactive') {
+                                    bufferedBlobs.push((<IBlobEvent>event).data);
+                                } else {
+                                    if (bufferedBlobs.length > 0) {
+                                        const blob = (<IBlobEvent>event).data;
+
+                                        Object.defineProperty(<IBlobEvent>event, 'data', {
+                                            value: new Blob([...bufferedBlobs, blob], { type: blob.type })
+                                        });
+
+                                        bufferedBlobs.length = 0;
+                                    }
+
+                                    listener.call(nativeMediaRecorder, event);
+                                }
+                            });
+                        };
 
                         dataAvailableListeners.set(listener, patchedEventListener);
                     } else if (type === 'error') {
@@ -40,13 +62,40 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                             }
                         };
 
-                        dataAvailableListeners.set(listener, patchedEventListener);
+                        errorListeners.set(listener, patchedEventListener);
+                    } else if (type === 'stop') {
+                        // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
+                        patchedEventListener = (event: Event) => {
+                            isActive = false;
+
+                            setTimeout(() => listener.call(nativeMediaRecorder, event));
+                        };
+
+                        stopListeners.set(listener, patchedEventListener);
                     }
                 }
 
                 return addEventListener.call(nativeMediaRecorder, type, patchedEventListener, options);
             };
         })(nativeMediaRecorder.addEventListener);
+
+        nativeMediaRecorder.dispatchEvent = ((dispatchEvent) => {
+            // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
+            return (event: Event) => {
+                let wasActive: boolean;
+
+                setTimeout(() => {
+                    wasActive = isActive;
+                    isActive = false;
+                });
+
+                const returnValue = dispatchEvent.call(nativeMediaRecorder, event);
+
+                setTimeout(() => (isActive = wasActive));
+
+                return returnValue;
+            };
+        })(nativeMediaRecorder.dispatchEvent);
 
         nativeMediaRecorder.removeEventListener = ((removeEventListener) => {
             return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
@@ -64,6 +113,12 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                         if (errorListener !== undefined) {
                             patchedEventListener = errorListener;
+                        }
+                    } else if (type === 'stop') {
+                        const stopListener = stopListeners.get(listener);
+
+                        if (stopListener !== undefined) {
+                            patchedEventListener = stopListener;
                         }
                     }
                 }
@@ -85,6 +140,8 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                 ) {
                     throw createNotSupportedError();
                 }
+
+                isActive = timeslice !== undefined;
 
                 return timeslice === undefined ? start.call(nativeMediaRecorder) : start.call(nativeMediaRecorder, timeslice);
             };

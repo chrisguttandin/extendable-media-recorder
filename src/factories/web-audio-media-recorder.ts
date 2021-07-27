@@ -46,6 +46,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         const audioContext = new MinimalAudioContext({ latencyHint: 'playback' });
         const length = Math.max(1024, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
         const audioBuffer = new AudioBuffer({ length, sampleRate: audioContext.sampleRate });
+        const bufferedArrayBuffers: ArrayBuffer[] = [];
         const promisedAudioWorkletModule = addRecorderAudioWorkletModule((url: string) => {
             if (addAudioWorkletModule === undefined) {
                 throw new Error(ERROR_MESSAGE);
@@ -64,9 +65,13 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         };
 
         const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
-            dispatchDataAvailableEvent(await encode(encoderId, timeslice));
+            const arrayBuffers = await encode(encoderId, timeslice);
 
-            if (promisedAudioNodesAndEncoderId !== null) {
+            if (promisedAudioNodesAndEncoderId === null) {
+                bufferedArrayBuffers.push(...arrayBuffers);
+            } else {
+                dispatchDataAvailableEvent(arrayBuffers);
+
                 promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
             }
         };
@@ -97,7 +102,12 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                dispatchDataAvailableEvent(await encode(encoderId, null));
+                const arrayBuffers = await encode(encoderId, null);
+
+                dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
+
+                bufferedArrayBuffers.length = 0;
+
                 eventTarget.dispatchEvent(new Event('stop'));
             });
 
