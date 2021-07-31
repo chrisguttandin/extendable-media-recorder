@@ -128,7 +128,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('dataavailable'));
 
-                                        // Bug #7 & 8: The dataavailable event is currently delayed.
+                                        // Bug #7 & #8: The dataavailable event is currently delayed.
                                         setTimeout(() => {
                                             expect(ondataavailable).to.have.been.calledTwice;
 
@@ -219,7 +219,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('stop'));
 
-                                        // Bug #7 & 8: The stop event is currently delayed.
+                                        // Bug #7 & #8: The stop event is currently delayed.
                                         setTimeout(() => {
                                             expect(onstop).to.have.been.calledTwice;
 

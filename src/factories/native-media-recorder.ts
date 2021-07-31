@@ -24,7 +24,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                 if (typeof listener === 'function') {
                     if (type === 'dataavailable') {
-                        // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
+                        // Bug #7 & #8: Chrome fires the dataavailable and stop events before it fires the error event.
                         patchedEventListener = (event: IBlobEvent) => {
                             setTimeout(() => {
                                 if (isActive && nativeMediaRecorder.state === 'inactive') {
@@ -47,12 +47,12 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                         dataAvailableListeners.set(listener, patchedEventListener);
                     } else if (type === 'error') {
-                        // Bug #12 & 13: Firefox fires a regular event with an error property.
+                        // Bug #12 & #13: Firefox fires a regular event with an error property.
                         patchedEventListener = (event: ErrorEvent | (Event & { error?: Error })) => {
-                            // Bug #3 & 4: Chrome throws an error event without any error.
+                            // Bug #3 & #4: Chrome throws an error event without any error.
                             if (event.error === undefined) {
                                 listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: createInvalidModificationError() }));
-                                // Bug #1 & 2: Firefox throws an error event with an UnknownError.
+                                // Bug #1 & #2: Firefox throws an error event with an UnknownError.
                             } else if (event.error.name === 'UnknownError') {
                                 const message = event.error.message;
 
@@ -69,7 +69,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                         errorListeners.set(listener, patchedEventListener);
                     } else if (type === 'stop') {
-                        // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
+                        // Bug #7 & #8: Chrome fires the dataavailable and stop events before it fires the error event.
                         patchedEventListener = (event: Event) => {
                             isActive = false;
 
@@ -85,7 +85,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         })(nativeMediaRecorder.addEventListener);
 
         nativeMediaRecorder.dispatchEvent = ((dispatchEvent) => {
-            // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
+            // Bug #7 & #8: Chrome fires the dataavailable and stop events before it fires the error event.
             return (event: Event) => {
                 let wasActive: boolean;
 
