@@ -8,7 +8,6 @@ export * from './element-type';
 export * from './error-event-handler';
 export * from './event-handler';
 export * from './event-target-constructor';
-export * from './event-target-constructor-factory';
 export * from './event-target-factory';
 export * from './event-target-factory-factory';
 export * from './invalid-modification-error-factory';

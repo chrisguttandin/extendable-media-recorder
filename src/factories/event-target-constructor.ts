@@ -1,7 +1,11 @@
-import { TEventTargetConstructorFactory, TNativeEventTarget } from '../types';
+import { IEventTarget } from '../interfaces';
+import { TEventHandler, TEventTargetConstructor, TEventTargetFactory, TNativeEventTarget, TWrapEventListenerFunction } from '../types';
 
-export const createEventTargetConstructor: TEventTargetConstructorFactory = (createEventTarget, wrapEventListener) => {
-    return class EventTarget implements TNativeEventTarget {
+export const createEventTargetConstructor = <EventMap extends Record<string, Event>>(
+    createEventTarget: TEventTargetFactory,
+    wrapEventListener: TWrapEventListenerFunction
+): TEventTargetConstructor<EventMap> => {
+    return class EventTarget implements IEventTarget<EventMap> {
         private _listeners: WeakMap<EventListenerOrEventListenerObject, EventListenerOrEventListenerObject>;
 
         private _nativeEventTarget: TNativeEventTarget;
@@ -13,7 +17,7 @@ export const createEventTargetConstructor: TEventTargetConstructorFactory = (cre
 
         public addEventListener(
             type: string,
-            listener: null | EventListenerOrEventListenerObject,
+            listener: null | TEventHandler<this> | EventListenerOrEventListenerObject,
             options?: boolean | AddEventListenerOptions
         ): void {
             if (listener !== null) {
@@ -37,7 +41,7 @@ export const createEventTargetConstructor: TEventTargetConstructorFactory = (cre
 
         public removeEventListener(
             type: string,
-            listener: null | EventListenerOrEventListenerObject,
+            listener: null | TEventHandler<this> | EventListenerOrEventListenerObject,
             options?: boolean | EventListenerOptions
         ): void {
             const wrappedEventListener = listener === null ? undefined : this._listeners.get(listener);

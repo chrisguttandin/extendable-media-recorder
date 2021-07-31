@@ -78,13 +78,13 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         set ondataavailable(value) {
             if (this._ondataavailable !== null) {
-                (<IMediaRecorder>this).removeEventListener('dataavailable', this._ondataavailable[1]);
+                this.removeEventListener('dataavailable', this._ondataavailable[1]);
             }
 
             if (typeof value === 'function') {
                 const boundListener = value.bind(this);
 
-                (<IMediaRecorder>this).addEventListener('dataavailable', boundListener);
+                this.addEventListener('dataavailable', boundListener);
 
                 this._ondataavailable = [value, boundListener];
             } else {
@@ -98,13 +98,13 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         set onerror(value) {
             if (this._onerror !== null) {
-                (<IMediaRecorder>this).removeEventListener('error', this._onerror[1]);
+                this.removeEventListener('error', this._onerror[1]);
             }
 
             if (typeof value === 'function') {
                 const boundListener = value.bind(this);
 
-                (<IMediaRecorder>this).addEventListener('error', boundListener);
+                this.addEventListener('error', boundListener);
 
                 this._onerror = [value, boundListener];
             } else {
@@ -118,13 +118,13 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         set onstop(value) {
             if (this._onstop !== null) {
-                (<IMediaRecorder>this).removeEventListener('stop', this._onstop[1]);
+                this.removeEventListener('stop', this._onstop[1]);
             }
 
             if (typeof value === 'function') {
                 const boundListener = value.bind(this);
 
-                (<IMediaRecorder>this).addEventListener('stop', boundListener);
+                this.addEventListener('stop', boundListener);
 
                 this._onstop = [value, boundListener];
             } else {

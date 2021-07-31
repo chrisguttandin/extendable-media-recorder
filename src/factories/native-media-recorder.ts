@@ -1,5 +1,5 @@
 import { IBlobEvent, IMediaRecorder } from '../interfaces';
-import { TNativeMediaRecorderFactoryFactory } from '../types';
+import { TEventHandler, TNativeMediaRecorderFactoryFactory } from '../types';
 
 export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (
     createInvalidModificationError,
@@ -7,29 +7,33 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 ) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
         const bufferedBlobs: Blob[] = [];
-        const dataAvailableListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
-        const errorListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
+        const dataAvailableListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: IBlobEvent) => void>();
+        const errorListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: ErrorEvent) => void>();
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
-        const stopListeners = new WeakMap<any, (this: IMediaRecorder, event: Event) => any>();
+        const stopListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: Event) => void>();
 
         let isActive = true;
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {
-            return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
+            return (
+                type: string,
+                listener: null | TEventHandler<IMediaRecorder> | EventListenerOrEventListenerObject,
+                options?: boolean | AddEventListenerOptions
+            ) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {
                     if (type === 'dataavailable') {
                         // Bug #7 & 8: Chrome fires the dataavailable and stop events before it fires the error event.
-                        patchedEventListener = (event: Event) => {
+                        patchedEventListener = (event: IBlobEvent) => {
                             setTimeout(() => {
                                 if (isActive && nativeMediaRecorder.state === 'inactive') {
-                                    bufferedBlobs.push((<IBlobEvent>event).data);
+                                    bufferedBlobs.push(event.data);
                                 } else {
                                     if (bufferedBlobs.length > 0) {
-                                        const blob = (<IBlobEvent>event).data;
+                                        const blob = event.data;
 
-                                        Object.defineProperty(<IBlobEvent>event, 'data', {
+                                        Object.defineProperty(event, 'data', {
                                             value: new Blob([...bufferedBlobs, blob], { type: blob.type })
                                         });
 
@@ -43,22 +47,23 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                         dataAvailableListeners.set(listener, patchedEventListener);
                     } else if (type === 'error') {
-                        patchedEventListener = (event: Event) => {
+                        // Bug #12 & 13: Firefox fires a regular event with an error property.
+                        patchedEventListener = (event: ErrorEvent | (Event & { error?: Error })) => {
                             // Bug #3 & 4: Chrome throws an error event without any error.
-                            if ((<ErrorEvent>event).error === undefined) {
+                            if (event.error === undefined) {
                                 listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: createInvalidModificationError() }));
                                 // Bug #1 & 2: Firefox throws an error event with an UnknownError.
-                            } else if ((<ErrorEvent>event).error.name === 'UnknownError') {
-                                const message = (<ErrorEvent>event).error.message;
+                            } else if (event.error.name === 'UnknownError') {
+                                const message = event.error.message;
 
                                 listener.call(
                                     nativeMediaRecorder,
                                     new ErrorEvent('error', { error: createInvalidModificationError(message) })
                                 );
-                            } else if (!(event instanceof ErrorEvent)) {
-                                listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: (<ErrorEvent>event).error }));
-                            } else {
+                            } else if (event instanceof ErrorEvent) {
                                 listener.call(nativeMediaRecorder, event);
+                            } else {
+                                listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: event.error }));
                             }
                         };
 
@@ -98,7 +103,11 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         })(nativeMediaRecorder.dispatchEvent);
 
         nativeMediaRecorder.removeEventListener = ((removeEventListener) => {
-            return (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
+            return (
+                type: string,
+                listener: null | TEventHandler<IMediaRecorder> | EventListenerOrEventListenerObject,
+                options?: boolean | EventListenerOptions
+            ) => {
                 let patchedEventListener = listener;
 
                 if (typeof listener === 'function') {

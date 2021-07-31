@@ -1,7 +1,7 @@
 import { IBlobEvent } from './blob-event';
 
 // @todo TypeScript does not include type definitions for the MediaStream Recording specification yet.
-export interface IMediaRecorderEventMap {
+export interface IMediaRecorderEventMap extends Record<string, Event> {
     dataavailable: IBlobEvent;
 
     // @todo This should fire a MediaRecorderErrorEvent.

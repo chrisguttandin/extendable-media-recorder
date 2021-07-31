@@ -1,8 +1,9 @@
-import { TBlobEventHandler, TErrorEventHandler, TEventHandler, TNativeEventTarget, TRecordingState } from '../types';
+import { TBlobEventHandler, TErrorEventHandler, TEventHandler, TRecordingState } from '../types';
+import { IEventTarget } from './event-target';
 import { IMediaRecorderEventMap } from './media-recorder-event-map';
 
 // @todo TypeScript does not include type definitions for the MediaStream Recording specification yet.
-export interface IMediaRecorder extends TNativeEventTarget {
+export interface IMediaRecorder extends IEventTarget<IMediaRecorderEventMap> {
     readonly mimeType: string;
 
     ondataavailable: null | TBlobEventHandler<this>;
@@ -12,22 +13,6 @@ export interface IMediaRecorder extends TNativeEventTarget {
     onstop: null | TEventHandler<this>;
 
     readonly state: TRecordingState;
-
-    addEventListener<K extends keyof IMediaRecorderEventMap>(
-        type: K,
-        listener: (this: this, event: IMediaRecorderEventMap[K]) => void,
-        options?: boolean | AddEventListenerOptions
-    ): void;
-
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-
-    removeEventListener<K extends keyof IMediaRecorderEventMap>(
-        type: K,
-        listener: (this: this, event: IMediaRecorderEventMap[K]) => void,
-        options?: boolean | EventListenerOptions
-    ): void;
-
-    removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 
     start(timeslice?: number): void;
 
