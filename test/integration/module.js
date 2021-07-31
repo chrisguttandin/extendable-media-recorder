@@ -5,6 +5,19 @@ import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
 import { spy } from 'sinon';
 
+const compareRotatingBuffers = (rotatingBuffers) => {
+    const bufferLength = rotatingBuffers[0].length;
+
+    expect(rotatingBuffers[1].length).to.equal(bufferLength);
+
+    for (let i = 0; i < bufferLength; i += 1) {
+        expect(rotatingBuffers[0][i]).to.not.equal(0);
+        expect(rotatingBuffers[0][i]).to.be.closeTo(rotatingBuffers[1][i], 0.0001);
+    }
+
+    return bufferLength;
+};
+
 describe('module', () => {
     // eslint-disable-next-line no-undef
     if (!process.env.TARGET || !process.env.TARGET.endsWith('-unsupported')) {
@@ -416,24 +429,18 @@ describe('module', () => {
                                                                 audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
                                                                 for (
-                                                                    let startInChannel = bufferLength;
-                                                                    startInChannel < audioBuffer.length - bufferLength;
-                                                                    startInChannel += bufferLength
+                                                                    let j = bufferLength;
+                                                                    j < audioBuffer.length - bufferLength;
+                                                                    j += bufferLength
                                                                 ) {
-                                                                    audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+                                                                    audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
 
-                                                                    for (let j = 0; j < bufferLength; j += 1) {
-                                                                        try {
-                                                                            expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                                                            expect(rotatingBuffers[0][j]).to.be.closeTo(
-                                                                                rotatingBuffers[1][j],
-                                                                                0.0001
-                                                                            );
-                                                                        } catch (err) {
-                                                                            done(err);
+                                                                    try {
+                                                                        compareRotatingBuffers(rotatingBuffers);
+                                                                    } catch (err) {
+                                                                        done(err);
 
-                                                                            return;
-                                                                        }
+                                                                        return;
                                                                     }
 
                                                                     rotatingBuffers.push(rotatingBuffers.shift());
@@ -520,24 +527,18 @@ describe('module', () => {
                                                                     audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
                                                                     for (
-                                                                        let startInChannel = bufferLength;
-                                                                        startInChannel < audioBuffer.length - bufferLength;
-                                                                        startInChannel += bufferLength
+                                                                        let j = bufferLength;
+                                                                        j < audioBuffer.length - bufferLength;
+                                                                        j += bufferLength
                                                                     ) {
-                                                                        audioBuffer.copyFromChannel(rotatingBuffers[1], i, startInChannel);
+                                                                        audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
 
-                                                                        for (let j = 0; j < bufferLength; j += 1) {
-                                                                            try {
-                                                                                expect(rotatingBuffers[0][j]).to.not.equal(0);
-                                                                                expect(rotatingBuffers[0][j]).to.be.closeTo(
-                                                                                    rotatingBuffers[1][j],
-                                                                                    0.0001
-                                                                                );
-                                                                            } catch (err) {
-                                                                                done(err);
+                                                                        try {
+                                                                            compareRotatingBuffers(rotatingBuffers);
+                                                                        } catch (err) {
+                                                                            done(err);
 
-                                                                                return;
-                                                                            }
+                                                                            return;
                                                                         }
 
                                                                         rotatingBuffers.push(rotatingBuffers.shift());
