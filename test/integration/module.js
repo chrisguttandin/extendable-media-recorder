@@ -1,18 +1,27 @@
+import { AudioContext, ConstantSourceNode } from 'standardized-audio-context';
 import { MediaRecorder, isSupported, register } from '../../src/module';
-import { AudioContext } from 'standardized-audio-context';
 import { connect } from 'extendable-media-recorder-wav-encoder';
+import { createMediaStreamAudioDestinationNode } from '../helpers/create-media-stream-audio-destination-node';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
 import { spy } from 'sinon';
 
-const compareRotatingBuffers = (rotatingBuffers) => {
+const compareRotatingBuffers = (rotatingBuffers, shouldThrow = true) => {
     const bufferLength = rotatingBuffers[0].length;
 
     expect(rotatingBuffers[1].length).to.equal(bufferLength);
 
     for (let i = 0; i < bufferLength; i += 1) {
-        expect(rotatingBuffers[0][i]).to.not.equal(0);
-        expect(rotatingBuffers[0][i]).to.be.closeTo(rotatingBuffers[1][i], 0.0001);
+        try {
+            expect(rotatingBuffers[0][i]).to.not.equal(0);
+            expect(rotatingBuffers[0][i]).to.be.closeTo(rotatingBuffers[1][i], 0.0001);
+        } catch (err) {
+            if (shouldThrow) {
+                throw err;
+            }
+
+            return i;
+        }
     }
 
     return bufferLength;
@@ -45,6 +54,7 @@ describe('module', () => {
                                 let bufferLength;
                                 let mediaRecorder;
                                 let mediaStream;
+                                let mediaStreamAudioDestinationNode;
 
                                 afterEach(function () {
                                     this.timeout(40000);
@@ -56,11 +66,12 @@ describe('module', () => {
                                     audioContext = new AudioContext({ sampleRate });
                                     bufferLength = 100;
 
-                                    mediaStream = await createMediaStreamWithAudioTrack(
+                                    mediaStreamAudioDestinationNode = await createMediaStreamAudioDestinationNode(
                                         audioContext,
                                         channelCount,
                                         audioContext.sampleRate / bufferLength
                                     );
+                                    mediaStream = mediaStreamAudioDestinationNode.stream;
 
                                     const [firstAudioTrack] = mediaStream.getAudioTracks();
 
@@ -224,6 +235,90 @@ describe('module', () => {
                                             expect(onstop).to.have.been.calledTwice;
 
                                             done();
+                                        });
+                                    });
+                                });
+
+                                describe('pause()', () => {
+                                    describe('with a state of inactive', () => {
+                                        it('should throw an InvalidStateError', (done) => {
+                                            try {
+                                                mediaRecorder.pause();
+                                            } catch (err) {
+                                                expect(err.code).to.equal(11);
+                                                expect(err.name).to.equal('InvalidStateError');
+
+                                                done();
+                                            }
+                                        });
+                                    });
+
+                                    describe('with a state of paused', () => {
+                                        afterEach(() => mediaRecorder.stop());
+
+                                        beforeEach(() => {
+                                            mediaRecorder.start();
+                                            mediaRecorder.pause();
+                                        });
+
+                                        it('should not change the state', () => {
+                                            mediaRecorder.pause();
+
+                                            expect(mediaRecorder.state).to.equal('paused');
+                                        });
+                                    });
+
+                                    describe('with a state of recording', () => {
+                                        afterEach(() => mediaRecorder.stop());
+
+                                        beforeEach(() => mediaRecorder.start());
+
+                                        it('should set the state to paused', () => {
+                                            mediaRecorder.pause();
+
+                                            expect(mediaRecorder.state).to.equal('paused');
+                                        });
+                                    });
+                                });
+
+                                describe('resume()', () => {
+                                    describe('with a state of inactive', () => {
+                                        it('should throw an InvalidStateError', (done) => {
+                                            try {
+                                                mediaRecorder.resume();
+                                            } catch (err) {
+                                                expect(err.code).to.equal(11);
+                                                expect(err.name).to.equal('InvalidStateError');
+
+                                                done();
+                                            }
+                                        });
+                                    });
+
+                                    describe('with a state of paused', () => {
+                                        afterEach(() => mediaRecorder.stop());
+
+                                        beforeEach(() => {
+                                            mediaRecorder.start();
+                                            mediaRecorder.pause();
+                                        });
+
+                                        it('should set the state to recording', () => {
+                                            mediaRecorder.resume();
+
+                                            expect(mediaRecorder.state).to.equal('recording');
+                                        });
+                                    });
+
+                                    describe('with a state of recording', () => {
+                                        afterEach(() => mediaRecorder.stop());
+
+                                        beforeEach(() => mediaRecorder.start());
+
+                                        it('should not change the state', () => {
+                                            mediaRecorder.resume();
+
+                                            expect(mediaRecorder.state).to.equal('recording');
                                         });
                                     });
                                 });
@@ -560,6 +655,147 @@ describe('module', () => {
                                                     mediaRecorder.start(100);
 
                                                     setTimeout(() => mediaRecorder.stop(), 1000);
+                                                });
+
+                                                it('should encode a mediaStream with a pause', function (done) {
+                                                    this.timeout(40000);
+
+                                                    let firedDataavailable = false;
+                                                    let firedStop = false;
+
+                                                    mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                        expect(firedDataavailable).to.be.false;
+                                                        expect(firedStop).to.be.false;
+
+                                                        // Bug #14: Safari does not yet support the BlobEvent.
+                                                        if (typeof BlobEvent === 'undefined') {
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                        } else {
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
+                                                        }
+
+                                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                                        expect(event.target).to.equal(mediaRecorder);
+                                                        expect(event.type).to.equal('dataavailable');
+
+                                                        expect(this).to.equal(mediaRecorder);
+
+                                                        firedDataavailable = true;
+
+                                                        // Test if the arrayBuffer is decodable.
+                                                        const arrayBuffer = await event.data.arrayBuffer();
+                                                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+
+                                                        expect(audioBuffer.numberOfChannels).to.equal(channelCount);
+
+                                                        // Test if the audioBuffer is at least half a second long.
+                                                        expect(audioBuffer.duration).to.be.above(0.5);
+
+                                                        // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                                        if (mimeType === 'audio/wav') {
+                                                            const dataView = new DataView(arrayBuffer);
+
+                                                            expect(dataView.getUint32(24, true), sampleRate);
+
+                                                            const rotatingBuffers = [
+                                                                new Float32Array(bufferLength),
+                                                                new Float32Array(bufferLength)
+                                                            ];
+
+                                                            let cut = null;
+
+                                                            for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                                                audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+
+                                                                for (let j = bufferLength; j < audioBuffer.length; j += bufferLength) {
+                                                                    audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
+
+                                                                    const k = compareRotatingBuffers(rotatingBuffers, false);
+
+                                                                    if (k !== bufferLength) {
+                                                                        if (cut === null) {
+                                                                            cut = j + k;
+                                                                        } else {
+                                                                            expect(cut).to.equal(j + k);
+                                                                        }
+
+                                                                        audioBuffer.copyFromChannel(rotatingBuffers[0], i, cut);
+
+                                                                        for (
+                                                                            let l = cut + bufferLength;
+                                                                            l < audioBuffer.length;
+                                                                            l += bufferLength
+                                                                        ) {
+                                                                            audioBuffer.copyFromChannel(rotatingBuffers[1], i, l);
+
+                                                                            try {
+                                                                                compareRotatingBuffers(rotatingBuffers);
+                                                                            } catch (err) {
+                                                                                done(err);
+
+                                                                                return;
+                                                                            }
+
+                                                                            rotatingBuffers.push(rotatingBuffers.shift());
+                                                                        }
+
+                                                                        break;
+                                                                    }
+
+                                                                    rotatingBuffers.push(rotatingBuffers.shift());
+                                                                }
+                                                            }
+                                                        }
+
+                                                        expect(firedDataavailable).to.be.true;
+                                                        expect(firedStop).to.be.true;
+
+                                                        done();
+                                                    });
+                                                    mediaRecorder.addEventListener('stop', function (event) {
+                                                        expect(firedDataavailable).to.be.true;
+                                                        expect(firedStop).to.be.false;
+
+                                                        expect(event).to.be.an.instanceOf(Event);
+                                                        expect(event.currentTarget).to.equal(mediaRecorder);
+                                                        expect(event.target).to.equal(mediaRecorder);
+                                                        expect(event.type).to.equal('stop');
+
+                                                        expect(this).to.equal(mediaRecorder);
+
+                                                        firedStop = true;
+                                                    });
+
+                                                    const constantSourceNode = new ConstantSourceNode(audioContext, { offset: 0 });
+
+                                                    constantSourceNode.connect(mediaStreamAudioDestinationNode);
+                                                    constantSourceNode.start();
+
+                                                    mediaRecorder.start();
+
+                                                    setTimeout(() => {
+                                                        mediaRecorder.pause();
+
+                                                        constantSourceNode.offset.value = 10;
+
+                                                        setTimeout(() => {
+                                                            constantSourceNode.offset.value = 100;
+
+                                                            mediaRecorder.resume();
+
+                                                            setTimeout(() => {
+                                                                mediaRecorder.stop();
+
+                                                                constantSourceNode.onended = () => {
+                                                                    constantSourceNode.onended = null;
+
+                                                                    constantSourceNode.disconnect(mediaStreamAudioDestinationNode);
+                                                                };
+
+                                                                constantSourceNode.stop(audioContext.currentTime + 0.5);
+                                                            }, 500);
+                                                        }, 500);
+                                                    }, 500);
                                                 });
                                             });
                                         }

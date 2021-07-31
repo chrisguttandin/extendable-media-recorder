@@ -18,11 +18,18 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     nativeMediaRecorderConstructor
 ) => {
     return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
-        private _internalMediaRecorder: Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | 'onstop' | keyof TNativeEventTarget>;
+        private _internalMediaRecorder: Omit<
+            IMediaRecorder,
+            'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstop' | keyof TNativeEventTarget
+        >;
 
         private _ondataavailable: null | [TBlobEventHandler<this>, TBlobEventHandler<this>];
 
         private _onerror: null | [TErrorEventHandler<this>, TErrorEventHandler<this>];
+
+        private _onpause: null | [TEventHandler<this>, TEventHandler<this>];
+
+        private _onresume: null | [TEventHandler<this>, TEventHandler<this>];
 
         private _onstop: null | [TEventHandler<this>, TEventHandler<this>];
 
@@ -65,6 +72,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
             this._ondataavailable = null;
             this._onerror = null;
+            this._onpause = null;
+            this._onresume = null;
             this._onstop = null;
         }
 
@@ -112,6 +121,46 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             }
         }
 
+        get onpause(): null | TEventHandler<this> {
+            return this._onpause === null ? this._onpause : this._onpause[0];
+        }
+
+        set onpause(value) {
+            if (this._onpause !== null) {
+                this.removeEventListener('pause', this._onpause[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                this.addEventListener('pause', boundListener);
+
+                this._onpause = [value, boundListener];
+            } else {
+                this._onpause = null;
+            }
+        }
+
+        get onresume(): null | TEventHandler<this> {
+            return this._onresume === null ? this._onresume : this._onresume[0];
+        }
+
+        set onresume(value) {
+            if (this._onresume !== null) {
+                this.removeEventListener('resume', this._onresume[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                this.addEventListener('resume', boundListener);
+
+                this._onresume = [value, boundListener];
+            } else {
+                this._onresume = null;
+            }
+        }
+
         get onstop(): null | TEventHandler<this> {
             return this._onstop === null ? this._onstop : this._onstop[0];
         }
@@ -134,6 +183,14 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
 
         get state(): TRecordingState {
             return this._internalMediaRecorder.state;
+        }
+
+        public pause(): void {
+            return this._internalMediaRecorder.pause();
+        }
+
+        public resume(): void {
+            return this._internalMediaRecorder.resume();
         }
 
         public start(timeslice?: number): void {

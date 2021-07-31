@@ -10,9 +10,17 @@ export interface IMediaRecorder extends IEventTarget<IMediaRecorderEventMap> {
 
     onerror: null | TErrorEventHandler<this>;
 
+    onpause: null | TEventHandler<this>;
+
+    onresume: null | TEventHandler<this>;
+
     onstop: null | TEventHandler<this>;
 
     readonly state: TRecordingState;
+
+    pause(): void;
+
+    resume(): void;
 
     start(timeslice?: number): void;
 

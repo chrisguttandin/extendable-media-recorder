@@ -60,6 +60,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         let intervalId: null | number = null;
         let promisedAudioNodesAndEncoderId: null | Promise<IAudioNodesAndEncoderId> = null;
         let promisedPartialRecording: null | Promise<void> = null;
+        let isAudioContextRunning = true;
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
             eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
@@ -75,6 +76,12 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
             }
+        };
+
+        const resume = (): Promise<void> => {
+            isAudioContextRunning = true;
+
+            return audioContext.resume();
         };
 
         const stop = (): void => {
@@ -103,7 +110,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                const [arrayBuffers] = await Promise.all([encode(encoderId, null), audioContext.suspend()]);
+                const [arrayBuffers] = await Promise.all([encode(encoderId, null), suspend()]);
 
                 dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
@@ -115,7 +122,13 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             promisedAudioNodesAndEncoderId = null;
         };
 
-        audioContext.suspend();
+        const suspend = (): Promise<void> => {
+            isAudioContextRunning = false;
+
+            return audioContext.suspend();
+        };
+
+        suspend();
 
         return {
             get mimeType(): string {
@@ -123,7 +136,29 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             get state(): TRecordingState {
-                return promisedAudioNodesAndEncoderId === null ? 'inactive' : 'recording';
+                return promisedAudioNodesAndEncoderId === null ? 'inactive' : isAudioContextRunning ? 'recording' : 'paused';
+            },
+
+            pause(): void {
+                if (promisedAudioNodesAndEncoderId === null) {
+                    throw createInvalidStateError();
+                }
+
+                if (isAudioContextRunning) {
+                    suspend();
+                    eventTarget.dispatchEvent(new Event('pause'));
+                }
+            },
+
+            resume(): void {
+                if (promisedAudioNodesAndEncoderId === null) {
+                    throw createInvalidStateError();
+                }
+
+                if (!isAudioContextRunning) {
+                    resume();
+                    eventTarget.dispatchEvent(new Event('resume'));
+                }
             },
 
             start(timeslice?: number): void {
@@ -139,7 +174,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 const channelCount = audioTracks.length === 0 ? 2 : audioTracks[0].getSettings().channelCount ?? 2;
 
                 promisedAudioNodesAndEncoderId = Promise.all([
-                    audioContext.resume(),
+                    resume(),
                     promisedAudioWorkletModule.then(() =>
                         createPromisedAudioNodesEncoderIdAndPort(audioBuffer, audioContext, channelCount, mediaStream, mimeType)
                     )
