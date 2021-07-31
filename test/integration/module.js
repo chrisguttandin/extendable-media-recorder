@@ -428,11 +428,7 @@ describe('module', () => {
                                                             for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
                                                                 audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
-                                                                for (
-                                                                    let j = bufferLength;
-                                                                    j < audioBuffer.length - bufferLength;
-                                                                    j += bufferLength
-                                                                ) {
+                                                                for (let j = bufferLength; j < audioBuffer.length; j += bufferLength) {
                                                                     audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
 
                                                                     try {
@@ -526,11 +522,7 @@ describe('module', () => {
                                                                 for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
                                                                     audioBuffer.copyFromChannel(rotatingBuffers[0], i);
 
-                                                                    for (
-                                                                        let j = bufferLength;
-                                                                        j < audioBuffer.length - bufferLength;
-                                                                        j += bufferLength
-                                                                    ) {
+                                                                    for (let j = bufferLength; j < audioBuffer.length; j += bufferLength) {
                                                                         audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
 
                                                                         try {
