@@ -1,4 +1,4 @@
-import { TBlobEventHandler, TErrorEventHandler, TNativeEventTarget, TRecordingState } from '../types';
+import { TBlobEventHandler, TErrorEventHandler, TEventHandler, TNativeEventTarget, TRecordingState } from '../types';
 import { IMediaRecorderEventMap } from './media-recorder-event-map';
 
 // @todo TypeScript does not include type definitions for the MediaStream Recording specification yet.
@@ -9,7 +9,7 @@ export interface IMediaRecorder extends TNativeEventTarget {
 
     onerror: null | TErrorEventHandler<this>;
 
-    onstop: null | TErrorEventHandler<this>;
+    onstop: null | TEventHandler<this>;
 
     readonly state: TRecordingState;
 
