@@ -1,4 +1,4 @@
-import { IMediaRecorder, IMediaRecorderOptions } from '../interfaces';
+import { IMediaRecorder, IMediaRecorderEventMap, IMediaRecorderOptions } from '../interfaces';
 import {
     TBlobEventHandler,
     TErrorEventHandler,
@@ -17,7 +17,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     eventTargetConstructor,
     nativeMediaRecorderConstructor
 ) => {
-    return class MediaRecorder extends eventTargetConstructor implements IMediaRecorder {
+    return class MediaRecorder extends eventTargetConstructor<IMediaRecorderEventMap> implements IMediaRecorder {
         private _internalMediaRecorder: Omit<
             IMediaRecorder,
             'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstop' | keyof TNativeEventTarget

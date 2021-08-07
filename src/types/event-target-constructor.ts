@@ -1,6 +1,6 @@
 import { IEventTarget } from '../interfaces';
 import { TNativeEventTarget } from './native-event-target';
 
-export type TEventTargetConstructor<EventMap extends Record<string, Event>> = new (
+export type TEventTargetConstructor = new <EventMap extends Record<string, Event>>(
     nativeEventTarget?: TNativeEventTarget
 ) => IEventTarget<EventMap>;
