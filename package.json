@@ -15,7 +15,7 @@
         "recorder-audio-worklet": "^5.1.4",
         "standardized-audio-context": "^25.3.6",
         "subscribable-things": "^1.11.24",
-        "tslib": "^2.3.0"
+        "tslib": "^2.3.1"
     },
     "description": "An extendable drop-in replacement for the native MediaRecorder.",
     "devDependencies": {
