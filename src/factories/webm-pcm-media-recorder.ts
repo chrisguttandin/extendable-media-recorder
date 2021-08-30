@@ -12,7 +12,11 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const audioTracks = mediaStream.getAudioTracks();
         const bufferedArrayBuffers: ArrayBuffer[] = [];
-        const channelCount = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().channelCount;
+        // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
+        const channelCount =
+            audioTracks.length === 0
+                ? undefined
+                : (<MediaTrackSettings & { channelCount?: number }>audioTracks[0].getSettings()).channelCount;
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
         const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
