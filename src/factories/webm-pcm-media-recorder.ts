@@ -86,11 +86,14 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 }
 
                 if (nativeMediaRecorder.state === 'inactive') {
-                    let promisedDataViewElementTypeEncoderIdAndPort: null | TPromisedDataViewElementTypeEncoderIdAndPort = null;
-
-                    if (sampleRate !== undefined) {
-                        promisedDataViewElementTypeEncoderIdAndPort = instantiate(mimeType, sampleRate);
+                    if (sampleRate === undefined) {
+                        throw new Error('The sampleRate is not defined.');
                     }
+
+                    let promisedDataViewElementTypeEncoderIdAndPort: TPromisedDataViewElementTypeEncoderIdAndPort = instantiate(
+                        mimeType,
+                        sampleRate
+                    );
 
                     // Bug #9: Chrome sometimes fires more than one dataavailable event while being inactive.
                     let pendingInvocations = 0;
@@ -101,59 +104,57 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                     )(({ data }) => {
                         pendingInvocations += 1;
 
-                        if (promisedDataViewElementTypeEncoderIdAndPort !== null) {
-                            promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
-                                async ({ dataView = null, elementType = null, encoderId, port }) => {
-                                    const multiOrSingleBufferDataView =
-                                        dataView === null
-                                            ? new DataView(await data.arrayBuffer())
-                                            : new MultiBufferDataView([...dataView.buffers, await data.arrayBuffer()], dataView.byteOffset);
+                        promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
+                            async ({ dataView = null, elementType = null, encoderId, port }) => {
+                                const multiOrSingleBufferDataView =
+                                    dataView === null
+                                        ? new DataView(await data.arrayBuffer())
+                                        : new MultiBufferDataView([...dataView.buffers, await data.arrayBuffer()], dataView.byteOffset);
 
-                                    const { currentElementType, offset, contents } = decodeWebMChunk(
-                                        multiOrSingleBufferDataView,
-                                        elementType,
-                                        channelCount
-                                    );
-                                    const buffers =
-                                        'buffer' in multiOrSingleBufferDataView
-                                            ? [multiOrSingleBufferDataView.buffer]
-                                            : multiOrSingleBufferDataView.buffers;
-                                    const remainingDataView =
-                                        offset < multiOrSingleBufferDataView.byteLength
-                                            ? new MultiBufferDataView(buffers, multiOrSingleBufferDataView.byteOffset + offset)
-                                            : null;
+                                const { currentElementType, offset, contents } = decodeWebMChunk(
+                                    multiOrSingleBufferDataView,
+                                    elementType,
+                                    channelCount
+                                );
+                                const buffers =
+                                    'buffer' in multiOrSingleBufferDataView
+                                        ? [multiOrSingleBufferDataView.buffer]
+                                        : multiOrSingleBufferDataView.buffers;
+                                const remainingDataView =
+                                    offset < multiOrSingleBufferDataView.byteLength
+                                        ? new MultiBufferDataView(buffers, multiOrSingleBufferDataView.byteOffset + offset)
+                                        : null;
 
-                                    contents.forEach((content) =>
-                                        port.postMessage(
-                                            content,
-                                            content.map(({ buffer }) => buffer)
-                                        )
-                                    );
+                                contents.forEach((content) =>
+                                    port.postMessage(
+                                        content,
+                                        content.map(({ buffer }) => buffer)
+                                    )
+                                );
 
-                                    pendingInvocations -= 1;
+                                pendingInvocations -= 1;
 
-                                    if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
-                                        encode(encoderId, null).then((arrayBuffers) => {
-                                            dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
+                                if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
+                                    encode(encoderId, null).then((arrayBuffers) => {
+                                        dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
-                                            bufferedArrayBuffers.length = 0;
+                                        bufferedArrayBuffers.length = 0;
 
-                                            eventTarget.dispatchEvent(new Event('stop'));
-                                        });
+                                        eventTarget.dispatchEvent(new Event('stop'));
+                                    });
 
-                                        port.postMessage([]);
-                                        port.close();
+                                    port.postMessage([]);
+                                    port.close();
 
-                                        removeEventListener();
-                                    }
-
-                                    return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
+                                    removeEventListener();
                                 }
-                            );
-                        }
+
+                                return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
+                            }
+                        );
                     });
 
-                    if (promisedDataViewElementTypeEncoderIdAndPort !== null && timeslice !== undefined) {
+                    if (timeslice !== undefined) {
                         promisedDataViewElementTypeEncoderIdAndPort.then(
                             ({ encoderId }) => (promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice))
                         );
