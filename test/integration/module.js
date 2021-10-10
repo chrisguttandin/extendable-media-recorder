@@ -539,6 +539,9 @@ describe('module', () => {
                                                                 const dataView = new DataView(arrayBuffer);
 
                                                                 expect(dataView.getUint32(24, true), sampleRate);
+                                                                expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                    audioBuffer.length
+                                                                );
 
                                                                 const rotatingBuffers = [
                                                                     new Float32Array(bufferLength),
@@ -637,6 +640,9 @@ describe('module', () => {
                                                                     const dataView = new DataView(arrayBuffer);
 
                                                                     expect(dataView.getUint32(24, true)).to.equal(sampleRate);
+                                                                    expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                        audioBuffer.length
+                                                                    );
 
                                                                     const rotatingBuffers = [
                                                                         new Float32Array(bufferLength),
@@ -731,6 +737,9 @@ describe('module', () => {
                                                                 const dataView = new DataView(arrayBuffer);
 
                                                                 expect(dataView.getUint32(24, true), sampleRate);
+                                                                expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                    audioBuffer.length
+                                                                );
 
                                                                 const rotatingBuffers = [
                                                                     new Float32Array(bufferLength),
@@ -881,6 +890,9 @@ describe('module', () => {
                                                                         const dataView = new DataView(arrayBuffer);
 
                                                                         expect(dataView.getUint32(24, true)).to.equal(sampleRate);
+                                                                        expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                            audioBuffer.length
+                                                                        );
 
                                                                         const rotatingBuffers = [
                                                                             new Float32Array(bufferLength),
