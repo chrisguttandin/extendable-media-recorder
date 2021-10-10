@@ -47,7 +47,8 @@ const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(
     createBlobEvent,
     createInvalidModificationError,
     createNotSupportedError,
-    decodeWebMChunk
+    decodeWebMChunk,
+    readVariableSizeInteger
 );
 const createEventTarget = createEventTargetFactory(window);
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);

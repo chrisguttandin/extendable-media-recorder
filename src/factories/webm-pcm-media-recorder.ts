@@ -7,7 +7,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     createBlobEvent,
     createInvalidModificationError,
     createNotSupportedError,
-    decodeWebMChunk
+    decodeWebMChunk,
+    readVariableSizeInteger
 ) => {
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const audioTracks = mediaStream.getAudioTracks();
@@ -21,6 +22,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
         const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
         let promisedPartialRecording: null | Promise<void> = null;
+        let stopRecording = () => {}; // tslint:disable-line:no-empty
 
         const dispatchDataAvailableEvent = (arrayBuffers: ArrayBuffer[]): void => {
             eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
@@ -49,6 +51,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 });
                 promisedPartialRecording = null;
             }
+
+            stopRecording();
+            stopRecording = () => {}; // tslint:disable-line:no-empty
 
             nativeMediaRecorder.stop();
         };
@@ -90,13 +95,18 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                         throw new Error('The sampleRate is not defined.');
                     }
 
+                    let isRecording = false;
+                    let isStopped = false;
+                    // Bug #9: Chrome sometimes fires more than one dataavailable event while being inactive.
+                    let pendingInvocations = 0;
                     let promisedDataViewElementTypeEncoderIdAndPort: TPromisedDataViewElementTypeEncoderIdAndPort = instantiate(
                         mimeType,
                         sampleRate
                     );
 
-                    // Bug #9: Chrome sometimes fires more than one dataavailable event while being inactive.
-                    let pendingInvocations = 0;
+                    stopRecording = () => {
+                        isStopped = true;
+                    };
 
                     const removeEventListener = on(
                         nativeMediaRecorder,
@@ -106,23 +116,39 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                         promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
                             async ({ dataView = null, elementType = null, encoderId, port }) => {
-                                const multiOrSingleBufferDataView =
+                                const arrayBuffer = await data.arrayBuffer();
+
+                                pendingInvocations -= 1;
+
+                                const currentDataView =
                                     dataView === null
-                                        ? new DataView(await data.arrayBuffer())
-                                        : new MultiBufferDataView([...dataView.buffers, await data.arrayBuffer()], dataView.byteOffset);
+                                        ? new MultiBufferDataView([arrayBuffer])
+                                        : new MultiBufferDataView([...dataView.buffers, arrayBuffer], dataView.byteOffset);
+
+                                if (!isRecording && nativeMediaRecorder.state === 'recording' && !isStopped) {
+                                    const lengthAndValue = readVariableSizeInteger(currentDataView, 0);
+
+                                    if (lengthAndValue === null) {
+                                        return { dataView: currentDataView, elementType, encoderId, port };
+                                    }
+
+                                    const { value } = lengthAndValue;
+
+                                    if (value !== 172351395) {
+                                        return { dataView, elementType, encoderId, port };
+                                    }
+
+                                    isRecording = true;
+                                }
 
                                 const { currentElementType, offset, contents } = decodeWebMChunk(
-                                    multiOrSingleBufferDataView,
+                                    currentDataView,
                                     elementType,
                                     channelCount
                                 );
-                                const buffers =
-                                    'buffer' in multiOrSingleBufferDataView
-                                        ? [multiOrSingleBufferDataView.buffer]
-                                        : multiOrSingleBufferDataView.buffers;
                                 const remainingDataView =
-                                    offset < multiOrSingleBufferDataView.byteLength
-                                        ? new MultiBufferDataView(buffers, multiOrSingleBufferDataView.byteOffset + offset)
+                                    offset < currentDataView.byteLength
+                                        ? new MultiBufferDataView(currentDataView.buffers, currentDataView.byteOffset + offset)
                                         : null;
 
                                 contents.forEach((content) =>
@@ -132,9 +158,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                     )
                                 );
 
-                                pendingInvocations -= 1;
-
-                                if (pendingInvocations === 0 && nativeMediaRecorder.state === 'inactive') {
+                                if (pendingInvocations === 0 && (nativeMediaRecorder.state === 'inactive' || isStopped)) {
                                     encode(encoderId, null).then((arrayBuffers) => {
                                         dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
