@@ -110,7 +110,11 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                 mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
 
-                const [arrayBuffers] = await Promise.all([encode(encoderId, null), suspend()]);
+                const arrayBuffers = await encode(encoderId, null);
+
+                if (promisedAudioNodesAndEncoderId === null) {
+                    await suspend();
+                }
 
                 dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
