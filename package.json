@@ -9,7 +9,7 @@
         }
     },
     "dependencies": {
-        "@babel/runtime": "^7.16.0",
+        "@babel/runtime": "^7.16.3",
         "media-encoder-host": "^8.0.63",
         "multi-buffer-data-view": "^3.0.9",
         "recorder-audio-worklet": "^5.1.10",
