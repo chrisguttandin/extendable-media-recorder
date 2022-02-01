@@ -30,7 +30,7 @@
         "commitizen": "^4.2.4",
         "cz-conventional-changelog": "^3.3.0",
         "eslint": "^8.8.0",
-        "eslint-config-holy-grail": "^51.0.1",
+        "eslint-config-holy-grail": "^51.0.2",
         "extendable-media-recorder-wav-encoder": "^7.0.65",
         "grunt": "^1.4.1",
         "grunt-cli": "^1.4.3",
