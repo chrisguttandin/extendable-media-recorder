@@ -13,7 +13,7 @@
         "media-encoder-host": "^8.0.67",
         "multi-buffer-data-view": "^3.0.14",
         "recorder-audio-worklet": "^5.1.17",
-        "standardized-audio-context": "^25.3.19",
+        "standardized-audio-context": "^25.3.21",
         "subscribable-things": "^2.0.6",
         "tslib": "^2.3.1"
     },
