@@ -5,4 +5,4 @@ export type TWebAudioMediaRecorderFactory = (
     eventTarget: TNativeEventTarget,
     mediaStream: MediaStream,
     mimeType: string
-) => Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstop' | keyof TNativeEventTarget>;
+) => Omit<IMediaRecorder, 'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstart' | 'onstop' | keyof TNativeEventTarget>;

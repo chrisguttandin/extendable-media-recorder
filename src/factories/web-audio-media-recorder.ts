@@ -174,6 +174,8 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                     throw createNotSupportedError();
                 }
 
+                eventTarget.dispatchEvent(new Event('start'));
+
                 const audioTracks = mediaStream.getAudioTracks();
                 // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
                 const channelCount =

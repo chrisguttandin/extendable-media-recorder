@@ -191,6 +191,54 @@ describe('module', () => {
                                     });
                                 });
 
+                                describe('onstart', () => {
+                                    it('should be null', () => {
+                                        expect(mediaRecorder.onstart).to.be.null;
+                                    });
+
+                                    it('should be assignable to a function', () => {
+                                        const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                        const onstart = (mediaRecorder.onstart = fn); // eslint-disable-line no-multi-assign
+
+                                        expect(onstart).to.equal(fn);
+                                        expect(mediaRecorder.onstart).to.equal(fn);
+                                    });
+
+                                    it('should be assignable to null', () => {
+                                        const onstart = (mediaRecorder.onstart = null); // eslint-disable-line no-multi-assign
+
+                                        expect(onstart).to.be.null;
+                                        expect(mediaRecorder.onstart).to.be.null;
+                                    });
+
+                                    it('should not be assignable to something else', () => {
+                                        const string = 'no function or null value';
+
+                                        mediaRecorder.onstart = () => {};
+
+                                        const onstart = (mediaRecorder.onstart = string); // eslint-disable-line no-multi-assign
+
+                                        expect(onstart).to.equal(string);
+                                        expect(mediaRecorder.onstart).to.be.null;
+                                    });
+
+                                    it('should register an independent event listener', (done) => {
+                                        const onstart = spy();
+
+                                        mediaRecorder.onstart = onstart;
+                                        mediaRecorder.addEventListener('start', onstart);
+
+                                        mediaRecorder.dispatchEvent(new Event('start'));
+
+                                        // Bug #7 & #8: The start event is currently delayed.
+                                        setTimeout(() => {
+                                            expect(onstart).to.have.been.calledTwice;
+
+                                            done();
+                                        });
+                                    });
+                                });
+
                                 describe('onstop', () => {
                                     it('should be null', () => {
                                         expect(mediaRecorder.onstop).to.be.null;
@@ -356,11 +404,13 @@ describe('module', () => {
 
                                                     let firedDataavailable = false;
                                                     let firedError = false;
+                                                    let firedStart = false;
 
                                                     mediaRecorder.addEventListener('dataavailable', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
                                                             expect(firedError).to.be.true;
+                                                            expect(firedStart).to.be.true;
 
                                                             // Bug #14: Safari does not yet support the BlobEvent.
                                                             if (typeof BlobEvent === 'undefined') {
@@ -384,6 +434,7 @@ describe('module', () => {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
                                                             expect(firedError).to.be.false;
+                                                            expect(firedStart).to.be.true;
 
                                                             expect(event).to.be.an.instanceOf(ErrorEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
@@ -400,10 +451,29 @@ describe('module', () => {
                                                             done(err);
                                                         }
                                                     });
+                                                    mediaRecorder.addEventListener('start', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedError).to.be.false;
+                                                            expect(firedStart).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('start');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedStart = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
                                                     mediaRecorder.addEventListener('stop', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.true;
                                                             expect(firedError).to.be.true;
+                                                            expect(firedStart).to.be.true;
 
                                                             expect(event).to.be.an.instanceOf(Event);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
@@ -431,11 +501,13 @@ describe('module', () => {
 
                                                     let firedDataavailable = false;
                                                     let firedError = false;
+                                                    let firedStart = false;
 
                                                     mediaRecorder.addEventListener('dataavailable', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
                                                             expect(firedError).to.be.true;
+                                                            expect(firedStart).to.be.true;
 
                                                             // Bug #14: Safari does not yet support the BlobEvent.
                                                             if (typeof BlobEvent === 'undefined') {
@@ -459,6 +531,7 @@ describe('module', () => {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
                                                             expect(firedError).to.be.false;
+                                                            expect(firedStart).to.be.true;
 
                                                             expect(event).to.be.an.instanceOf(ErrorEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
@@ -475,10 +548,29 @@ describe('module', () => {
                                                             done(err);
                                                         }
                                                     });
+                                                    mediaRecorder.addEventListener('start', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedError).to.be.false;
+                                                            expect(firedStart).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('start');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedStart = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
                                                     mediaRecorder.addEventListener('stop', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.true;
                                                             expect(firedError).to.be.true;
+                                                            expect(firedStart).to.be.true;
 
                                                             expect(event).to.be.an.instanceOf(Event);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
@@ -503,11 +595,13 @@ describe('module', () => {
                                                     this.timeout(40000);
 
                                                     let firedDataavailable = false;
+                                                    let firedStart = false;
                                                     let firedStop = false;
 
                                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
+                                                            expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             // Bug #14: Safari does not yet support the BlobEvent.
@@ -562,6 +656,7 @@ describe('module', () => {
                                                             }
 
                                                             expect(firedDataavailable).to.be.true;
+                                                            expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.true;
 
                                                             done();
@@ -569,9 +664,28 @@ describe('module', () => {
                                                             done(err);
                                                         }
                                                     });
+                                                    mediaRecorder.addEventListener('start', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedStart).to.be.false;
+                                                            expect(firedStop).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('start');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedStart = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
                                                     mediaRecorder.addEventListener('stop', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.true;
+                                                            expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             expect(event).to.be.an.instanceOf(Event);
@@ -597,11 +711,13 @@ describe('module', () => {
                                                     const chunks = [];
 
                                                     let firedDataavailable = false;
+                                                    let firedStart = false;
                                                     let firedStop = false;
 
                                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
+                                                            expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             // Bug #14: Safari does not yet support the BlobEvent.
@@ -668,6 +784,7 @@ describe('module', () => {
                                                                 }
 
                                                                 expect(firedDataavailable).to.be.true;
+                                                                expect(firedStart).to.be.true;
                                                                 expect(firedStop).to.be.true;
 
                                                                 done();
@@ -676,9 +793,28 @@ describe('module', () => {
                                                             done(err);
                                                         }
                                                     });
+                                                    mediaRecorder.addEventListener('start', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedStart).to.be.false;
+                                                            expect(firedStop).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('start');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedStart = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
                                                     mediaRecorder.addEventListener('stop', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.true;
+                                                            expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             expect(event).to.be.an.instanceOf(Event);

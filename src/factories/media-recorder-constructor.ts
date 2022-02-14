@@ -20,7 +20,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
     return class MediaRecorder extends eventTargetConstructor<IMediaRecorderEventMap> implements IMediaRecorder {
         private _internalMediaRecorder: Omit<
             IMediaRecorder,
-            'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstop' | keyof TNativeEventTarget
+            'ondataavailable' | 'onerror' | 'onpause' | 'onresume' | 'onstart' | 'onstop' | keyof TNativeEventTarget
         >;
 
         private _ondataavailable: null | [TBlobEventHandler<this>, TBlobEventHandler<this>];
@@ -30,6 +30,8 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
         private _onpause: null | [TEventHandler<this>, TEventHandler<this>];
 
         private _onresume: null | [TEventHandler<this>, TEventHandler<this>];
+
+        private _onstart: null | [TEventHandler<this>, TEventHandler<this>];
 
         private _onstop: null | [TEventHandler<this>, TEventHandler<this>];
 
@@ -74,6 +76,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             this._onerror = null;
             this._onpause = null;
             this._onresume = null;
+            this._onstart = null;
             this._onstop = null;
         }
 
@@ -158,6 +161,26 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 this._onresume = [value, boundListener];
             } else {
                 this._onresume = null;
+            }
+        }
+
+        get onstart(): null | TEventHandler<this> {
+            return this._onstart === null ? this._onstart : this._onstart[0];
+        }
+
+        set onstart(value) {
+            if (this._onstart !== null) {
+                this.removeEventListener('start', this._onstart[1]);
+            }
+
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+
+                this.addEventListener('start', boundListener);
+
+                this._onstart = [value, boundListener];
+            } else {
+                this._onstart = null;
             }
         }
 
