@@ -640,7 +640,8 @@ describe('module', () => {
                                                                     const dataView = new DataView(arrayBuffer);
 
                                                                     expect(dataView.getUint32(24, true)).to.equal(sampleRate);
-                                                                    expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                    expect(dataView.getUint32(40, true)).to.equal(2 ** 32 - 45);
+                                                                    expect((arrayBuffer.byteLength - 44) / 2 / channelCount).to.equal(
                                                                         audioBuffer.length
                                                                     );
 
