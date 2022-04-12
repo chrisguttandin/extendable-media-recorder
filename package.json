@@ -19,7 +19,7 @@
     },
     "description": "An extendable drop-in replacement for the native MediaRecorder.",
     "devDependencies": {
-        "@babel/core": "^7.17.5",
+        "@babel/core": "^7.17.9",
         "@babel/plugin-external-helpers": "^7.16.7",
         "@babel/plugin-transform-runtime": "^7.17.0",
         "@babel/preset-env": "^7.16.11",
