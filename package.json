@@ -32,7 +32,7 @@
         "eslint": "^8.13.0",
         "eslint-config-holy-grail": "^52.0.4",
         "extendable-media-recorder-wav-encoder": "^7.0.67",
-        "grunt": "^1.4.1",
+        "grunt": "^1.5.1",
         "grunt-cli": "^1.4.3",
         "grunt-contrib-clean": "^2.0.0",
         "grunt-contrib-watch": "^1.1.0",
