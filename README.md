@@ -23,7 +23,7 @@ It exports the `MediaRecorder` constructor. It can be used like the native imple
 import { MediaRecorder } from 'extendable-media-recorder';
 
 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-const mediaRecoder = new MediaRecorder(stream);
+const mediaRecorder = new MediaRecorder(stream);
 ```
 
 `extendable-media-recorder` also exports a `register()` function which can be used to define custom encoders. One predefined encoder is available as the [`extendable-media-recorder-wav-encoder` package](https://github.com/chrisguttandin/extendable-media-recorder-wav-encoder). It can be used as shown here.
@@ -35,7 +35,7 @@ import { connect } from 'extendable-media-recorder-wav-encoder';
 await register(await connect());
 
 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-const mediaRecoder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
+const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
 ```
 
 ## Inner Workings
