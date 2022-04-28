@@ -8,6 +8,12 @@
             "path": "cz-conventional-changelog"
         }
     },
+    "contributors": [
+        {
+            "email": "alex.maclean2000@gmail.com",
+            "name": "Alex MacLean"
+        }
+    ],
     "dependencies": {
         "@babel/runtime": "^7.17.9",
         "media-encoder-host": "^8.0.70",
