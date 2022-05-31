@@ -40,7 +40,6 @@
         "extendable-media-recorder-wav-encoder": "^7.0.73",
         "grunt": "^1.5.3",
         "grunt-cli": "^1.4.3",
-        "grunt-contrib-clean": "^2.0.1",
         "grunt-contrib-watch": "^1.1.0",
         "grunt-sh": "^0.2.0",
         "husky": "^8.0.1",
