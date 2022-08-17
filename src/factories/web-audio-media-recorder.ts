@@ -4,6 +4,7 @@ import {
     AudioBuffer,
     AudioBufferSourceNode,
     AudioWorkletNode,
+    ConstantSourceNode,
     IAudioBuffer,
     IMinimalAudioContext,
     MediaStreamAudioSourceNode,
@@ -98,30 +99,33 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 clearTimeout(intervalId);
             }
 
-            promisedAudioNodesAndEncoderId.then(async ({ encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
-                if (promisedPartialRecording !== null) {
-                    promisedPartialRecording.catch(() => {
-                        /* @todo Only catch the errors caused by a duplicate call to encode. */
-                    });
-                    promisedPartialRecording = null;
+            promisedAudioNodesAndEncoderId.then(
+                async ({ constantSourceNode, encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
+                    if (promisedPartialRecording !== null) {
+                        promisedPartialRecording.catch(() => {
+                            /* @todo Only catch the errors caused by a duplicate call to encode. */
+                        });
+                        promisedPartialRecording = null;
+                    }
+
+                    await recorderAudioWorkletNode.stop();
+
+                    mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
+                    constantSourceNode.stop();
+
+                    const arrayBuffers = await encode(encoderId, null);
+
+                    if (promisedAudioNodesAndEncoderId === null) {
+                        await suspend();
+                    }
+
+                    dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
+
+                    bufferedArrayBuffers.length = 0;
+
+                    eventTarget.dispatchEvent(new Event('stop'));
                 }
-
-                await recorderAudioWorkletNode.stop();
-
-                mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
-
-                const arrayBuffers = await encode(encoderId, null);
-
-                if (promisedAudioNodesAndEncoderId === null) {
-                    await suspend();
-                }
-
-                dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
-
-                bufferedArrayBuffers.length = 0;
-
-                eventTarget.dispatchEvent(new Event('stop'));
-            });
+            );
 
             promisedAudioNodesAndEncoderId = null;
         };
@@ -199,13 +203,20 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
                     audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
 
+                    // Bug #17: Safari does throttle the processing on hidden tabs if there is no active audio output.
+                    const constantSourceNode = new ConstantSourceNode(audioContext, { offset: 0 });
+
+                    constantSourceNode.onended = () => constantSourceNode.disconnect();
+                    constantSourceNode.connect(audioContext.destination);
+                    constantSourceNode.start();
+
                     await recorderAudioWorkletNode.record(port);
 
                     if (timeslice !== undefined) {
                         promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
                     }
 
-                    return { encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
+                    return { constantSourceNode, encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
                 });
 
                 const tracks = mediaStream.getTracks();
