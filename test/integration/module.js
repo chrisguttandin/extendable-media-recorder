@@ -958,23 +958,27 @@ describe('module', () => {
                                                     setTimeout(() => {
                                                         mediaRecorder.pause();
 
-                                                        constantSourceNode.offset.value = 10;
-
                                                         setTimeout(() => {
-                                                            constantSourceNode.offset.value = -1;
-
-                                                            mediaRecorder.resume();
+                                                            constantSourceNode.offset.value = 10;
 
                                                             setTimeout(() => {
-                                                                mediaRecorder.stop();
+                                                                constantSourceNode.offset.value = -1;
 
-                                                                constantSourceNode.onended = () => {
-                                                                    constantSourceNode.onended = null;
+                                                                setTimeout(() => {
+                                                                    mediaRecorder.resume();
 
-                                                                    constantSourceNode.disconnect(mediaStreamAudioDestinationNode);
-                                                                };
+                                                                    setTimeout(() => {
+                                                                        mediaRecorder.stop();
 
-                                                                constantSourceNode.stop(audioContext.currentTime + 0.5);
+                                                                        constantSourceNode.onended = () => {
+                                                                            constantSourceNode.onended = null;
+
+                                                                            constantSourceNode.disconnect(mediaStreamAudioDestinationNode);
+                                                                        };
+
+                                                                        constantSourceNode.stop(audioContext.currentTime + 0.5);
+                                                                    }, 500);
+                                                                }, 500);
                                                             }, 500);
                                                         }, 500);
                                                     }, 500);
