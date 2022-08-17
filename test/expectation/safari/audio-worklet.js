@@ -84,30 +84,34 @@ describe('AudioWorklet', () => {
 
     // bug #17
 
-    // This test will only work when changing the browser settings to allow popups.
-    it('should occasionally throttle the processing when the current tab looses focus', (done) => {
-        const audioBufferSourceNode = new AudioBufferSourceNode(playingAudioContext, { buffer, loop: true });
-        const channelData = buffer.getChannelData(0);
-        const audioWorkletNode = new AudioWorkletNode(recordingAudioContext, 'detector-processor', { processorOptions: channelData });
-        const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(playingAudioContext);
-        const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(recordingAudioContext, {
-            mediaStream: mediaStreamAudioDestinationNode.stream
+    // @todo There is currently no way to disable the autoplay policy on BrowserStack or Sauce Labs.
+    // eslint-disable-next-line no-undef
+    if (!process.env.CI) {
+        // This test will only work when changing the browser settings to allow popups.
+        it('should occasionally throttle the processing when the current tab looses focus', (done) => {
+            const audioBufferSourceNode = new AudioBufferSourceNode(playingAudioContext, { buffer, loop: true });
+            const channelData = buffer.getChannelData(0);
+            const audioWorkletNode = new AudioWorkletNode(recordingAudioContext, 'detector-processor', { processorOptions: channelData });
+            const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(playingAudioContext);
+            const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(recordingAudioContext, {
+                mediaStream: mediaStreamAudioDestinationNode.stream
+            });
+            const stopOpeningAnotherTab = openAnotherTab();
+
+            audioWorkletNode.port.onmessage = () => {
+                audioBufferSourceNode.stop();
+                audioBufferSourceNode.disconnect();
+
+                mediaStreamAudioSourceNode.disconnect();
+
+                stopOpeningAnotherTab();
+                done();
+            };
+
+            audioBufferSourceNode.connect(mediaStreamAudioDestinationNode);
+            audioBufferSourceNode.start();
+
+            mediaStreamAudioSourceNode.connect(audioWorkletNode);
         });
-        const stopOpeningAnotherTab = openAnotherTab();
-
-        audioWorkletNode.port.onmessage = () => {
-            audioBufferSourceNode.stop();
-            audioBufferSourceNode.disconnect();
-
-            mediaStreamAudioSourceNode.disconnect();
-
-            stopOpeningAnotherTab();
-            done();
-        };
-
-        audioBufferSourceNode.connect(mediaStreamAudioDestinationNode);
-        audioBufferSourceNode.start();
-
-        mediaStreamAudioSourceNode.connect(audioWorkletNode);
-    });
+    }
 });
