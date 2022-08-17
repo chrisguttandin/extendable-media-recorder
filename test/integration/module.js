@@ -961,7 +961,7 @@ describe('module', () => {
                                                         constantSourceNode.offset.value = 10;
 
                                                         setTimeout(() => {
-                                                            constantSourceNode.offset.value = 100;
+                                                            constantSourceNode.offset.value = -1;
 
                                                             mediaRecorder.resume();
 
