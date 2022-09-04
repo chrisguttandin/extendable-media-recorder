@@ -80,7 +80,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                     }
                 }
 
-                return addEventListener.call(nativeMediaRecorder, type, patchedEventListener, options);
+                return addEventListener.call(nativeMediaRecorder, type, <EventListenerOrEventListenerObject>patchedEventListener, options);
             };
         })(nativeMediaRecorder.addEventListener);
 
@@ -132,7 +132,12 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                     }
                 }
 
-                return removeEventListener.call(nativeMediaRecorder, type, patchedEventListener, options);
+                return removeEventListener.call(
+                    nativeMediaRecorder,
+                    type,
+                    <EventListenerOrEventListenerObject>patchedEventListener,
+                    options
+                );
             };
         })(nativeMediaRecorder.removeEventListener);
 

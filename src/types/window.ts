@@ -1,9 +1,8 @@
-import { IMediaRecorderConstructor } from '../interfaces';
-import { TBlobEventConstructor } from './blob-event-constructor';
+import { TNativeBlobEventConstructor } from './native-blob-event-constructor';
+import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 
 export type TWindow = Window &
     typeof globalThis & {
-        // @todo TypeScript does not include type definitions for the MediaStream Recording specification yet.
-        BlobEvent?: TBlobEventConstructor;
-        MediaRecorder?: IMediaRecorderConstructor;
+        BlobEvent?: TNativeBlobEventConstructor;
+        MediaRecorder?: TNativeMediaRecorderConstructor;
     };

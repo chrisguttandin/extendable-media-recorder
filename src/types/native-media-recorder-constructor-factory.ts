@@ -1,4 +1,4 @@
-import { IMediaRecorderConstructor } from '../interfaces';
+import { TNativeMediaRecorderConstructor } from './native-media-recorder-constructor';
 import { TWindow } from './window';
 
-export type TNativeMediaRecorderConstructorFactory = (window: null | TWindow) => null | IMediaRecorderConstructor;
+export type TNativeMediaRecorderConstructorFactory = (window: null | TWindow) => null | TNativeMediaRecorderConstructor;

@@ -2,7 +2,6 @@ import { TBlobEventHandler, TErrorEventHandler, TEventHandler, TRecordingState }
 import { IEventTarget } from './event-target';
 import { IMediaRecorderEventMap } from './media-recorder-event-map';
 
-// @todo TypeScript does not include type definitions for the MediaStream Recording specification yet.
 export interface IMediaRecorder extends IEventTarget<IMediaRecorderEventMap> {
     readonly mimeType: string;
 
