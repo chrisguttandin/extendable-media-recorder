@@ -19,7 +19,6 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
                 return resolve(true);
             }
 
-            // @todo captureStream() is not defined yet.
             const canvasElement: HTMLCanvasElement & { captureStream?(): MediaStream } = document.createElement('canvas');
 
             // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
