@@ -412,13 +412,7 @@ describe('module', () => {
                                                             expect(firedError).to.be.true;
                                                             expect(firedStart).to.be.true;
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');
@@ -509,13 +503,7 @@ describe('module', () => {
                                                             expect(firedError).to.be.true;
                                                             expect(firedStart).to.be.true;
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');
@@ -604,13 +592,7 @@ describe('module', () => {
                                                             expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');
@@ -720,13 +702,7 @@ describe('module', () => {
                                                             expect(firedStart).to.be.true;
                                                             expect(firedStop).to.be.false;
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');
@@ -845,13 +821,7 @@ describe('module', () => {
                                                             expect(firedDataavailable).to.be.false;
                                                             expect(firedStop).to.be.false;
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');
@@ -996,13 +966,7 @@ describe('module', () => {
                                                         try {
                                                             expect(firedDataavailable).to.equal(firedStop);
 
-                                                            // Bug #14: Safari does not yet support the BlobEvent.
-                                                            if (typeof BlobEvent === 'undefined') {
-                                                                expect(event).to.be.an.instanceOf(Event);
-                                                            } else {
-                                                                expect(event).to.be.an.instanceOf(BlobEvent);
-                                                            }
-
+                                                            expect(event).to.be.an.instanceOf(BlobEvent);
                                                             expect(event.currentTarget).to.equal(mediaRecorder);
                                                             expect(event.target).to.equal(mediaRecorder);
                                                             expect(event.type).to.equal('dataavailable');

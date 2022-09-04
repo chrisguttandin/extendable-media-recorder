@@ -3,6 +3,8 @@ import { TIsSupportedPromiseFactory } from '../types';
 export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => {
     if (
         window !== null &&
+        // Bug #14: Before v14.1 Safari did not support the BlobEvent.
+        window.BlobEvent !== undefined &&
         window.MediaStream !== undefined &&
         /*
          * Bug #10: An early experimental implemenation in Safari did not provide the isTypeSupported() function.
