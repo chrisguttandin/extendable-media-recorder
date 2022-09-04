@@ -7,7 +7,10 @@ describe('module', () => {
         let mediaRecorder;
         let mediaStream;
 
-        afterEach(() => audioContext.close());
+        afterEach(() => {
+            audioContext.close();
+            mediaStream.getTracks().forEach((track) => track.stop());
+        });
 
         beforeEach(async () => {
             audioContext = new AudioContext();

@@ -1062,10 +1062,12 @@ describe('module', () => {
 
                             describe('with a MediaStream which contains a video track', () => {
                                 let mediaRecorder;
+                                let mediaStream;
+
+                                afterEach(() => mediaStream.getTracks().forEach((track) => track.stop()));
 
                                 beforeEach(() => {
-                                    const mediaStream = createMediaStreamWithVideoTrack();
-
+                                    mediaStream = createMediaStreamWithVideoTrack();
                                     mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
                                 });
 
@@ -1091,11 +1093,13 @@ describe('module', () => {
                 let audioContext;
                 let mediaStream;
 
-                afterEach(() => audioContext.close());
+                afterEach(() => {
+                    audioContext.close();
+                    mediaStream.getTracks().forEach((track) => track.stop());
+                });
 
                 beforeEach(async () => {
                     audioContext = new AudioContext();
-
                     mediaStream = await createMediaStreamWithAudioTrack(audioContext);
                 });
 

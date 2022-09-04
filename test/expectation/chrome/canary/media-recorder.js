@@ -9,7 +9,10 @@ describe('module', () => {
         let mediaRecorder;
         let mediaStream;
 
-        afterEach(() => audioContext.close());
+        afterEach(() => {
+            audioContext.close();
+            mediaStream.getTracks().forEach((track) => track.stop());
+        });
 
         beforeEach(async () => {
             audioContext = new AudioContext();
@@ -115,7 +118,11 @@ describe('module', () => {
                         };
                         recorder.stop();
 
-                        setTimeout(() => resolve(callsWhileBeingInactive), 1000);
+                        setTimeout(() => {
+                            resolve(callsWhileBeingInactive);
+
+                            mediaStream.getTracks().forEach((track) => track.stop());
+                        }, 1000);
                     }, Math.random() * 1000);
                 });
 
@@ -127,9 +134,10 @@ describe('module', () => {
         let mediaStream;
         let mediaRecorder;
 
+        afterEach(() => mediaStream.getTracks().forEach((track) => track.stop()));
+
         beforeEach(() => {
             mediaStream = createMediaStreamWithVideoTrack();
-
             mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
         });
 
