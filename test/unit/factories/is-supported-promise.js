@@ -4,11 +4,17 @@ describe('createIsSupportedPromise()', () => {
     let fakeWindow;
 
     beforeEach(() => {
-        fakeWindow = { MediaStream: 'a fake MediaStream constructor' };
+        fakeWindow = { BlobEvent: 'a fake BlobEvent constructor', MediaStream: 'a fake MediaStream constructor' };
     });
 
     it('should resolve to true if all test pass', () => {
         return createIsSupportedPromise(fakeWindow).then((isSupported) => expect(isSupported).to.be.true);
+    });
+
+    it('should resolve to false if the window contains no BlobEvent constructor', () => {
+        delete fakeWindow.BlobEvent;
+
+        return createIsSupportedPromise(fakeWindow).then((isSupported) => expect(isSupported).to.be.false);
     });
 
     it('should resolve to false if the window contains no MediaStream constructor', () => {
