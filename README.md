@@ -2,7 +2,6 @@
 
 **An extendable drop-in replacement for the native MediaRecorder.**
 
-[![dependencies](https://img.shields.io/david/chrisguttandin/extendable-media-recorder.svg?style=flat-square)](https://github.com/chrisguttandin/extendable-media-recorder/network/dependencies)
 [![version](https://img.shields.io/npm/v/extendable-media-recorder.svg?style=flat-square)](https://www.npmjs.com/package/extendable-media-recorder)
 
 This package provides (a part of) the MediaRecorder API as defined by the [MediaStream Recording](https://w3c.github.io/mediacapture-record) specification. If possible it will use the native implementation which is available in Chrome and Firefox.
