@@ -191,6 +191,102 @@ describe('module', () => {
                                     });
                                 });
 
+                                describe('onpause', () => {
+                                    it('should be null', () => {
+                                        expect(mediaRecorder.onpause).to.be.null;
+                                    });
+
+                                    it('should be assignable to a function', () => {
+                                        const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                        const onpause = (mediaRecorder.onpause = fn); // eslint-disable-line no-multi-assign
+
+                                        expect(onpause).to.equal(fn);
+                                        expect(mediaRecorder.onpause).to.equal(fn);
+                                    });
+
+                                    it('should be assignable to null', () => {
+                                        const onpause = (mediaRecorder.onpause = null); // eslint-disable-line no-multi-assign
+
+                                        expect(onpause).to.be.null;
+                                        expect(mediaRecorder.onpause).to.be.null;
+                                    });
+
+                                    it('should not be assignable to something else', () => {
+                                        const string = 'no function or null value';
+
+                                        mediaRecorder.onpause = () => {};
+
+                                        const onpause = (mediaRecorder.onpause = string); // eslint-disable-line no-multi-assign
+
+                                        expect(onpause).to.equal(string);
+                                        expect(mediaRecorder.onpause).to.be.null;
+                                    });
+
+                                    it('should register an independent event listener', (done) => {
+                                        const onpause = spy();
+
+                                        mediaRecorder.onpause = onpause;
+                                        mediaRecorder.addEventListener('pause', onpause);
+
+                                        mediaRecorder.dispatchEvent(new Event('pause'));
+
+                                        // Bug #7 & #8: The pause event is currently delayed.
+                                        setTimeout(() => {
+                                            expect(onpause).to.have.been.calledTwice;
+
+                                            done();
+                                        });
+                                    });
+                                });
+
+                                describe('onresume', () => {
+                                    it('should be null', () => {
+                                        expect(mediaRecorder.onresume).to.be.null;
+                                    });
+
+                                    it('should be assignable to a function', () => {
+                                        const fn = () => {}; // eslint-disable-line unicorn/consistent-function-scoping
+                                        const onresume = (mediaRecorder.onresume = fn); // eslint-disable-line no-multi-assign
+
+                                        expect(onresume).to.equal(fn);
+                                        expect(mediaRecorder.onresume).to.equal(fn);
+                                    });
+
+                                    it('should be assignable to null', () => {
+                                        const onresume = (mediaRecorder.onresume = null); // eslint-disable-line no-multi-assign
+
+                                        expect(onresume).to.be.null;
+                                        expect(mediaRecorder.onresume).to.be.null;
+                                    });
+
+                                    it('should not be assignable to something else', () => {
+                                        const string = 'no function or null value';
+
+                                        mediaRecorder.onresume = () => {};
+
+                                        const onresume = (mediaRecorder.onresume = string); // eslint-disable-line no-multi-assign
+
+                                        expect(onresume).to.equal(string);
+                                        expect(mediaRecorder.onresume).to.be.null;
+                                    });
+
+                                    it('should register an independent event listener', (done) => {
+                                        const onresume = spy();
+
+                                        mediaRecorder.onresume = onresume;
+                                        mediaRecorder.addEventListener('resume', onresume);
+
+                                        mediaRecorder.dispatchEvent(new Event('resume'));
+
+                                        // Bug #7 & #8: The resume event is currently delayed.
+                                        setTimeout(() => {
+                                            expect(onresume).to.have.been.calledTwice;
+
+                                            done();
+                                        });
+                                    });
+                                });
+
                                 describe('onstart', () => {
                                     it('should be null', () => {
                                         expect(mediaRecorder.onstart).to.be.null;
@@ -814,11 +910,15 @@ describe('module', () => {
                                                     this.timeout(40000);
 
                                                     let firedDataavailable = false;
+                                                    let firedPause = false;
+                                                    let firedResume = false;
                                                     let firedStop = false;
 
                                                     mediaRecorder.addEventListener('dataavailable', async function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.false;
+                                                            expect(firedPause).to.be.true;
+                                                            expect(firedResume).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             expect(event).to.be.an.instanceOf(BlobEvent);
@@ -900,9 +1000,49 @@ describe('module', () => {
                                                             done(err);
                                                         }
                                                     });
+                                                    mediaRecorder.addEventListener('pause', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedPause).to.be.false;
+                                                            expect(firedResume).to.be.false;
+                                                            expect(firedStop).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('pause');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedPause = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
+                                                    mediaRecorder.addEventListener('resume', function (event) {
+                                                        try {
+                                                            expect(firedDataavailable).to.be.false;
+                                                            expect(firedPause).to.be.true;
+                                                            expect(firedResume).to.be.false;
+                                                            expect(firedStop).to.be.false;
+
+                                                            expect(event).to.be.an.instanceOf(Event);
+                                                            expect(event.currentTarget).to.equal(mediaRecorder);
+                                                            expect(event.target).to.equal(mediaRecorder);
+                                                            expect(event.type).to.equal('resume');
+
+                                                            expect(this).to.equal(mediaRecorder);
+
+                                                            firedResume = true;
+                                                        } catch (err) {
+                                                            done(err);
+                                                        }
+                                                    });
                                                     mediaRecorder.addEventListener('stop', function (event) {
                                                         try {
                                                             expect(firedDataavailable).to.be.true;
+                                                            expect(firedPause).to.be.true;
+                                                            expect(firedResume).to.be.true;
                                                             expect(firedStop).to.be.false;
 
                                                             expect(event).to.be.an.instanceOf(Event);
