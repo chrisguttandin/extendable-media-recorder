@@ -7,7 +7,7 @@ module.exports = (grunt) => {
             cmd: 'tsc --project src/tsconfig.json'
         },
         'build-es5': {
-            cmd: 'rollup --config config/rollup/bundle.js'
+            cmd: 'rollup --config config/rollup/bundle.mjs'
         },
         'clean': {
             cmd: 'rimraf build/*'
