@@ -39,6 +39,26 @@ const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
 ```
 
+### Setting the sample rate
+
+The `MediaRecoder` has no way to modify the sample rate directly. It uses the `sampleRate` of the given `MediaStream`. You can read the value being used like this:
+
+```js
+const { sampleRate } = stream.getAudioTracks()[0].getSettings();
+```
+
+To modifiy the sample rate of the recording you need to change the `sampleRate` of the `MediaStream`. But that's not possible either. Therefore the most reliable way is to use an `AudioContext` at the desired `sampleRate` to do the resampling.
+
+```js
+const audioContext = new AudioContext({ sampleRate: 16000 });
+const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(audioContext, { mediaStream: stream });
+const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext);
+
+mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
+
+const mediaRecorder = new MediaRecorder(mediaStreamAudioSourceNode.stream);
+```
+
 ## Inner Workings
 
 Internally two different techniques are used to enable custom encoders. In Chrome the native MediaRecorder is used to encode the stream as webm file with pcm encoded audio. Then a minimal version of [ts-ebml](https://github.com/legokichi/ts-ebml) is used to parse that pcm data to pass it on to the encoder. In other browsers the Web Audio API is used to get the pcm data of the recorded audio.
