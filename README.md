@@ -4,7 +4,7 @@
 
 [![version](https://img.shields.io/npm/v/extendable-media-recorder.svg?style=flat-square)](https://www.npmjs.com/package/extendable-media-recorder)
 
-This package provides (a part of) the MediaRecorder API as defined by the [MediaStream Recording](https://w3c.github.io/mediacapture-record) specification. If possible it will use the native implementation which is available in Chrome and Firefox.
+This package provides (a part of) the MediaRecorder API as defined by the [MediaStream Recording](https://w3c.github.io/mediacapture-record) specification. If possible it will use the native implementation.
 
 In addition this package also allows to define custom encoders. Those encoders can be used to render files which are not supported by any browser so far. This does currently only work for audio encoders.
 
