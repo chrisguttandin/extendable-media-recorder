@@ -25,6 +25,8 @@ const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 const mediaRecorder = new MediaRecorder(stream);
 ```
 
+### Using a custom encoder
+
 `extendable-media-recorder` also exports a `register()` function which can be used to define custom encoders. One predefined encoder is available as the [`extendable-media-recorder-wav-encoder` package](https://github.com/chrisguttandin/extendable-media-recorder-wav-encoder). It can be used as shown here.
 
 ```js
