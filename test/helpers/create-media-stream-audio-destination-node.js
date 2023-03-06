@@ -13,6 +13,7 @@ export const createMediaStreamAudioDestinationNode = (audioContext, channelCount
 
     const stream = mediaStreamAudioDestinationNode.stream;
 
+    // Bug #19: Chrome does not expose the correct channelCount property right away.
     return new Promise((resolve) => {
         const intervalId = setInterval(() => {
             const channelCountOfStream = stream.getAudioTracks()[0].getSettings().channelCount;

@@ -13,13 +13,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const audioTracks = mediaStream.getAudioTracks();
         const bufferedArrayBuffers: ArrayBuffer[] = [];
-        // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
-        const channelCount =
-            audioTracks.length === 0
-                ? undefined
-                : (<MediaTrackSettings & { channelCount?: number }>audioTracks[0].getSettings()).channelCount;
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
-        const sampleRate = audioTracks.length === 0 ? undefined : audioTracks[0].getSettings().sampleRate;
 
         let promisedPartialRecording: null | Promise<void> = null;
         let stopRecording = () => {}; // tslint:disable-line:no-empty
@@ -94,6 +88,15 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                 }
 
                 if (nativeMediaRecorder.state === 'inactive') {
+                    // Bug #19: Chrome does not expose the correct channelCount property right away.
+                    // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
+                    const channelCount = (<MediaTrackSettings & { channelCount?: number }>audioTracks[0]?.getSettings()).channelCount;
+                    const sampleRate = audioTracks[0]?.getSettings().sampleRate;
+
+                    if (channelCount === undefined) {
+                        throw new Error('The channelCount is not defined.');
+                    }
+
                     if (sampleRate === undefined) {
                         throw new Error('The sampleRate is not defined.');
                     }
