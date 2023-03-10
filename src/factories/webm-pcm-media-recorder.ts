@@ -56,7 +56,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             stop();
             // Bug #3 & #4: Chrome throws an error event without any error.
             eventTarget.dispatchEvent(
-                (<ErrorEvent>event).error === undefined ? new ErrorEvent('error', { error: createInvalidModificationError() }) : event
+                new ErrorEvent('error', {
+                    error: (<ErrorEvent>event).error === undefined ? createInvalidModificationError() : (<ErrorEvent>event).error
+                })
             );
         });
         nativeMediaRecorder.addEventListener('pause', () => eventTarget.dispatchEvent(new Event('pause')));
