@@ -20,39 +20,6 @@ describe('module', () => {
             mediaRecorder = new MediaRecorder(mediaStream);
         });
 
-        // bug #3
-
-        it('should fire an error event without an error when adding a track', function (done) {
-            this.timeout(10000);
-
-            mediaRecorder.addEventListener('error', (err) => {
-                expect(err.error).to.be.undefined;
-                expect(err.type).to.equal('error');
-
-                done();
-            });
-            mediaRecorder.start();
-
-            createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
-                mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
-            );
-        });
-
-        // bug #4
-
-        it('should fire an error event without an error when removing a track', function (done) {
-            this.timeout(10000);
-
-            mediaRecorder.addEventListener('error', (err) => {
-                expect(err.error).to.be.undefined;
-                expect(err.type).to.equal('error');
-
-                done();
-            });
-            mediaRecorder.start();
-            mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
-        });
-
         // bug #7
 
         it('should fire an error event after the dataavailable and stop events when adding a track', function (done) {
