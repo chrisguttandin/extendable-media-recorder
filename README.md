@@ -56,7 +56,7 @@ const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audi
 
 mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
 
-const mediaRecorder = new MediaRecorder(mediaStreamAudioSourceNode.stream);
+const mediaRecorder = new MediaRecorder(mediaStreamAudioDestinationNode.stream);
 ```
 
 ## Inner Workings
