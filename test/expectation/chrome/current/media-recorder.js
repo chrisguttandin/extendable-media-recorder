@@ -126,7 +126,7 @@ describe('module', () => {
                     }, Math.random() * 1000);
                 });
 
-            expect((await Promise.all(Array.from({ length: 50 }, recordAboutASecondOfAudio))).sort().pop()).to.be.above(1);
+            expect((await Promise.all(Array.from({ length: 200 }, recordAboutASecondOfAudio))).sort().pop()).to.be.above(1);
         });
     });
 
