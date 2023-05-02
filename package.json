@@ -37,7 +37,7 @@
         "cz-conventional-changelog": "^3.3.0",
         "eslint": "^8.39.0",
         "eslint-config-holy-grail": "^56.0.6",
-        "extendable-media-recorder-wav-encoder": "^7.0.86",
+        "extendable-media-recorder-wav-encoder": "^7.0.87",
         "grunt": "^1.6.1",
         "grunt-cli": "^1.4.3",
         "grunt-contrib-watch": "^1.1.0",
