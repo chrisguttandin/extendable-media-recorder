@@ -21,7 +21,7 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
                 return resolve(true);
             }
 
-            const canvasElement: HTMLCanvasElement & { captureStream?(): MediaStream } = window.document.createElement('canvas');
+            const canvasElement = window.document.createElement('canvas');
 
             // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
             canvasElement.getContext('2d');
