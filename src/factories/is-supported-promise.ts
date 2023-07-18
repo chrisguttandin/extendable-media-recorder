@@ -16,11 +16,6 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
          * audio codec.
          */
         return new Promise((resolve) => {
-            // Bug #11 Safari does not yet support the MediaRecorder but that isn't tested here.
-            if (window.MediaRecorder === undefined) {
-                return resolve(true);
-            }
-
             const canvasElement = window.document.createElement('canvas');
 
             // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
