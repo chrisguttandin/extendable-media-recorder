@@ -1,5 +1,5 @@
 import { AudioContext } from 'standardized-audio-context';
-import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
+import { recordAboutASecondOfAudio } from '../../../helpers/record-about-a-second-of-audio';
 
 describe('module', () => {
     describe('with a MediaStream which contains an audio track', () => {
@@ -14,35 +14,13 @@ describe('module', () => {
         });
 
         // bug #9
+
         it('should fire another dataavailable event after being inactive', async function () {
             this.timeout(10000);
 
-            const recordAboutASecondOfAudio = () =>
-                new Promise(async (resolve) => {
-                    const mediaStream = await createMediaStreamWithAudioTrack(audioContext);
-                    const mediaRecorder = new MediaRecorder(mediaStream);
-
-                    mediaRecorder.start(1);
-
-                    setTimeout(() => {
-                        let callsWhileBeingInactive = 0;
-
-                        mediaRecorder.ondataavailable = () => {
-                            if (mediaRecorder.state === 'inactive') {
-                                callsWhileBeingInactive += 1;
-                            }
-                        };
-                        mediaRecorder.stop();
-
-                        setTimeout(() => {
-                            resolve(callsWhileBeingInactive);
-
-                            mediaStream.getTracks().forEach((track) => track.stop());
-                        }, 1000);
-                    }, Math.random() * 1000);
-                });
-
-            expect((await Promise.all(Array.from({ length: 200 }, recordAboutASecondOfAudio))).sort().pop()).to.be.above(1);
+            expect(
+                (await Promise.all(Array.from({ length: 200 }, () => recordAboutASecondOfAudio(audioContext)))).sort().pop()
+            ).to.be.above(1);
         });
     });
 });

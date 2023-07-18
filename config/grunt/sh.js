@@ -26,6 +26,14 @@ module.exports = (grunt) => {
         'test-expectation-chrome-canary': {
             cmd: `karma start config/karma/config-expectation-chrome-canary.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
         },
+        'test-expectation-chrome-penultimate': {
+            cmd: `karma start config/karma/config-expectation-chrome-penultimate.js ${
+                continuous ? '--concurrency Infinity' : '--single-run'
+            }`
+        },
+        'test-expectation-chrome-previous': {
+            cmd: `karma start config/karma/config-expectation-chrome-previous.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
+        },
         'test-expectation-firefox': {
             cmd: `karma start config/karma/config-expectation-firefox.js ${continuous ? '--concurrency Infinity' : '--single-run'}`
         },
