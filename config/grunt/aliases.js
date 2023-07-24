@@ -17,7 +17,6 @@ module.exports = {
             ...filter(isTarget('chrome-previous'), 'sh:test-expectation-chrome-previous'),
             ...filter(isTarget('firefox'), 'sh:test-expectation-firefox'),
             ...filter(isTarget(), 'sh:test-expectation-firefox-developer'),
-            ...filter(isTarget('firefox-legacy'), 'sh:test-expectation-firefox-legacy'),
             ...filter(isTarget('firefox-penultimate'), 'sh:test-expectation-firefox-penultimate'),
             ...filter(isTarget('firefox-previous'), 'sh:test-expectation-firefox-previous'),
             ...filter(isTarget('safari'), 'sh:test-expectation-safari')

@@ -19,9 +19,6 @@ jobs:
                       target: firefox
                       type: expectation
                     - node-version: 18.x
-                      target: firefox-legacy
-                      type: expectation
-                    - node-version: 18.x
                       target: safari
                       type: expectation
                 node-version: [18.x]
