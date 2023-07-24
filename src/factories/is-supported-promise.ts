@@ -11,34 +11,56 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
          */
         (window.MediaRecorder === undefined || window.MediaRecorder.isTypeSupported !== undefined)
     ) {
-        /*
-         * Bug #5: Up until v70 Firefox did emit a blob of type video/webm when asked to encode a MediaStream with a video track into an
-         * audio codec.
-         */
-        return new Promise((resolve) => {
-            const canvasElement = window.document.createElement('canvas');
+        const canvasElement = window.document.createElement('canvas');
 
-            // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
-            canvasElement.getContext('2d');
+        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
+        canvasElement.getContext('2d');
 
-            if (typeof canvasElement.captureStream !== 'function') {
-                return resolve(false);
-            }
+        if (typeof canvasElement.captureStream !== 'function') {
+            return Promise.resolve(false);
+        }
 
-            const mediaStream = canvasElement.captureStream();
-            const mimeType = 'audio/webm';
+        const mediaStream = canvasElement.captureStream();
 
-            try {
-                const mediaRecorder = new window.MediaRecorder(mediaStream, { mimeType });
+        return Promise.all([
+            /*
+             * Bug #5: Up until v70 Firefox did emit a blob of type video/webm when asked to encode a MediaStream with a video track into an
+             * audio codec.
+             */
+            new Promise((resolve) => {
+                const mimeType = 'audio/webm';
 
-                mediaRecorder.addEventListener('dataavailable', ({ data }) => resolve(data.type === mimeType));
+                try {
+                    const mediaRecorder = new window.MediaRecorder(mediaStream, { mimeType });
+
+                    mediaRecorder.addEventListener('dataavailable', ({ data }) => resolve(data.type === mimeType));
+                    mediaRecorder.start();
+
+                    setTimeout(() => mediaRecorder.stop(), 10);
+                } catch (err) {
+                    resolve(err.name === 'NotSupportedError');
+                }
+            }),
+            /*
+             * Bug #1 & #2: Up until v83 Firefox fired an error event with an UnknownError when adding or removing a track.
+             */
+            new Promise((resolve) => {
+                const mediaRecorder = new window.MediaRecorder(mediaStream);
+
+                mediaRecorder.addEventListener('error', (event) => {
+                    resolve(
+                        'error' in event &&
+                            event.error !== null &&
+                            typeof event.error === 'object' &&
+                            'name' in event.error &&
+                            event.error.name !== 'UnknownError'
+                    );
+                    mediaRecorder.stop();
+                });
                 mediaRecorder.start();
-
-                setTimeout(() => mediaRecorder.stop(), 10);
-            } catch (err) {
-                resolve(err.name === 'NotSupportedError');
-            }
-        });
+                mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
+            })
+        ]).then((results) => results.every((result) => result));
     }
 
     return Promise.resolve(false);
