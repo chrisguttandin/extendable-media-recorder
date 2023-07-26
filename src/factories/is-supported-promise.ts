@@ -7,11 +7,14 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
         window.BlobEvent !== undefined &&
         window.MediaStream !== undefined &&
         /*
-         * Bug #10: An early experimental implemenation in Safari did not provide the isTypeSupported() function.
+         * Bug #10: An early experimental implemenation in Safari v14 did not provide the isTypeSupported() function.
+         *
+         * Bug #17: Safari up to v14.1.2 throttled the processing on hidden tabs if there was no active audio output. This is not tested
+         * here but should be covered by the following test, too.
          */
         (window.MediaRecorder === undefined || window.MediaRecorder.isTypeSupported !== undefined)
     ) {
-        // Bug #11 Safari does not yet support the MediaRecorder but that isn't tested here.
+        // Bug #11 Safari up to v14.1.2 did not support the MediaRecorder but that isn't tested here.
         if (window.MediaRecorder === undefined) {
             return Promise.resolve(true);
         }
