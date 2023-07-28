@@ -1,10 +1,7 @@
 import { IBlobEvent, IMediaRecorder } from '../interfaces';
 import { TEventHandler, TNativeMediaRecorderFactoryFactory } from '../types';
 
-export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (
-    createInvalidModificationError,
-    createNotSupportedError
-) => {
+export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactory = (createNotSupportedError) => {
     return (nativeMediaRecorderConstructor, stream, mediaRecorderOptions) => {
         const bufferedBlobs: Blob[] = [];
         const dataAvailableListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: IBlobEvent) => void>();
@@ -49,10 +46,7 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                     } else if (type === 'error') {
                         // Bug #12 & #13: Firefox fires a regular event with an error property.
                         patchedEventListener = (event: ErrorEvent | (Event & { error?: Error })) => {
-                            // Bug #3 & #4: Chrome throws an error event without any error.
-                            if (event.error === undefined) {
-                                listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: createInvalidModificationError() }));
-                            } else if (event instanceof ErrorEvent) {
+                            if (event instanceof ErrorEvent) {
                                 listener.call(nativeMediaRecorder, event);
                             } else {
                                 listener.call(nativeMediaRecorder, new ErrorEvent('error', { error: event.error }));

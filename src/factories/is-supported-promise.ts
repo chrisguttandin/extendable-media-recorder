@@ -20,11 +20,9 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
         }
 
         const canvasElement = window.document.createElement('canvas');
+        const context = canvasElement.getContext('2d');
 
-        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
-        canvasElement.getContext('2d');
-
-        if (typeof canvasElement.captureStream !== 'function') {
+        if (context === null || typeof canvasElement.captureStream !== 'function') {
             return Promise.resolve(false);
         }
 
@@ -51,6 +49,8 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
             }),
             /*
              * Bug #1 & #2: Up until v83 Firefox fired an error event with an UnknownError when adding or removing a track.
+             *
+             * Bug #3 & #4: Up until v112 Chrome dispatched an error event without any error.
              */
             new Promise((resolve) => {
                 const mediaRecorder = new window.MediaRecorder(mediaStream);
@@ -63,9 +63,9 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
                             'name' in event.error &&
                             event.error.name !== 'UnknownError'
                     );
-                    mediaRecorder.stop();
                 });
                 mediaRecorder.start();
+                context.fillRect(0, 0, 1, 1);
                 mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
             })
         ]).then((results) => results.every((result) => result));

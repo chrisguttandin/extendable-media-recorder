@@ -5,7 +5,6 @@ import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcm
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
     createBlobEvent,
-    createInvalidModificationError,
     createNotSupportedError,
     decodeWebMChunk,
     readVariableSizeInteger
@@ -54,10 +53,9 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
         nativeMediaRecorder.addEventListener('error', (event) => {
             stop();
-            // Bug #3 & #4: Chrome throws an error event without any error.
             eventTarget.dispatchEvent(
                 new ErrorEvent('error', {
-                    error: (<ErrorEvent>event).error === undefined ? createInvalidModificationError() : (<ErrorEvent>event).error
+                    error: (<ErrorEvent>event).error
                 })
             );
         });
