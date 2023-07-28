@@ -73,5 +73,5 @@ module.exports = (config) => {
         }
     });
 
-    env.CHROME_BIN = 'chromium-v112/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
+    env.CHROME_BIN = 'chromium-v113/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
 };
