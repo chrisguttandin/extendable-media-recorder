@@ -2,14 +2,8 @@ module.exports = (grunt) => {
     const continuous = grunt.option('continuous') === true;
 
     return {
-        'build-es2019': {
-            cmd: 'tsc --project src/tsconfig.json'
-        },
-        'build-es5': {
-            cmd: 'rollup --config config/rollup/bundle.mjs'
-        },
-        'clean': {
-            cmd: 'rimraf build/*'
+        'build': {
+            cmd: 'npm run build'
         },
         'lint-config': {
             cmd: 'npm run lint:config'
