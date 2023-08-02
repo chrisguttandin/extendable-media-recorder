@@ -9,6 +9,8 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
+        browsers: ['WebkitHeadless'],
+
         client: {
             mocha: {
                 bail: true,
@@ -18,12 +20,12 @@ module.exports = (config) => {
 
         concurrency: 1,
 
-        files: ['test/expectation/safari/current/**/*.js'],
+        files: ['test/expectation/safari/previous/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/safari/current/**/*.js': 'webpack'
+            'test/expectation/safari/previous/**/*.js': 'webpack'
         },
 
         reporters: ['dots'],
@@ -64,35 +66,5 @@ module.exports = (config) => {
         }
     });
 
-    if (env.CI) {
-        config.set({
-            browserStack: {
-                accessKey: env.BROWSER_STACK_ACCESS_KEY,
-                build: `${env.GITHUB_RUN_ID}/expectation-safari`,
-                forceLocal: true,
-                localIdentifier: `${Math.floor(Math.random() * 1000000)}`,
-                project: env.GITHUB_REPOSITORY,
-                username: env.BROWSER_STACK_USERNAME,
-                video: false
-            },
-
-            browsers: ['SafariBrowserStack'],
-
-            captureTimeout: 300000,
-
-            customLaunchers: {
-                SafariBrowserStack: {
-                    base: 'BrowserStack',
-                    browser: 'safari',
-                    captureTimeout: 300,
-                    os: 'OS X',
-                    os_version: 'Big Sur' // eslint-disable-line camelcase
-                }
-            }
-        });
-    } else {
-        config.set({
-            browsers: ['Safari']
-        });
-    }
+    env.WEBKIT_HEADLESS_BIN = 'webkit-v16-4/pw_run.sh';
 };
