@@ -8,7 +8,7 @@ import { createInvalidStateError } from './factories/invalid-state-error';
 import { createIsSupportedPromise } from './factories/is-supported-promise';
 import { createMediaRecorderConstructor } from './factories/media-recorder-constructor';
 import { createNativeBlobEventConstructor } from './factories/native-blob-event-constructor';
-import { createNativeMediaRecorderFactory } from './factories/native-media-recorder';
+import { createNativeMediaRecorder } from './factories/native-media-recorder';
 import { createNativeMediaRecorderConstructor } from './factories/native-media-recorder-constructor';
 import { createNotSupportedError } from './factories/not-supported-error';
 import { createReadElementContent } from './factories/read-element-content';
@@ -47,7 +47,6 @@ const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(createBlobE
 const createEventTarget = createEventTargetFactory(window);
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 
-const createNativeMediaRecorder = createNativeMediaRecorderFactory();
 const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
     createNativeMediaRecorder,
     createNotSupportedError,
