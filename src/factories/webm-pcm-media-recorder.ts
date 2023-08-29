@@ -5,12 +5,10 @@ import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcm
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
     createBlobEvent,
-    createNotSupportedError,
     decodeWebMChunk,
     readVariableSizeInteger
 ) => {
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
-        const audioTracks = mediaStream.getAudioTracks();
         const bufferedArrayBuffers: ArrayBuffer[] = [];
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
 
@@ -81,19 +79,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             },
 
             start(timeslice?: number): void {
-                /*
-                 * Bug #6: Chrome will emit a blob without any data when asked to encode a MediaStream with a video track into an audio
-                 * codec.
-                 */
-                if (mediaStream.getVideoTracks().length > 0) {
-                    throw createNotSupportedError();
-                }
+                const [audioTrack] = mediaStream.getAudioTracks();
 
-                if (nativeMediaRecorder.state === 'inactive') {
+                if (audioTrack !== undefined && nativeMediaRecorder.state === 'inactive') {
                     // Bug #19: Chrome does not expose the correct channelCount property right away.
                     // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
-                    const channelCount = (<MediaTrackSettings & { channelCount?: number }>audioTracks[0]?.getSettings()).channelCount;
-                    const sampleRate = audioTracks[0]?.getSettings().sampleRate;
+                    const channelCount = (<MediaTrackSettings & { channelCount?: number }>audioTrack.getSettings()).channelCount;
+                    const sampleRate = audioTrack.getSettings().sampleRate;
 
                     if (channelCount === undefined) {
                         throw new Error('The channelCount is not defined.');

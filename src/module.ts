@@ -43,16 +43,11 @@ const readVariableSizeInteger = createReadVariableSizeInteger(readVariableSizeIn
 const readElementContent = createReadElementContent(readVariableSizeInteger);
 const readElementType = createReadElementType(readVariableSizeInteger);
 const decodeWebMChunk = createDecodeWebMChunk(readElementContent, readElementType);
-const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(
-    createBlobEvent,
-    createNotSupportedError,
-    decodeWebMChunk,
-    readVariableSizeInteger
-);
+const createWebmPcmMediaRecorder = createWebmPcmMediaRecorderFactory(createBlobEvent, decodeWebMChunk, readVariableSizeInteger);
 const createEventTarget = createEventTargetFactory(window);
 const nativeMediaRecorderConstructor = createNativeMediaRecorderConstructor(window);
 
-const createNativeMediaRecorder = createNativeMediaRecorderFactory(createNotSupportedError);
+const createNativeMediaRecorder = createNativeMediaRecorderFactory();
 const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderConstructor(
     createNativeMediaRecorder,
     createNotSupportedError,

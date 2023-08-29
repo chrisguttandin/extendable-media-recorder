@@ -131,7 +131,7 @@ describe('module', () => {
                                         expect(mediaRecorder.ondataavailable).to.be.null;
                                     });
 
-                                    it('should register an independent event listener', (done) => {
+                                    it('should register an independent event listener', () => {
                                         const ondataavailable = spy();
 
                                         mediaRecorder.ondataavailable = ondataavailable;
@@ -139,12 +139,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('dataavailable'));
 
-                                        // Bug #7 & #8: The dataavailable event is currently delayed.
-                                        setTimeout(() => {
-                                            expect(ondataavailable).to.have.been.calledTwice;
-
-                                            done();
-                                        });
+                                        expect(ondataavailable).to.have.been.calledTwice;
                                     });
                                 });
 
@@ -222,7 +217,7 @@ describe('module', () => {
                                         expect(mediaRecorder.onpause).to.be.null;
                                     });
 
-                                    it('should register an independent event listener', (done) => {
+                                    it('should register an independent event listener', () => {
                                         const onpause = spy();
 
                                         mediaRecorder.onpause = onpause;
@@ -230,12 +225,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('pause'));
 
-                                        // Bug #7 & #8: The pause event is currently delayed.
-                                        setTimeout(() => {
-                                            expect(onpause).to.have.been.calledTwice;
-
-                                            done();
-                                        });
+                                        expect(onpause).to.have.been.calledTwice;
                                     });
                                 });
 
@@ -270,7 +260,7 @@ describe('module', () => {
                                         expect(mediaRecorder.onresume).to.be.null;
                                     });
 
-                                    it('should register an independent event listener', (done) => {
+                                    it('should register an independent event listener', () => {
                                         const onresume = spy();
 
                                         mediaRecorder.onresume = onresume;
@@ -278,12 +268,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('resume'));
 
-                                        // Bug #7 & #8: The resume event is currently delayed.
-                                        setTimeout(() => {
-                                            expect(onresume).to.have.been.calledTwice;
-
-                                            done();
-                                        });
+                                        expect(onresume).to.have.been.calledTwice;
                                     });
                                 });
 
@@ -318,7 +303,7 @@ describe('module', () => {
                                         expect(mediaRecorder.onstart).to.be.null;
                                     });
 
-                                    it('should register an independent event listener', (done) => {
+                                    it('should register an independent event listener', () => {
                                         const onstart = spy();
 
                                         mediaRecorder.onstart = onstart;
@@ -326,12 +311,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('start'));
 
-                                        // Bug #7 & #8: The start event is currently delayed.
-                                        setTimeout(() => {
-                                            expect(onstart).to.have.been.calledTwice;
-
-                                            done();
-                                        });
+                                        expect(onstart).to.have.been.calledTwice;
                                     });
                                 });
 
@@ -366,7 +346,7 @@ describe('module', () => {
                                         expect(mediaRecorder.onstop).to.be.null;
                                     });
 
-                                    it('should register an independent event listener', (done) => {
+                                    it('should register an independent event listener', () => {
                                         const onstop = spy();
 
                                         mediaRecorder.onstop = onstop;
@@ -374,12 +354,7 @@ describe('module', () => {
 
                                         mediaRecorder.dispatchEvent(new Event('stop'));
 
-                                        // Bug #7 & #8: The stop event is currently delayed.
-                                        setTimeout(() => {
-                                            expect(onstop).to.have.been.calledTwice;
-
-                                            done();
-                                        });
+                                        expect(onstop).to.have.been.calledTwice;
                                     });
                                 });
 

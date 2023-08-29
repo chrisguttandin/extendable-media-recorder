@@ -51,19 +51,32 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
              * Bug #1 & #2: Up until v83 Firefox fired an error event with an UnknownError when adding or removing a track.
              *
              * Bug #3 & #4: Up until v112 Chrome dispatched an error event without any error.
+             *
+             * Bug #6: Up until v113 Chrome emitted a blob without any data when asked to encode a MediaStream with a video track as audio.
+             * This is not directly tested here as it can only be tested by recording something for a short time. It got fixed at the same
+             * time as #7 and #8.
+             *
+             * Bug #7 & #8: Up until v113 Chrome dispatched the dataavailable and stop events before it dispatched the error event.
              */
             new Promise((resolve) => {
                 const mediaRecorder = new window.MediaRecorder(mediaStream);
 
+                let hasDispatchedDataAvailableEvent = false;
+                let hasDispatchedStopEvent = false;
+
+                mediaRecorder.addEventListener('dataavailable', () => (hasDispatchedDataAvailableEvent = true));
                 mediaRecorder.addEventListener('error', (event) => {
                     resolve(
-                        'error' in event &&
+                        !hasDispatchedDataAvailableEvent &&
+                            !hasDispatchedStopEvent &&
+                            'error' in event &&
                             event.error !== null &&
                             typeof event.error === 'object' &&
                             'name' in event.error &&
                             event.error.name !== 'UnknownError'
                     );
                 });
+                mediaRecorder.addEventListener('stop', () => (hasDispatchedStopEvent = true));
                 mediaRecorder.start();
                 context.fillRect(0, 0, 1, 1);
                 mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
