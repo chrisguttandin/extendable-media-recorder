@@ -51,5 +51,28 @@ describe('module', () => {
                 mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
             }, 1000);
         });
+
+        // bug #20
+
+        it('should fire multiple dataavailable events when inactive', function (done) {
+            this.timeout(10000);
+
+            let firedDataAvailableWhenInactive = false;
+
+            mediaRecorder.ondataavailable = () => {
+                if (mediaRecorder.state === 'inactive') {
+                    if (firedDataAvailableWhenInactive) {
+                        mediaRecorder.ondataavailable = null;
+
+                        done();
+                    } else {
+                        firedDataAvailableWhenInactive = true;
+                    }
+                }
+            };
+            mediaRecorder.start(100);
+
+            setTimeout(() => mediaRecorder.stop(), 1000);
+        });
     });
 });
