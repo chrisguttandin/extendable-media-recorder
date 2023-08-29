@@ -83,9 +83,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                 if (audioTrack !== undefined && nativeMediaRecorder.state === 'inactive') {
                     // Bug #19: Chrome does not expose the correct channelCount property right away.
-                    // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
-                    const channelCount = (<MediaTrackSettings & { channelCount?: number }>audioTrack.getSettings()).channelCount;
-                    const sampleRate = audioTrack.getSettings().sampleRate;
+                    const { channelCount, sampleRate } = audioTrack.getSettings();
 
                     if (channelCount === undefined) {
                         throw new Error('The channelCount is not defined.');

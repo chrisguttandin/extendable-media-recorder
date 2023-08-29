@@ -177,11 +177,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 eventTarget.dispatchEvent(new Event('start'));
 
                 const audioTracks = mediaStream.getAudioTracks();
-                // @todo TypeScript v4.4.2 removed the channelCount property from the MediaTrackSettings interface.
-                const channelCount =
-                    audioTracks.length === 0
-                        ? 2
-                        : (<MediaTrackSettings & { channelCount?: number }>audioTracks[0].getSettings()).channelCount ?? 2;
+                const channelCount = audioTracks.length === 0 ? 2 : audioTracks[0].getSettings().channelCount ?? 2;
 
                 promisedAudioNodesAndEncoderId = Promise.all([
                     resume(),
