@@ -112,9 +112,11 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                     )(({ data }) => {
                         pendingInvocations += 1;
 
+                        const promisedArrayBuffer = data.arrayBuffer();
+
                         promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
                             async ({ dataView = null, elementType = null, encoderId, port }) => {
-                                const arrayBuffer = await data.arrayBuffer();
+                                const arrayBuffer = await promisedArrayBuffer;
 
                                 pendingInvocations -= 1;
 
