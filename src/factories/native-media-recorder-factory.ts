@@ -6,10 +6,15 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
         const bufferedBlobEventListeners: Map<EventListener, IBlobEvent[]> = new Map();
         const dataAvailableListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: IBlobEvent) => void>();
         const errorListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: ErrorEvent) => void>();
+        const flags: [boolean, boolean][] = [];
         const nativeMediaRecorder = new nativeMediaRecorderConstructor(stream, mediaRecorderOptions);
         const stopListeners = new WeakMap<EventListener, (this: IMediaRecorder, event: Event) => void>();
 
-        let isSliced = false;
+        nativeMediaRecorder.addEventListener('stop', ({ isTrusted }: Event): void => {
+            if (isTrusted) {
+                setTimeout(() => flags.shift());
+            }
+        });
 
         nativeMediaRecorder.addEventListener = ((addEventListener) => {
             return (
@@ -25,7 +30,9 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
 
                         // Bug #20: Firefox dispatches multiple dataavailable events while being inactive.
                         patchedEventListener = (event: IBlobEvent) => {
-                            if (isSliced && nativeMediaRecorder.state === 'inactive') {
+                            const [[isSliced, isActive] = [false, false]] = flags;
+
+                            if (isSliced && !isActive) {
                                 bufferedBlobEvents.push(event);
                             } else {
                                 listener.call(nativeMediaRecorder, event);
@@ -66,8 +73,6 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                                     dataAvailableListener.call(nativeMediaRecorder, blobEvent);
                                 }
                             }
-
-                            isSliced = false;
 
                             listener.call(nativeMediaRecorder, event);
                         };
@@ -135,11 +140,23 @@ export const createNativeMediaRecorderFactory: TNativeMediaRecorderFactoryFactor
                     throw createNotSupportedError();
                 }
 
-                isSliced = timeslice !== undefined;
+                if (nativeMediaRecorder.state === 'inactive') {
+                    flags.push([timeslice !== undefined, true]);
+                }
 
                 return timeslice === undefined ? start.call(nativeMediaRecorder) : start.call(nativeMediaRecorder, timeslice);
             };
         })(nativeMediaRecorder.start);
+
+        nativeMediaRecorder.stop = ((stop) => {
+            return () => {
+                if (nativeMediaRecorder.state !== 'inactive') {
+                    flags[0][1] = false;
+                }
+
+                stop.call(nativeMediaRecorder);
+            };
+        })(nativeMediaRecorder.stop);
 
         return nativeMediaRecorder;
     };
