@@ -16,6 +16,7 @@
     ],
     "dependencies": {
         "@babel/runtime": "^7.22.6",
+        "linked": "^0.2.0",
         "media-encoder-host": "^8.0.99",
         "multi-buffer-data-view": "^5.0.8",
         "recorder-audio-worklet": "^6.0.13",
@@ -25,7 +26,7 @@
     },
     "description": "An extendable drop-in replacement for the native MediaRecorder.",
     "devDependencies": {
-        "@babel/core": "^7.22.17",
+        "@babel/core": "^7.22.19",
         "@babel/plugin-external-helpers": "^7.22.5",
         "@babel/plugin-transform-runtime": "^7.22.15",
         "@babel/preset-env": "^7.22.15",
