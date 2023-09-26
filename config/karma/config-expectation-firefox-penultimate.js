@@ -23,7 +23,7 @@ module.exports = (config) => {
         customLaunchers: {
             penultimateFirefoxHeadless: {
                 base: 'FirefoxHeadless',
-                command: 'firefox-v115/firefox/Firefox.app/Contents/MacOS/firefox'
+                command: 'firefox-v116/firefox/Firefox.app/Contents/MacOS/firefox'
             }
         },
 
