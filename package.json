@@ -53,7 +53,7 @@
         "lint-staged": "^15.1.0",
         "load-grunt-config": "^4.0.1",
         "mocha": "^10.2.0",
-        "prettier": "^2.8.8",
+        "prettier": "^3.1.0",
         "rimraf": "^5.0.5",
         "rollup": "^4.5.1",
         "sinon": "^17.0.1",
