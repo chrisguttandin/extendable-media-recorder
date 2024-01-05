@@ -88,10 +88,10 @@ module.exports = (config) => {
                 env.TARGET === 'chrome'
                     ? ['ChromeBrowserStack']
                     : env.TARGET === 'firefox'
-                    ? ['FirefoxBrowserStack']
-                    : env.TARGET === 'safari'
-                    ? ['SafariBrowserStack']
-                    : ['ChromeBrowserStack', 'FirefoxBrowserStack', 'SafariBrowserStack'],
+                      ? ['FirefoxBrowserStack']
+                      : env.TARGET === 'safari'
+                        ? ['SafariBrowserStack']
+                        : ['ChromeBrowserStack', 'FirefoxBrowserStack', 'SafariBrowserStack'],
 
             captureTimeout: 300000,
 
@@ -141,13 +141,13 @@ module.exports = (config) => {
                 FirefoxDeveloperWithPrefs: {
                     base: 'FirefoxDeveloperHeadless',
                     prefs: {
-                        'media.autoplay.block-webaudio': false
+                        'media.autoplay.default': 0
                     }
                 },
                 FirefoxWithPrefs: {
                     base: 'FirefoxHeadless',
                     prefs: {
-                        'media.autoplay.block-webaudio': false
+                        'media.autoplay.default': 0
                     }
                 }
             }
