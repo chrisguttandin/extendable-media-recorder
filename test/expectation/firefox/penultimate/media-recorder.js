@@ -1,7 +1,7 @@
 import { AudioContext } from 'standardized-audio-context';
 import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 
-describe('module', () => {
+describe('MediaRecorder', () => {
     describe('with a MediaStream which contains an audio track', () => {
         let audioContext;
         let mediaRecorder;

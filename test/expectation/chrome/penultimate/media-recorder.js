@@ -1,7 +1,7 @@
 import { AudioContext } from 'standardized-audio-context';
 import { recordAboutASecondOfAudio } from '../../../helpers/record-about-a-second-of-audio';
 
-describe('module', () => {
+describe('MediaRecorder', () => {
     describe('with a MediaStream which contains an audio track', () => {
         let audioContext;
 
