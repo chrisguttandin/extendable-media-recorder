@@ -15,13 +15,13 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - node-version: 18.x
+                    - node-version: 20.x
                       target: firefox
                       type: expectation
-                    - node-version: 18.x
+                    - node-version: 20.x
                       target: safari
                       type: expectation
-                node-version: [18.x]
+                node-version: [20.x]
                 target: [chrome, firefox, safari]
                 type: [integration, unit]
             max-parallel: 3
