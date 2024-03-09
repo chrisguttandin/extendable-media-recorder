@@ -19,7 +19,7 @@
         "media-encoder-host": "^8.0.110",
         "multi-buffer-data-view": "^6.0.1",
         "recorder-audio-worklet": "^6.0.22",
-        "standardized-audio-context": "^25.3.65",
+        "standardized-audio-context": "^25.3.66",
         "subscribable-things": "^2.1.31",
         "tslib": "^2.6.2"
     },
