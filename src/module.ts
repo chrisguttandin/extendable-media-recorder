@@ -65,9 +65,12 @@ export const deregister = async (port: MessagePort): Promise<void> => {
     await drgstr(port);
 
     const encoderRegex = ports.get(port);
-    const index = encoderRegexes.indexOf(encoderRegex);
 
-    encoderRegexes.splice(index, 1);
+    if (encoderRegex !== undefined) {
+        const index = encoderRegexes.indexOf(encoderRegex);
+
+        encoderRegexes.splice(index, 1);
+    }
 };
 
 export const isSupported = () => createIsSupportedPromise(window);
