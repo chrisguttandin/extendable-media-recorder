@@ -1,4 +1,4 @@
-import { register as rgstr } from 'media-encoder-host';
+import { deregister as drgstr, register as rgstr } from 'media-encoder-host';
 import { createBlobEventFactory } from './factories/blob-event-factory';
 import { createDecodeWebMChunk } from './factories/decode-web-m-chunk';
 import { createEventTargetConstructor } from './factories/event-target-constructor';
@@ -59,8 +59,22 @@ const mediaRecorderConstructor: IMediaRecorderConstructor = createMediaRecorderC
 
 export { mediaRecorderConstructor as MediaRecorder };
 
+const ports = new WeakMap<MessagePort, RegExp>();
+
+export const deregister = async (port: MessagePort): Promise<void> => {
+    await drgstr(port);
+
+    const encoderRegex = ports.get(port);
+    const index = encoderRegexes.indexOf(encoderRegex);
+
+    encoderRegexes.splice(index, 1);
+};
+
 export const isSupported = () => createIsSupportedPromise(window);
 
 export const register = async (port: MessagePort): Promise<void> => {
-    encoderRegexes.push(await rgstr(port));
+    const encoderRegex = await rgstr(port);
+
+    encoderRegexes.push(encoderRegex);
+    ports.set(port, encoderRegex);
 };
