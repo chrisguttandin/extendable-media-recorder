@@ -1,5 +1,5 @@
 import { AudioContext, ConstantSourceNode } from 'standardized-audio-context';
-import { MediaRecorder, isSupported, register } from '../../src/module';
+import { MediaRecorder, deregister, isSupported, register } from '../../src/module';
 import { connect } from 'extendable-media-recorder-wav-encoder';
 import { createMediaStreamAudioDestinationNode } from '../helpers/create-media-stream-audio-destination-node';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
@@ -31,10 +31,18 @@ describe('module', () => {
     // eslint-disable-next-line no-undef
     if (!process.env.TARGET || !process.env.TARGET.endsWith('-unsupported')) {
         describe('MediaRecorder', () => {
-            before(async () => {
-                const port = await connect();
+            let port;
 
+            beforeEach(async () => {
+                port = await connect();
+
+                console.log('reg port', port);
                 await register(port);
+            });
+
+            afterEach(async () => {
+                console.log('der port', port);
+                await deregister(port);
             });
 
             // eslint-disable-next-line no-undef
