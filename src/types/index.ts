@@ -23,7 +23,7 @@ export * from './native-media-recorder-constructor-factory';
 export * from './native-media-recorder-factory';
 export * from './native-media-recorder-factory-factory';
 export * from './not-supported-error-factory';
-export * from './promised-data-view-element-type-encoder-id-and-port';
+export * from './promised-data-view-element-type-encoder-instance-id-and-port';
 export * from './read-element-content-factory';
 export * from './read-element-content-function';
 export * from './read-element-type-factory';

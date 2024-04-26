@@ -10,20 +10,20 @@ import {
     MinimalAudioContext,
     addAudioWorkletModule
 } from 'standardized-audio-context';
-import { IAudioNodesAndEncoderId } from '../interfaces';
+import { IAudioNodesAndEncoderInstanceId } from '../interfaces';
 import { TRecordingState, TWebAudioMediaRecorderFactoryFactory } from '../types';
 
 const ERROR_MESSAGE = 'Missing AudioWorklet support. Maybe this is not running in a secure context.';
 
 // @todo This should live in a separate file.
-const createPromisedAudioNodesEncoderIdAndPort = async (
+const createPromisedAudioNodesEncoderInstanceIdAndPort = async (
     audioBuffer: IAudioBuffer,
     audioContext: IMinimalAudioContext,
     channelCount: number,
     mediaStream: MediaStream,
     mimeType: string
 ) => {
-    const { encoderId, port } = await instantiate(mimeType, audioContext.sampleRate);
+    const { encoderInstanceId, port } = await instantiate(mimeType, audioContext.sampleRate);
 
     if (AudioWorkletNode === undefined) {
         throw new Error(ERROR_MESSAGE);
@@ -33,7 +33,7 @@ const createPromisedAudioNodesEncoderIdAndPort = async (
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(audioContext, { mediaStream });
     const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext, { channelCount });
 
-    return { audioBufferSourceNode, encoderId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode };
+    return { audioBufferSourceNode, encoderInstanceId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode };
 };
 
 export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFactory = (
@@ -58,7 +58,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
 
         let abortRecording: null | (() => void) = null;
         let intervalId: null | number = null;
-        let promisedAudioNodesAndEncoderId: null | Promise<IAudioNodesAndEncoderId> = null;
+        let promisedAudioNodesAndEncoderInstanceId: null | Promise<IAudioNodesAndEncoderInstanceId> = null;
         let promisedPartialRecording: null | Promise<void> = null;
         let isAudioContextRunning = true;
 
@@ -66,15 +66,15 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
-        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
-            const arrayBuffers = await encode(encoderId, timeslice);
+        const requestNextPartialRecording = async (encoderInstanceId: number, timeslice: number): Promise<void> => {
+            const arrayBuffers = await encode(encoderInstanceId, timeslice);
 
-            if (promisedAudioNodesAndEncoderId === null) {
+            if (promisedAudioNodesAndEncoderInstanceId === null) {
                 bufferedArrayBuffers.push(...arrayBuffers);
             } else {
                 dispatchDataAvailableEvent(arrayBuffers);
 
-                promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
+                promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice);
             }
         };
 
@@ -85,7 +85,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
         };
 
         const stop = (): void => {
-            if (promisedAudioNodesAndEncoderId === null) {
+            if (promisedAudioNodesAndEncoderInstanceId === null) {
                 return;
             }
 
@@ -98,32 +98,34 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 clearTimeout(intervalId);
             }
 
-            promisedAudioNodesAndEncoderId.then(async ({ encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
-                if (promisedPartialRecording !== null) {
-                    promisedPartialRecording.catch(() => {
-                        /* @todo Only catch the errors caused by a duplicate call to encode. */
-                    });
-                    promisedPartialRecording = null;
+            promisedAudioNodesAndEncoderInstanceId.then(
+                async ({ encoderInstanceId, mediaStreamAudioSourceNode, recorderAudioWorkletNode }) => {
+                    if (promisedPartialRecording !== null) {
+                        promisedPartialRecording.catch(() => {
+                            /* @todo Only catch the errors caused by a duplicate call to encode. */
+                        });
+                        promisedPartialRecording = null;
+                    }
+
+                    await recorderAudioWorkletNode.stop();
+
+                    mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
+
+                    const arrayBuffers = await encode(encoderInstanceId, null);
+
+                    if (promisedAudioNodesAndEncoderInstanceId === null) {
+                        await suspend();
+                    }
+
+                    dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
+
+                    bufferedArrayBuffers.length = 0;
+
+                    eventTarget.dispatchEvent(new Event('stop'));
                 }
+            );
 
-                await recorderAudioWorkletNode.stop();
-
-                mediaStreamAudioSourceNode.disconnect(recorderAudioWorkletNode);
-
-                const arrayBuffers = await encode(encoderId, null);
-
-                if (promisedAudioNodesAndEncoderId === null) {
-                    await suspend();
-                }
-
-                dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
-
-                bufferedArrayBuffers.length = 0;
-
-                eventTarget.dispatchEvent(new Event('stop'));
-            });
-
-            promisedAudioNodesAndEncoderId = null;
+            promisedAudioNodesAndEncoderInstanceId = null;
         };
 
         const suspend = (): Promise<void> => {
@@ -140,11 +142,11 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             get state(): TRecordingState {
-                return promisedAudioNodesAndEncoderId === null ? 'inactive' : isAudioContextRunning ? 'recording' : 'paused';
+                return promisedAudioNodesAndEncoderInstanceId === null ? 'inactive' : isAudioContextRunning ? 'recording' : 'paused';
             },
 
             pause(): void {
-                if (promisedAudioNodesAndEncoderId === null) {
+                if (promisedAudioNodesAndEncoderInstanceId === null) {
                     throw createInvalidStateError();
                 }
 
@@ -155,7 +157,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             resume(): void {
-                if (promisedAudioNodesAndEncoderId === null) {
+                if (promisedAudioNodesAndEncoderInstanceId === null) {
                     throw createInvalidStateError();
                 }
 
@@ -166,7 +168,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
             },
 
             start(timeslice?: number): void {
-                if (promisedAudioNodesAndEncoderId !== null) {
+                if (promisedAudioNodesAndEncoderInstanceId !== null) {
                     throw createInvalidStateError();
                 }
 
@@ -179,30 +181,35 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 const audioTracks = mediaStream.getAudioTracks();
                 const channelCount = audioTracks.length === 0 ? 2 : audioTracks[0].getSettings().channelCount ?? 2;
 
-                promisedAudioNodesAndEncoderId = Promise.all([
+                promisedAudioNodesAndEncoderInstanceId = Promise.all([
                     resume(),
                     promisedAudioWorkletModule.then(() =>
-                        createPromisedAudioNodesEncoderIdAndPort(audioBuffer, audioContext, channelCount, mediaStream, mimeType)
+                        createPromisedAudioNodesEncoderInstanceIdAndPort(audioBuffer, audioContext, channelCount, mediaStream, mimeType)
                     )
-                ]).then(async ([, { audioBufferSourceNode, encoderId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode }]) => {
-                    mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
+                ]).then(
+                    async ([
+                        ,
+                        { audioBufferSourceNode, encoderInstanceId, mediaStreamAudioSourceNode, port, recorderAudioWorkletNode }
+                    ]) => {
+                        mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
 
-                    await new Promise((resolve) => {
-                        audioBufferSourceNode.onended = resolve;
-                        audioBufferSourceNode.connect(recorderAudioWorkletNode);
-                        audioBufferSourceNode.start(audioContext.currentTime + length / audioContext.sampleRate);
-                    });
+                        await new Promise((resolve) => {
+                            audioBufferSourceNode.onended = resolve;
+                            audioBufferSourceNode.connect(recorderAudioWorkletNode);
+                            audioBufferSourceNode.start(audioContext.currentTime + length / audioContext.sampleRate);
+                        });
 
-                    audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
+                        audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
 
-                    await recorderAudioWorkletNode.record(port);
+                        await recorderAudioWorkletNode.record(port);
 
-                    if (timeslice !== undefined) {
-                        promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
+                        if (timeslice !== undefined) {
+                            promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice);
+                        }
+
+                        return { encoderInstanceId, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
                     }
-
-                    return { encoderId, mediaStreamAudioSourceNode, recorderAudioWorkletNode };
-                });
+                );
 
                 const tracks = mediaStream.getTracks();
 

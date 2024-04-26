@@ -1,7 +1,7 @@
 import { encode, instantiate } from 'media-encoder-host';
 import { MultiBufferDataView } from 'multi-buffer-data-view';
 import { on } from 'subscribable-things';
-import { TPromisedDataViewElementTypeEncoderIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
+import { TPromisedDataViewElementTypeEncoderInstanceIdAndPort, TRecordingState, TWebmPcmMediaRecorderFactoryFactory } from '../types';
 
 export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFactory = (
     createBlobEvent,
@@ -19,15 +19,15 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
             eventTarget.dispatchEvent(createBlobEvent('dataavailable', { data: new Blob(arrayBuffers, { type: mimeType }) }));
         };
 
-        const requestNextPartialRecording = async (encoderId: number, timeslice: number): Promise<void> => {
-            const arrayBuffers = await encode(encoderId, timeslice);
+        const requestNextPartialRecording = async (encoderInstanceId: number, timeslice: number): Promise<void> => {
+            const arrayBuffers = await encode(encoderInstanceId, timeslice);
 
             if (nativeMediaRecorder.state === 'inactive') {
                 bufferedArrayBuffers.push(...arrayBuffers);
             } else {
                 dispatchDataAvailableEvent(arrayBuffers);
 
-                promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice);
+                promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice);
             }
         };
 
@@ -97,10 +97,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                     let isStopped = false;
                     // Bug #9: Chrome sometimes fires more than one dataavailable event while being inactive.
                     let pendingInvocations = 0;
-                    let promisedDataViewElementTypeEncoderIdAndPort: TPromisedDataViewElementTypeEncoderIdAndPort = instantiate(
-                        mimeType,
-                        sampleRate
-                    );
+                    let promisedDataViewElementTypeEncoderInstanceIdAndPort: TPromisedDataViewElementTypeEncoderInstanceIdAndPort =
+                        instantiate(mimeType, sampleRate);
 
                     stopRecording = () => {
                         isStopped = true;
@@ -114,8 +112,8 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 
                         const promisedArrayBuffer = data.arrayBuffer();
 
-                        promisedDataViewElementTypeEncoderIdAndPort = promisedDataViewElementTypeEncoderIdAndPort.then(
-                            async ({ dataView = null, elementType = null, encoderId, port }) => {
+                        promisedDataViewElementTypeEncoderInstanceIdAndPort = promisedDataViewElementTypeEncoderInstanceIdAndPort.then(
+                            async ({ dataView = null, elementType = null, encoderInstanceId, port }) => {
                                 const arrayBuffer = await promisedArrayBuffer;
 
                                 pendingInvocations -= 1;
@@ -129,13 +127,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                     const lengthAndValue = readVariableSizeInteger(currentDataView, 0);
 
                                     if (lengthAndValue === null) {
-                                        return { dataView: currentDataView, elementType, encoderId, port };
+                                        return { dataView: currentDataView, elementType, encoderInstanceId, port };
                                     }
 
                                     const { value } = lengthAndValue;
 
                                     if (value !== 172351395) {
-                                        return { dataView, elementType, encoderId, port };
+                                        return { dataView, elementType, encoderInstanceId, port };
                                     }
 
                                     isRecording = true;
@@ -159,7 +157,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                 );
 
                                 if (pendingInvocations === 0 && (nativeMediaRecorder.state === 'inactive' || isStopped)) {
-                                    encode(encoderId, null).then((arrayBuffers) => {
+                                    encode(encoderInstanceId, null).then((arrayBuffers) => {
                                         dispatchDataAvailableEvent([...bufferedArrayBuffers, ...arrayBuffers]);
 
                                         bufferedArrayBuffers.length = 0;
@@ -173,14 +171,15 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                                     removeEventListener();
                                 }
 
-                                return { dataView: remainingDataView, elementType: currentElementType, encoderId, port };
+                                return { dataView: remainingDataView, elementType: currentElementType, encoderInstanceId, port };
                             }
                         );
                     });
 
                     if (timeslice !== undefined) {
-                        promisedDataViewElementTypeEncoderIdAndPort.then(
-                            ({ encoderId }) => (promisedPartialRecording = requestNextPartialRecording(encoderId, timeslice))
+                        promisedDataViewElementTypeEncoderInstanceIdAndPort.then(
+                            ({ encoderInstanceId }) =>
+                                (promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice))
                         );
                     }
                 }

@@ -1,4 +1,4 @@
-export * from './audio-nodes-and-encoder-id';
+export * from './audio-nodes-and-encoder-instance-id';
 export * from './blob-event';
 export * from './blob-event-init';
 export * from './event-target';
