@@ -17,7 +17,7 @@
     "dependencies": {
         "@babel/runtime": "^7.24.5",
         "media-encoder-host": "^9.0.1",
-        "multi-buffer-data-view": "^6.0.5",
+        "multi-buffer-data-view": "^6.0.6",
         "recorder-audio-worklet": "^6.0.27",
         "standardized-audio-context": "^25.3.71",
         "subscribable-things": "^2.1.35",
