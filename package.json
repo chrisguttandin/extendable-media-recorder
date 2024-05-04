@@ -20,7 +20,7 @@
         "multi-buffer-data-view": "^6.0.6",
         "recorder-audio-worklet": "^6.0.28",
         "standardized-audio-context": "^25.3.72",
-        "subscribable-things": "^2.1.35",
+        "subscribable-things": "^2.1.36",
         "tslib": "^2.6.2"
     },
     "description": "An extendable drop-in replacement for the native MediaRecorder.",
