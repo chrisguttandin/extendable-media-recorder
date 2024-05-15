@@ -224,6 +224,10 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
             return this._internalMediaRecorder.stop();
         }
 
+        public requestData(): void {
+            return this._internalMediaRecorder.requestData();
+        }
+
         public static isTypeSupported(mimeType: string): boolean {
             return (
                 (nativeMediaRecorderConstructor !== null &&
