@@ -20,6 +20,7 @@ module.exports = {
             ...filter(isTarget('firefox-penultimate'), 'sh:test-expectation-firefox-penultimate'),
             ...filter(isTarget('firefox-previous'), 'sh:test-expectation-firefox-previous'),
             ...filter(isTarget('safari'), 'sh:test-expectation-safari'),
+            ...filter(isTarget('safari-penultimate'), 'sh:test-expectation-safari-penultimate'),
             ...filter(isTarget('safari-previous'), 'sh:test-expectation-safari-previous')
         ),
         ...filter(isType('integration'), 'sh:test-integration'),

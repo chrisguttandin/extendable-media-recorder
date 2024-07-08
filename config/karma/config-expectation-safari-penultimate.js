@@ -20,12 +20,12 @@ module.exports = (config) => {
 
         concurrency: 1,
 
-        files: ['test/expectation/safari/previous/**/*.js'],
+        files: ['test/expectation/safari/penultimate/**/*.js'],
 
         frameworks: ['mocha', 'sinon-chai'],
 
         preprocessors: {
-            'test/expectation/safari/previous/**/*.js': 'webpack'
+            'test/expectation/safari/penultimate/**/*.js': 'webpack'
         },
 
         reporters: ['dots'],
@@ -66,5 +66,5 @@ module.exports = (config) => {
         }
     });
 
-    env.WEBKIT_HEADLESS_BIN = 'webkit-v17-0/pw_run.sh';
+    env.WEBKIT_HEADLESS_BIN = 'webkit-v16-4/pw_run.sh';
 };
