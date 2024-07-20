@@ -177,10 +177,13 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
                     });
 
                     if (timeslice !== undefined) {
-                        promisedDataViewElementTypeEncoderInstanceIdAndPort.then(
-                            ({ encoderInstanceId }) =>
-                                (promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice))
-                        );
+                        promisedDataViewElementTypeEncoderInstanceIdAndPort.then(({ encoderInstanceId }) => {
+                            if (isStopped) {
+                                return;
+                            }
+
+                            promisedPartialRecording = requestNextPartialRecording(encoderInstanceId, timeslice);
+                        });
                     }
                 }
 
