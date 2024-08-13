@@ -50,7 +50,7 @@
         "karma-sinon-chai": "^2.0.2",
         "karma-webkit-launcher": "^2.6.0",
         "karma-webpack": "^5.0.1",
-        "lint-staged": "^15.2.7",
+        "lint-staged": "^15.2.9",
         "load-grunt-config": "^4.0.1",
         "mocha": "^10.7.0",
         "prettier": "^3.3.3",
