@@ -19,7 +19,7 @@ describe('MediaRecorder', () => {
             this.timeout(10000);
 
             expect(
-                (await Promise.all(Array.from({ length: 200 }, () => recordAboutASecondOfAudio(audioContext)))).sort().pop()
+                (await Promise.all(Array.from({ length: 2000 }, () => recordAboutASecondOfAudio(audioContext)))).sort().pop()
             ).to.be.above(1);
         });
     });
