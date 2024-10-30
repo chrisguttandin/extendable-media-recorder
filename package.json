@@ -52,7 +52,7 @@
         "karma-webpack": "^5.0.1",
         "lint-staged": "^15.2.10",
         "load-grunt-config": "^4.0.1",
-        "mocha": "^10.8.1",
+        "mocha": "^10.8.2",
         "prettier": "^3.3.3",
         "rimraf": "^6.0.1",
         "rollup": "^4.24.3",
