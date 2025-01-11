@@ -122,19 +122,19 @@ module.exports = (config) => {
     } else {
         config.set({
             browsers: [
-                'ChromeCanaryHeadlessWithNoRequiredUserGesture',
-                'ChromeHeadlessWithNoRequiredUserGesture',
+                'ChromeCanaryHeadlessWithFlags',
+                'ChromeHeadlessWithFlags',
                 'FirefoxDeveloperWithPrefs',
                 'FirefoxWithPrefs',
                 'Safari'
             ],
 
             customLaunchers: {
-                ChromeCanaryHeadlessWithNoRequiredUserGesture: {
+                ChromeCanaryHeadlessWithFlags: {
                     base: 'ChromeCanaryHeadless',
                     flags: ['--autoplay-policy=no-user-gesture-required']
                 },
-                ChromeHeadlessWithNoRequiredUserGesture: {
+                ChromeHeadlessWithFlags: {
                     base: 'ChromeHeadless',
                     flags: ['--autoplay-policy=no-user-gesture-required']
                 },
