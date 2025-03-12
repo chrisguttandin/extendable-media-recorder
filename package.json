@@ -18,7 +18,7 @@
         "@babel/runtime": "^7.26.10",
         "media-encoder-host": "^9.0.17",
         "multi-buffer-data-view": "^6.0.19",
-        "recorder-audio-worklet": "^6.0.43",
+        "recorder-audio-worklet": "^6.0.44",
         "standardized-audio-context": "^25.3.77",
         "subscribable-things": "^2.1.49",
         "tslib": "^2.8.1"
