@@ -39,7 +39,6 @@
         "eslint-config-holy-grail": "^60.0.28",
         "extendable-media-recorder-wav-encoder": "^7.0.126",
         "grunt": "^1.6.1",
-        "grunt-cli": "^1.5.0",
         "husky": "^9.1.7",
         "karma": "^6.4.4",
         "karma-browserstack-launcher": "^1.6.0",
