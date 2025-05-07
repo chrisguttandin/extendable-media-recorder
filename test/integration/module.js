@@ -771,6 +771,120 @@ describe('module', () => {
                                                         setTimeout(() => mediaRecorder.stop(), 1000);
                                                     });
 
+                                                    it('should encode a mediaStream as one chunk', function (done) {
+                                                        this.timeout(40000);
+
+                                                        let firedDataavailable = false;
+                                                        let firedStart = false;
+                                                        let firedStop = false;
+
+                                                        mediaRecorder.addEventListener('dataavailable', async function (event) {
+                                                            try {
+                                                                expect(firedDataavailable).to.be.false;
+                                                                expect(firedStart).to.be.true;
+                                                                expect(firedStop).to.be.false;
+
+                                                                expect(event).to.be.an.instanceOf(BlobEvent);
+                                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                                expect(event.target).to.equal(mediaRecorder);
+                                                                expect(event.type).to.equal('dataavailable');
+
+                                                                expect(this).to.equal(mediaRecorder);
+
+                                                                firedDataavailable = true;
+
+                                                                // Test if the arrayBuffer is decodable.
+                                                                const arrayBuffer = await event.data.arrayBuffer();
+                                                                const audioBuffer = await audioContext.decodeAudioData(
+                                                                    arrayBuffer.slice(0)
+                                                                );
+
+                                                                expect(audioBuffer.numberOfChannels).to.equal(channelCount);
+
+                                                                // Test if the audioBuffer is at least half a second long.
+                                                                expect(audioBuffer.duration).to.be.above(0.5);
+
+                                                                // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
+                                                                if (mimeType === 'audio/wav') {
+                                                                    const dataView = new DataView(arrayBuffer);
+
+                                                                    expect(dataView.getUint32(24, true)).to.equal(sampleRate);
+                                                                    expect(dataView.getUint32(40, true) / 2 / channelCount).to.equal(
+                                                                        audioBuffer.length
+                                                                    );
+
+                                                                    const rotatingBuffers = [
+                                                                        new Float32Array(bufferLength),
+                                                                        new Float32Array(bufferLength)
+                                                                    ];
+
+                                                                    for (let i = 0; i < audioBuffer.numberOfChannels; i += 1) {
+                                                                        audioBuffer.copyFromChannel(rotatingBuffers[0], i);
+
+                                                                        for (
+                                                                            let j = bufferLength;
+                                                                            j < audioBuffer.length;
+                                                                            j += bufferLength
+                                                                        ) {
+                                                                            audioBuffer.copyFromChannel(rotatingBuffers[1], i, j);
+
+                                                                            compareRotatingBuffers(gain * 3, gain, rotatingBuffers);
+
+                                                                            rotatingBuffers.push(rotatingBuffers.shift());
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                expect(firedDataavailable).to.be.true;
+                                                                expect(firedStart).to.be.true;
+                                                                expect(firedStop).to.be.true;
+
+                                                                done();
+                                                            } catch (err) {
+                                                                done(err);
+                                                            }
+                                                        });
+                                                        mediaRecorder.addEventListener('start', function (event) {
+                                                            try {
+                                                                expect(firedDataavailable).to.be.false;
+                                                                expect(firedStart).to.be.false;
+                                                                expect(firedStop).to.be.false;
+
+                                                                expect(event).to.be.an.instanceOf(Event);
+                                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                                expect(event.target).to.equal(mediaRecorder);
+                                                                expect(event.type).to.equal('start');
+
+                                                                expect(this).to.equal(mediaRecorder);
+
+                                                                firedStart = true;
+                                                            } catch (err) {
+                                                                done(err);
+                                                            }
+                                                        });
+                                                        mediaRecorder.addEventListener('stop', function (event) {
+                                                            try {
+                                                                expect(firedDataavailable).to.be.true;
+                                                                expect(firedStart).to.be.true;
+                                                                expect(firedStop).to.be.false;
+
+                                                                expect(event).to.be.an.instanceOf(Event);
+                                                                expect(event.currentTarget).to.equal(mediaRecorder);
+                                                                expect(event.target).to.equal(mediaRecorder);
+                                                                expect(event.type).to.equal('stop');
+
+                                                                expect(this).to.equal(mediaRecorder);
+
+                                                                firedStop = true;
+                                                            } catch (err) {
+                                                                done(err);
+                                                            }
+                                                        });
+                                                        mediaRecorder.start(10000);
+
+                                                        setTimeout(() => mediaRecorder.stop(), 1000);
+                                                    });
+
                                                     it('should encode a mediaStream in chunks', function (done) {
                                                         this.timeout(40000);
 
