@@ -497,6 +497,8 @@ describe('module', () => {
 
                                                                 expect(this).to.equal(mediaRecorder);
 
+                                                                expect(mediaRecorder.state).to.equal('inactive');
+
                                                                 firedDataavailable = true;
                                                             } catch (err) {
                                                                 done(err);
@@ -588,6 +590,8 @@ describe('module', () => {
 
                                                                 expect(this).to.equal(mediaRecorder);
 
+                                                                expect(mediaRecorder.state).to.equal('inactive');
+
                                                                 firedDataavailable = true;
                                                             } catch (err) {
                                                                 done(err);
@@ -676,6 +680,8 @@ describe('module', () => {
                                                                 expect(event.type).to.equal('dataavailable');
 
                                                                 expect(this).to.equal(mediaRecorder);
+
+                                                                expect(mediaRecorder.state).to.equal('inactive');
 
                                                                 firedDataavailable = true;
 
@@ -790,6 +796,8 @@ describe('module', () => {
                                                                 expect(event.type).to.equal('dataavailable');
 
                                                                 expect(this).to.equal(mediaRecorder);
+
+                                                                expect(mediaRecorder.state).to.equal('inactive');
 
                                                                 firedDataavailable = true;
 
@@ -1030,6 +1038,8 @@ describe('module', () => {
 
                                                                 expect(this).to.equal(mediaRecorder);
 
+                                                                expect(mediaRecorder.state).to.equal('inactive');
+
                                                                 firedDataavailable = true;
 
                                                                 // Test if the arrayBuffer is decodable.
@@ -1237,6 +1247,8 @@ describe('module', () => {
                                                                 blobs.push(event.data);
 
                                                                 if (firedDataavailable === 2) {
+                                                                    expect(mediaRecorder.state).to.equal('inactive');
+
                                                                     for (const blob of blobs) {
                                                                         // Test if the arrayBuffer is decodable.
                                                                         const arrayBuffer = await blob.arrayBuffer();
