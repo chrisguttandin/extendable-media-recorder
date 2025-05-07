@@ -34,9 +34,9 @@ describe('module', () => {
         describe('MediaRecorder', () => {
             let port;
 
-            afterEach(() => deregister(port));
+            after(() => deregister(port));
 
-            beforeEach(async () => {
+            before(async () => {
                 port = await connect();
 
                 await register(port);
