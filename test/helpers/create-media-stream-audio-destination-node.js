@@ -1,8 +1,8 @@
 import { ConstantSourceNode, GainNode, MediaStreamAudioDestinationNode, OscillatorNode } from 'standardized-audio-context';
 
-export const createMediaStreamAudioDestinationNode = (audioContext, channelCount = 2, frequency = 441) => {
+export const createMediaStreamAudioDestinationNode = (audioContext, channelCount = 2, frequency = 441, gain = 0.25) => {
     const constantSourceNode = new ConstantSourceNode(audioContext, { offset: 2 });
-    const gainNode = new GainNode(audioContext, { gain: 0.25 });
+    const gainNode = new GainNode(audioContext, { gain });
     const mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext, { channelCount });
     const oscillatorNode = new OscillatorNode(audioContext, { frequency, type: 'sawtooth' });
 
