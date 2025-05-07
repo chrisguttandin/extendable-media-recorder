@@ -687,8 +687,8 @@ describe('module', () => {
 
                                                                 expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                // Test if the audioBuffer is at least half a second long.
-                                                                expect(audioBuffer.duration).to.be.above(0.5);
+                                                                expect(audioBuffer.duration).to.at.least(0.5);
+                                                                expect(audioBuffer.duration).to.at.most(1.5);
 
                                                                 // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                 if (mimeType === 'audio/wav') {
@@ -801,8 +801,8 @@ describe('module', () => {
 
                                                                 expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                // Test if the audioBuffer is at least half a second long.
-                                                                expect(audioBuffer.duration).to.be.above(0.5);
+                                                                expect(audioBuffer.duration).to.at.least(0.5);
+                                                                expect(audioBuffer.duration).to.at.most(1.5);
 
                                                                 // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                 if (mimeType === 'audio/wav') {
@@ -922,8 +922,8 @@ describe('module', () => {
 
                                                                     expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                    // Test if the audioBuffer is at least half a second long.
-                                                                    expect(audioBuffer.duration).to.be.above(0.5);
+                                                                    expect(audioBuffer.duration).to.at.least(0.5);
+                                                                    expect(audioBuffer.duration).to.at.most(1.5);
 
                                                                     // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                     if (mimeType === 'audio/wav') {
@@ -1040,8 +1040,8 @@ describe('module', () => {
 
                                                                 expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                // Test if the audioBuffer is at least half a second long.
-                                                                expect(audioBuffer.duration).to.be.above(0.5);
+                                                                expect(audioBuffer.duration).to.at.least(0.5);
+                                                                expect(audioBuffer.duration).to.at.most(1.5);
 
                                                                 // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                 if (mimeType === 'audio/wav') {
@@ -1246,8 +1246,8 @@ describe('module', () => {
 
                                                                         expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                        // Test if the audioBuffer is at least half a second long.
-                                                                        expect(audioBuffer.duration).to.be.above(0.5);
+                                                                        expect(audioBuffer.duration).to.at.least(0.5);
+                                                                        expect(audioBuffer.duration).to.at.most(1.5);
 
                                                                         // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                         if (mimeType === 'audio/wav') {
