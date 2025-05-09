@@ -59,7 +59,8 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
              * Bug #7 & #8: Up until v113 Chrome dispatched the dataavailable and stop events before it dispatched the error event.
              */
             new Promise((resolve) => {
-                const mediaRecorder = new window.MediaRecorder(mediaStream);
+                const clonedMediaStream = mediaStream.clone();
+                const mediaRecorder = new window.MediaRecorder(clonedMediaStream);
 
                 let hasDispatchedDataAvailableEvent = false;
                 let hasDispatchedStopEvent = false;
@@ -79,7 +80,7 @@ export const createIsSupportedPromise: TIsSupportedPromiseFactory = (window) => 
                 mediaRecorder.addEventListener('stop', () => (hasDispatchedStopEvent = true));
                 mediaRecorder.start();
                 context.fillRect(0, 0, 1, 1);
-                mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
+                clonedMediaStream.removeTrack(clonedMediaStream.getVideoTracks()[0]);
             })
         ]).then((results) => results.every((result) => result));
     }
