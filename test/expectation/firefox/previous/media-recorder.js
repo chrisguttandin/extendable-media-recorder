@@ -75,4 +75,12 @@ describe('MediaRecorder', () => {
             setTimeout(() => mediaRecorder.stop(), 1000);
         });
     });
+
+    describe('isTypeSupported()', () => {
+        // #21
+
+        it('should not support audio/mp4', () => {
+            expect(MediaRecorder.isTypeSupported('audio/mp4')).to.be.false;
+        });
+    });
 });
