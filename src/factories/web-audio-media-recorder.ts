@@ -17,7 +17,7 @@ const ERROR_MESSAGE = 'Missing AudioWorklet support. Maybe this is not running i
 
 // @todo This should live in a separate file.
 const createPromisedAudioNodesEncoderInstanceIdAndPort = async (
-    audioBuffer: IAudioBuffer,
+    audioBuffer: null | IAudioBuffer,
     audioContext: IMinimalAudioContext,
     channelCount: number,
     mediaStream: MediaStream,
@@ -29,7 +29,7 @@ const createPromisedAudioNodesEncoderInstanceIdAndPort = async (
         throw new Error(ERROR_MESSAGE);
     }
 
-    const audioBufferSourceNode = new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
+    const audioBufferSourceNode = audioBuffer === null ? null : new AudioBufferSourceNode(audioContext, { buffer: audioBuffer });
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(audioContext, { mediaStream });
     const recorderAudioWorkletNode = createRecorderAudioWorkletNode(AudioWorkletNode, audioContext, { channelCount });
 
@@ -45,8 +45,15 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
     return (eventTarget, mediaStream, mimeType) => {
         const sampleRate = mediaStream.getAudioTracks()[0]?.getSettings().sampleRate;
         const audioContext = new MinimalAudioContext({ latencyHint: 'playback', sampleRate });
-        const length = Math.max(1024, Math.ceil(audioContext.baseLatency * audioContext.sampleRate));
-        const audioBuffer = new AudioBuffer({ length, sampleRate: audioContext.sampleRate });
+        /*
+         * Bug #22: Safari adds a certain number of leading zeros which need to be skipped.
+         *
+         * Bug #21: Firefox is the only browser not supporting audio/mp4. This is totally unrelated and just used to apply the fix only for
+         * Safari.
+         */
+        const audioBuffer = MediaRecorder.isTypeSupported('audio/mp4')
+            ? new AudioBuffer({ length: 2688, sampleRate: audioContext.sampleRate })
+            : null;
         const bufferedArrayBuffers: ArrayBuffer[] = [];
         const promisedAudioWorkletModule = addRecorderAudioWorkletModule((url: string) => {
             if (addAudioWorkletModule === undefined) {
@@ -179,7 +186,7 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                 eventTarget.dispatchEvent(new Event('start'));
 
                 const audioTracks = mediaStream.getAudioTracks();
-                const channelCount = audioTracks.length === 0 ? 2 : audioTracks[0].getSettings().channelCount ?? 2;
+                const channelCount = audioTracks.length === 0 ? 2 : (audioTracks[0].getSettings().channelCount ?? 2);
 
                 promisedAudioNodesAndEncoderInstanceId = Promise.all([
                     resume(),
@@ -193,13 +200,15 @@ export const createWebAudioMediaRecorderFactory: TWebAudioMediaRecorderFactoryFa
                     ]) => {
                         mediaStreamAudioSourceNode.connect(recorderAudioWorkletNode);
 
-                        await new Promise((resolve) => {
-                            audioBufferSourceNode.onended = resolve;
-                            audioBufferSourceNode.connect(recorderAudioWorkletNode);
-                            audioBufferSourceNode.start(audioContext.currentTime + length / audioContext.sampleRate);
-                        });
+                        if (audioBufferSourceNode !== null) {
+                            await new Promise((resolve) => {
+                                audioBufferSourceNode.onended = resolve;
+                                audioBufferSourceNode.connect(recorderAudioWorkletNode);
+                                audioBufferSourceNode.start();
+                            });
 
-                        audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
+                            audioBufferSourceNode.disconnect(recorderAudioWorkletNode);
+                        }
 
                         await recorderAudioWorkletNode.record(port);
 
