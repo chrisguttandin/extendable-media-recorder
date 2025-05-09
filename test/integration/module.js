@@ -1093,10 +1093,37 @@ describe('module', () => {
                                                                                     expect(cut).to.equal(j + k);
                                                                                 }
 
-                                                                                audioBuffer.copyFromChannel(rotatingBuffers[0], i, cut);
+                                                                                /*
+                                                                                 * Bug #23: Safari inserts 128 samples of silence when
+                                                                                 * something changes while the AudioContext is suspended.
+                                                                                 */
+                                                                                const numberOfExpectedZeros =
+                                                                                    gain !== 0 &&
+                                                                                    !/Chrome/.test(navigator.userAgent) &&
+                                                                                    /Safari/.test(navigator.userAgent)
+                                                                                        ? 128
+                                                                                        : 0;
+
+                                                                                if (numberOfExpectedZeros > 0) {
+                                                                                    const zeroBuffer = new Float32Array(
+                                                                                        numberOfExpectedZeros
+                                                                                    );
+
+                                                                                    audioBuffer.copyFromChannel(zeroBuffer, i, cut);
+
+                                                                                    for (let l = 0; l < numberOfExpectedZeros; l += 1) {
+                                                                                        expect(zeroBuffer[l]).to.equal(0);
+                                                                                    }
+                                                                                }
+
+                                                                                audioBuffer.copyFromChannel(
+                                                                                    rotatingBuffers[0],
+                                                                                    i,
+                                                                                    cut + numberOfExpectedZeros
+                                                                                );
 
                                                                                 for (
-                                                                                    let l = cut + bufferLength;
+                                                                                    let l = cut + numberOfExpectedZeros + bufferLength;
                                                                                     l < audioBuffer.length;
                                                                                     l += bufferLength
                                                                                 ) {
