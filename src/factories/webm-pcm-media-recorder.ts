@@ -10,7 +10,7 @@ export const createWebmPcmMediaRecorderFactory: TWebmPcmMediaRecorderFactoryFact
 ) => {
     return (eventTarget, nativeMediaRecorderConstructor, mediaStream, mimeType) => {
         const bufferedArrayBuffers: ArrayBuffer[] = [];
-        const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm;codecs=pcm' });
+        const nativeMediaRecorder = new nativeMediaRecorderConstructor(mediaStream, { mimeType: 'audio/webm; codecs=pcm' });
 
         let promisedPartialRecording: null | Promise<void> = null;
         let stopRecording = () => {}; // tslint:disable-line:no-empty

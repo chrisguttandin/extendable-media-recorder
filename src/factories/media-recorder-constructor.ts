@@ -57,7 +57,7 @@ export const createMediaRecorderConstructor: TMediaRecorderConstructorFactory = 
                 if (
                     nativeMediaRecorderConstructor !== null &&
                     nativeMediaRecorderConstructor.isTypeSupported !== undefined &&
-                    nativeMediaRecorderConstructor.isTypeSupported('audio/webm;codecs=pcm')
+                    nativeMediaRecorderConstructor.isTypeSupported('audio/webm; codecs=pcm')
                 ) {
                     this._internalMediaRecorder = createWebmPcmMediaRecorder(this, nativeMediaRecorderConstructor, stream, mimeType);
                 } else {
