@@ -1388,31 +1388,57 @@ describe('module', () => {
                 }
             }
 
-            describe('with the mimeType of audio/anything', () => {
-                let audioContext;
-                let mediaStream;
+            for (const { isTypeSupported, mimeType } of [
+                { isTypeSupported: false, mimeType: 'audio/anything' },
+                { isTypeSupported: true, mimeType: 'audio/wav' },
+                { isTypeSupported: true, mimeType: 'audio/webm' }
+            ]) {
+                describe(`with the mimeType of ${mimeType}`, () => {
+                    let audioContext;
+                    let mediaStream;
 
-                afterEach(() => {
-                    audioContext.close();
-                    mediaStream.getTracks().forEach((track) => track.stop());
+                    afterEach(() => {
+                        audioContext.close();
+                        mediaStream.getTracks().forEach((track) => track.stop());
+                    });
+
+                    beforeEach(async () => {
+                        audioContext = new AudioContext();
+                        mediaStream = await createMediaStreamWithAudioTrack(audioContext);
+                    });
+
+                    describe('constructor()', () => {
+                        if (isTypeSupported) {
+                            it('should not throw any error', () => {
+                                new MediaRecorder(mediaStream, { mimeType });
+                            });
+                        } else {
+                            it('should throw a NotSupportedError', (done) => {
+                                try {
+                                    new MediaRecorder(mediaStream, { mimeType });
+                                } catch (err) {
+                                    expect(err.code).to.equal(9);
+                                    expect(err.name).to.equal('NotSupportedError');
+
+                                    done();
+                                }
+                            });
+                        }
+                    });
+
+                    describe('isTypeSupported()', () => {
+                        if (isTypeSupported) {
+                            it(`should support ${mimeType}`, () => {
+                                expect(MediaRecorder.isTypeSupported(mimeType)).to.be.true;
+                            });
+                        } else {
+                            it(`should not support ${mimeType}`, () => {
+                                expect(MediaRecorder.isTypeSupported(mimeType)).to.be.false;
+                            });
+                        }
+                    });
                 });
-
-                beforeEach(async () => {
-                    audioContext = new AudioContext();
-                    mediaStream = await createMediaStreamWithAudioTrack(audioContext);
-                });
-
-                it('should throw a NotSupportedError', (done) => {
-                    try {
-                        new MediaRecorder(mediaStream, { mimeType: 'audio/anything' });
-                    } catch (err) {
-                        expect(err.code).to.equal(9);
-                        expect(err.name).to.equal('NotSupportedError');
-
-                        done();
-                    }
-                });
-            });
+            }
         });
     }
 
