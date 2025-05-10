@@ -86,7 +86,7 @@ module.exports = (config) => {
                     browser: 'safari',
                     captureTimeout: 300,
                     os: 'OS X',
-                    os_version: 'Ventura' // eslint-disable-line camelcase
+                    os_version: 'Sequoia' // eslint-disable-line camelcase
                 }
             }
         });
