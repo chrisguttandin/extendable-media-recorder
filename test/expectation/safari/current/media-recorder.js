@@ -50,6 +50,12 @@ describe('MediaRecorder', () => {
     });
 
     describe('isTypeSupported()', () => {
+        // #28
+
+        it('should not support audio/aac', () => {
+            expect(MediaRecorder.isTypeSupported('audio/aac')).to.be.false;
+        });
+
         // #23
 
         it('should not support audio/mp4 with alac as codec', () => {
