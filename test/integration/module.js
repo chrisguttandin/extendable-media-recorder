@@ -4,6 +4,7 @@ import { connect } from 'extendable-media-recorder-wav-encoder';
 import { createMediaStreamAudioDestinationNode } from '../helpers/create-media-stream-audio-destination-node';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
+import { isSafari } from '../helpers/is-safari';
 import { spy } from 'sinon';
 
 const compareRotatingBuffers = (maximum, minimum, rotatingBuffers, shouldThrow = true) => {
@@ -44,11 +45,7 @@ describe('module', () => {
 
             // eslint-disable-next-line no-undef
             const channelCounts = process.env.CI && /Chrome/.test(navigator.userAgent) ? [2] : [1, 2];
-            const mimeTypes = [
-                // Bug #11 Safari does not yet support the MediaRecorder which means it can't be used to record webm encoded files.
-                ...(!/Chrome/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) ? [] : ['audio/webm']),
-                'audio/wav'
-            ];
+            const mimeTypes = ['audio/wav', 'audio/webm'];
 
             for (const channelCount of channelCounts) {
                 for (const gain of [0, 0.25, 0.3]) {
@@ -930,8 +927,14 @@ describe('module', () => {
 
                                                                     expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                    expect(audioBuffer.duration).to.at.least(0.5);
-                                                                    expect(audioBuffer.duration).to.at.most(1.5);
+                                                                    // Bug #26: Safari emits chunks of at least about a second.
+                                                                    if (isSafari(navigator) && mimeType === 'audio/webm') {
+                                                                        expect(audioBuffer.duration).to.at.least(5);
+                                                                        expect(audioBuffer.duration).to.at.most(15);
+                                                                    } else {
+                                                                        expect(audioBuffer.duration).to.at.least(0.5);
+                                                                        expect(audioBuffer.duration).to.at.most(1.5);
+                                                                    }
 
                                                                     // Only test if the audioBuffer contains the ouput of the oscillator when recording a lossless file.
                                                                     if (mimeType === 'audio/wav') {
@@ -1013,7 +1016,10 @@ describe('module', () => {
                                                         });
                                                         mediaRecorder.start(100);
 
-                                                        setTimeout(() => mediaRecorder.stop(), 1000);
+                                                        setTimeout(
+                                                            () => mediaRecorder.stop(),
+                                                            isSafari(navigator) && mimeType === 'audio/webm' ? 10000 : 1000
+                                                        );
                                                     });
 
                                                     it('should encode a mediaStream with a pause', function (done) {
@@ -1101,11 +1107,7 @@ describe('module', () => {
                                                                                  * something changes while the AudioContext is suspended.
                                                                                  */
                                                                                 const numberOfExpectedZeros =
-                                                                                    gain !== 0 &&
-                                                                                    !/Chrome/.test(navigator.userAgent) &&
-                                                                                    /Safari/.test(navigator.userAgent)
-                                                                                        ? 128
-                                                                                        : 0;
+                                                                                    gain !== 0 && isSafari(navigator) ? 128 : 0;
 
                                                                                 if (numberOfExpectedZeros > 0) {
                                                                                     const zeroBuffer = new Float32Array(
