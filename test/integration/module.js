@@ -1089,6 +1089,9 @@ describe('module', () => {
                                                                             if (k !== bufferLength) {
                                                                                 if (cut === null) {
                                                                                     cut = j + k;
+
+                                                                                    expect(cut).to.be.at.least(audioBuffer.length / 3);
+                                                                                    expect(cut).to.be.at.most((audioBuffer.length / 3) * 2);
                                                                                 } else {
                                                                                     expect(cut).to.equal(j + k);
                                                                                 }
