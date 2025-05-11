@@ -7,6 +7,13 @@ import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-
 import { isSafari } from '../helpers/is-safari';
 import { spy } from 'sinon';
 
+const MIME_TYPES = [
+    { isTypeSupported: false, mimeType: 'audio/anything' },
+    // Bug #27: Only Firefox supports encoding something as audio/ogg.
+    { isTypeSupported: /Firefox/.test(navigator.userAgent), mimeType: 'audio/ogg' },
+    { isTypeSupported: true, mimeType: 'audio/wav' },
+    { isTypeSupported: true, mimeType: 'audio/webm' }
+];
 const compareRotatingBuffers = (maximum, minimum, rotatingBuffers, shouldThrow = true) => {
     const bufferLength = rotatingBuffers[0].length;
 
@@ -45,10 +52,11 @@ describe('module', () => {
 
             // eslint-disable-next-line no-undef
             const channelCounts = process.env.CI && /Chrome/.test(navigator.userAgent) ? [2] : [1, 2];
-            const mimeTypes = ['audio/wav', 'audio/webm'];
 
             for (const channelCount of channelCounts) {
                 for (const gain of [0, 0.25, 0.3]) {
+                    const mimeTypes = MIME_TYPES.filter(({ isTypeSupported }) => isTypeSupported).map(({ mimeType }) => mimeType);
+
                     for (const mimeType of mimeTypes) {
                         for (const sampleRate of mimeType === 'audio/wav' ? [44100, 48000] : [48000]) {
                             describe(`with a channelCount of ${channelCount}, a gain of ${gain}, a mimeType of ${mimeType} and a sampleRate of ${sampleRate}`, () => {
@@ -1393,11 +1401,7 @@ describe('module', () => {
                 }
             }
 
-            for (const { isTypeSupported, mimeType } of [
-                { isTypeSupported: false, mimeType: 'audio/anything' },
-                { isTypeSupported: true, mimeType: 'audio/wav' },
-                { isTypeSupported: true, mimeType: 'audio/webm' }
-            ]) {
+            for (const { isTypeSupported, mimeType } of MIME_TYPES) {
                 describe(`with the mimeType of ${mimeType}`, () => {
                     let audioContext;
                     let mediaStream;

@@ -30,5 +30,11 @@ describe('MediaRecorder', () => {
         it('should not support audio/mp4 with alac as codec', () => {
             expect(MediaRecorder.isTypeSupported('audio/mp4; codecs=alac')).to.be.false;
         });
+
+        // #27
+
+        it('should not support audio/ogg', () => {
+            expect(MediaRecorder.isTypeSupported('audio/ogg')).to.be.false;
+        });
     });
 });

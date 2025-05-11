@@ -40,5 +40,11 @@ describe('MediaRecorder', () => {
         it('should not support audio/mp4 with pcm as codec', () => {
             expect(MediaRecorder.isTypeSupported('audio/mp4; codecs=pcm')).to.be.false;
         });
+
+        // #27
+
+        it('should not support audio/ogg', () => {
+            expect(MediaRecorder.isTypeSupported('audio/ogg')).to.be.false;
+        });
     });
 });
