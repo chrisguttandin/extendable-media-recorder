@@ -9,6 +9,8 @@ import { spy } from 'sinon';
 
 const MIME_TYPES = [
     { isTypeSupported: false, mimeType: 'audio/anything' },
+    // Bug #21: Firefox is the only browser not supporting encoding something as audio/mp4.
+    { isTypeSupported: !/Firefox/.test(navigator.userAgent), mimeType: 'audio/mp4' },
     // Bug #27: Only Firefox supports encoding something as audio/ogg.
     { isTypeSupported: /Firefox/.test(navigator.userAgent), mimeType: 'audio/ogg' },
     { isTypeSupported: true, mimeType: 'audio/wav' },
@@ -935,8 +937,14 @@ describe('module', () => {
 
                                                                     expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                    // Bug #26: Safari emits chunks of at least about a second.
-                                                                    if (isSafari(navigator) && mimeType === 'audio/webm') {
+                                                                    /*
+                                                                     * Bug #26: Chrome (when encoding audio/mp4) and Safari emit chunks of
+                                                                     * at least about a second.
+                                                                     */
+                                                                    if (
+                                                                        (isSafari(navigator) && mimeType !== 'audio/wav') ||
+                                                                        mimeType === 'audio/mp4'
+                                                                    ) {
                                                                         expect(audioBuffer.duration).to.at.least(5);
                                                                         expect(audioBuffer.duration).to.at.most(15);
                                                                     } else {
@@ -1026,7 +1034,13 @@ describe('module', () => {
 
                                                         setTimeout(
                                                             () => mediaRecorder.stop(),
-                                                            isSafari(navigator) && mimeType === 'audio/webm' ? 10000 : 1000
+                                                            /*
+                                                             * Bug #26: Chrome (when encoding audio/mp4) and Safari emit chunks of at least
+                                                             * about a second.
+                                                             */
+                                                            (isSafari(navigator) && mimeType !== 'audio/wav') || mimeType === 'audio/mp4'
+                                                                ? 10000
+                                                                : 1000
                                                         );
                                                     });
 
