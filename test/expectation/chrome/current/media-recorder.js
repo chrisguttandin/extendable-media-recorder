@@ -29,7 +29,7 @@ describe('MediaRecorder', () => {
             ).to.be.above(1);
         });
 
-        // #26
+        // bug #26
 
         it('should emit chunks of at least about a second', function (done) {
             this.timeout(10000);
@@ -56,19 +56,19 @@ describe('MediaRecorder', () => {
     });
 
     describe('isTypeSupported()', () => {
-        // #28
+        // bug #28
 
         it('should not support audio/aac', () => {
             expect(MediaRecorder.isTypeSupported('audio/aac')).to.be.false;
         });
 
-        // #23
+        // bug #23
 
         it('should not support audio/mp4 with alac as codec', () => {
             expect(MediaRecorder.isTypeSupported('audio/mp4; codecs=alac')).to.be.false;
         });
 
-        // #27
+        // bug #27
 
         it('should not support audio/ogg', () => {
             expect(MediaRecorder.isTypeSupported('audio/ogg')).to.be.false;

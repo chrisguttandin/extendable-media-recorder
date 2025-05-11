@@ -29,25 +29,25 @@ describe('MediaRecorder', () => {
     });
 
     describe('isTypeSupported()', () => {
-        // #28
+        // bug #28
 
         it('should not support audio/aac', () => {
             expect(MediaRecorder.isTypeSupported('audio/aac')).to.be.false;
         });
 
-        // #23
+        // bug #23
 
         it('should not support audio/mp4 with alac as codec', () => {
             expect(MediaRecorder.isTypeSupported('audio/mp4; codecs=alac')).to.be.false;
         });
 
-        // #25
+        // bug #25
 
         it('should not support audio/mp4 with pcm as codec', () => {
             expect(MediaRecorder.isTypeSupported('audio/mp4; codecs=pcm')).to.be.false;
         });
 
-        // #27
+        // bug #27
 
         it('should not support audio/ogg', () => {
             expect(MediaRecorder.isTypeSupported('audio/ogg')).to.be.false;
