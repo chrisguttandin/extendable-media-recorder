@@ -9,7 +9,7 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
-        browsers: ['FirefoxDeveloperHeadless'],
+        browsers: ['FirefoxDeveloperHeadlessWithPrefs'],
 
         client: {
             mocha: {
@@ -19,6 +19,15 @@ module.exports = (config) => {
         },
 
         concurrency: 1,
+
+        customLaunchers: {
+            FirefoxDeveloperHeadlessWithPrefs: {
+                base: 'FirefoxDeveloperHeadless',
+                prefs: {
+                    'media.autoplay.default': 0
+                }
+            }
+        },
 
         files: ['test/expectation/firefox/developer/**/*.js'],
 

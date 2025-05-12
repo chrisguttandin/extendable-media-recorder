@@ -92,7 +92,16 @@ module.exports = (config) => {
         });
     } else {
         config.set({
-            browsers: ['FirefoxHeadless']
+            browsers: ['FirefoxHeadlessWithPrefs'],
+
+            customLaunchers: {
+                FirefoxHeadlessWithPrefs: {
+                    base: 'FirefoxHeadless',
+                    prefs: {
+                        'media.autoplay.default': 0
+                    }
+                }
+            }
         });
     }
 };

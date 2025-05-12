@@ -9,7 +9,7 @@ module.exports = (config) => {
 
         browserNoActivityTimeout: 100000,
 
-        browsers: ['PenultimateFirefoxHeadless'],
+        browsers: ['PenultimateFirefoxHeadlessWithPrefs'],
 
         client: {
             mocha: {
@@ -21,9 +21,12 @@ module.exports = (config) => {
         concurrency: 1,
 
         customLaunchers: {
-            PenultimateFirefoxHeadless: {
+            PenultimateFirefoxHeadlessWithPrefs: {
                 base: 'FirefoxHeadless',
-                command: 'firefox-v136/firefox/Firefox.app/Contents/MacOS/firefox'
+                command: 'firefox-v136/firefox/Firefox.app/Contents/MacOS/firefox',
+                prefs: {
+                    'media.autoplay.default': 0
+                }
             }
         },
 

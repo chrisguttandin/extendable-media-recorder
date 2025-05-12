@@ -11,6 +11,12 @@ export const createMediaStreamAudioDestinationNode = (audioContext, channelCount
     constantSourceNode.connect(gainNode);
     constantSourceNode.start();
 
+    // Bug #29: Firefox needs a directly connected source to reliably dispatch ondataavailable events.
+    const silentConstantSourceNode = new ConstantSourceNode(audioContext, { offset: 0 });
+
+    silentConstantSourceNode.connect(mediaStreamAudioDestinationNode);
+    silentConstantSourceNode.start();
+
     const stream = mediaStreamAudioDestinationNode.stream;
 
     // Bug #19: Chrome does not expose the correct channelCount property right away.
