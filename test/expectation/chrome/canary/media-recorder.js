@@ -36,10 +36,12 @@ describe('MediaRecorder', () => {
 
             const chunks = [];
 
-            mediaRecorder.addEventListener('dataavailable', ({ data }) => {
+            mediaRecorder.ondataavailable = ({ data }) => {
                 chunks.push(data);
 
                 if (mediaRecorder.state === 'inactive') {
+                    mediaRecorder.ondataavailable = null;
+
                     if (chunks.length === 5) {
                         expect(chunks.map(({ size }) => size)).to.deep.equal([641, 34045, 16539, 16539, 12671]);
                     } else {
@@ -48,7 +50,7 @@ describe('MediaRecorder', () => {
 
                     done();
                 }
-            });
+            };
             mediaRecorder.start(100);
 
             setTimeout(() => mediaRecorder.stop(), 5000);
