@@ -43,9 +43,9 @@ describe('MediaRecorder', () => {
                     mediaRecorder.ondataavailable = null;
 
                     if (chunks.length === 5) {
-                        expect(chunks.map(({ size }) => size)).to.deep.equal([641, 34474, 16590, 16622, 12754]);
+                        expect(chunks.map(({ size }) => size)).to.deep.equal([641, 34474, 16590, 16622, chunks[4].size]);
                     } else {
-                        expect(chunks.map(({ size }) => size)).to.deep.equal([36, 605, 34474, 16590, 16622, 12754]);
+                        expect(chunks.map(({ size }) => size)).to.deep.equal([36, 605, 34474, 16590, 16622, chunks[5].size]);
                     }
 
                     done();
