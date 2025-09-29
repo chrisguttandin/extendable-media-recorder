@@ -480,8 +480,13 @@ describe('module', () => {
                                                     beforeEach(function (done) {
                                                         this.timeout(3000);
 
-                                                        // Wait two seconds before starting the recording.
-                                                        setTimeout(done, 2000);
+                                                        // Bug #19: Chrome does not expose the correct channelCount property right away.
+                                                        if (/Chrome/.test(navigator.userAgent)) {
+                                                            // Wait two seconds before starting the recording.
+                                                            setTimeout(done, 2000);
+                                                        } else {
+                                                            done();
+                                                        }
                                                     });
 
                                                     it('should abort the encoding when adding a track', function (done) {
