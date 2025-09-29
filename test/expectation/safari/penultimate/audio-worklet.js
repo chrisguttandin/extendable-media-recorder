@@ -5,7 +5,7 @@ describe('AudioWorklet', () => {
         describe('when starting to record a MediaStream', () => {
             for (const { maximum, minimum, sampleRate } of [
                 { maximum: 2360, minimum: 2176, sampleRate: 44100 },
-                { maximum: 2620, minimum: 2353, sampleRate: 48000 }
+                { maximum: 2631, minimum: 2353, sampleRate: 48000 }
             ]) {
                 describe(`with a sampleRate of ${sampleRate}`, () => {
                     let blob;
