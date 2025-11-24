@@ -23,7 +23,7 @@ module.exports = (config) => {
         customLaunchers: {
             PreviousFirefoxHeadlessWithPrefs: {
                 base: 'FirefoxHeadless',
-                command: 'firefox-v142/firefox/Firefox.app/Contents/MacOS/firefox',
+                command: 'firefox-v143/firefox/Firefox.app/Contents/MacOS/firefox',
                 prefs: {
                     'media.autoplay.default': 0
                 }
