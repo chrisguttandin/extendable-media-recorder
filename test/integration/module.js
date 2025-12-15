@@ -942,14 +942,8 @@ describe('module', () => {
 
                                                                     expect(audioBuffer.numberOfChannels).to.equal(channelCount);
 
-                                                                    /*
-                                                                     * Bug #26: Chrome (when encoding audio/mp4) and Safari emit chunks of
-                                                                     * at least about a second.
-                                                                     */
-                                                                    if (
-                                                                        (isSafari(navigator) && mimeType !== 'audio/wav') ||
-                                                                        mimeType === 'audio/mp4'
-                                                                    ) {
+                                                                    // Bug #26: Safari emits chunks of at least about a second.
+                                                                    if (isSafari(navigator) && mimeType !== 'audio/wav') {
                                                                         expect(audioBuffer.duration).to.at.least(5);
                                                                         expect(audioBuffer.duration).to.at.most(15);
                                                                     } else {
@@ -1039,13 +1033,8 @@ describe('module', () => {
 
                                                         setTimeout(
                                                             () => mediaRecorder.stop(),
-                                                            /*
-                                                             * Bug #26: Chrome (when encoding audio/mp4) and Safari emit chunks of at least
-                                                             * about a second.
-                                                             */
-                                                            (isSafari(navigator) && mimeType !== 'audio/wav') || mimeType === 'audio/mp4'
-                                                                ? 10000
-                                                                : 1000
+                                                            // Bug #26: Safari emits chunks of at least about a second.
+                                                            isSafari(navigator) && mimeType !== 'audio/wav' ? 10000 : 1000
                                                         );
                                                     });
 
