@@ -1,4 +1,5 @@
 import { MediaRecorder, isSupported, register } from '../../src/module';
+import { describe, expect, it } from 'vitest';
 
 describe('module', () => {
     it('should export the MediaRecorder constructor', () => {

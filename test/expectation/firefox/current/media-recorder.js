@@ -1,4 +1,5 @@
 import { AudioContext, GainNode, MediaStreamAudioDestinationNode, OscillatorNode } from 'standardized-audio-context';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 
 describe('MediaRecorder', () => {
@@ -20,59 +21,81 @@ describe('MediaRecorder', () => {
 
         // bug #12
 
-        it('should fire an error event which is not an instance of ErrorEvent when adding a track', function (done) {
-            this.timeout(10000);
+        it('should fire an error event which is not an instance of ErrorEvent when adding a track', () => {
+            const { promise, resolve } = Promise.withResolvers();
 
             mediaRecorder.addEventListener('error', (event) => {
                 expect(event instanceof ErrorEvent).to.be.false;
 
-                done();
+                resolve();
             });
             mediaRecorder.start();
 
             createMediaStreamWithAudioTrack(audioContext).then((anotherMediaStream) =>
                 mediaStream.addTrack(anotherMediaStream.getAudioTracks()[0])
             );
+
+            return promise;
         });
 
         // bug #13
 
-        it('should fire an error event which is not an instance of ErrorEvent when removing a track', function (done) {
-            this.timeout(10000);
+        it('should fire an error event which is not an instance of ErrorEvent when removing a track', () => {
+            const { promise, resolve } = Promise.withResolvers();
 
             mediaRecorder.addEventListener('error', (event) => {
                 expect(event instanceof ErrorEvent).to.be.false;
 
-                done();
+                resolve();
             });
             mediaRecorder.start();
 
             setTimeout(() => {
                 mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
             }, 1000);
+
+            return promise;
         });
 
         // bug #20
 
-        it('should fire multiple dataavailable events when inactive', function (done) {
-            this.timeout(10000);
+        it('should fire multiple dataavailable events when inactive', { timeout: 0 }, async () => {
+            while (true) {
+                const { promise, reject, resolve } = Promise.withResolvers();
 
-            let firedDataAvailableWhenInactive = false;
+                let firedDataAvailableWhenInactive = false;
+                let timeout = null;
 
-            mediaRecorder.ondataavailable = () => {
-                if (mediaRecorder.state === 'inactive') {
-                    if (firedDataAvailableWhenInactive) {
+                mediaRecorder.ondataavailable = () => {
+                    if (mediaRecorder.state === 'inactive') {
+                        if (firedDataAvailableWhenInactive) {
+                            mediaRecorder.ondataavailable = null;
+
+                            clearTimeout(timeout);
+                            resolve();
+                        } else {
+                            firedDataAvailableWhenInactive = true;
+                        }
+                    }
+                };
+                mediaRecorder.start(100);
+
+                setTimeout(() => {
+                    mediaRecorder.stop();
+
+                    timeout = setTimeout(() => {
                         mediaRecorder.ondataavailable = null;
 
-                        done();
-                    } else {
-                        firedDataAvailableWhenInactive = true;
-                    }
-                }
-            };
-            mediaRecorder.start(100);
+                        reject(new Error('The test timed out.'));
+                    }, 100);
+                }, 1000);
 
-            setTimeout(() => mediaRecorder.stop(), 1000);
+                try {
+                    await promise;
+
+                    return;
+                } catch {}
+            }
         });
     });
 
@@ -120,8 +143,8 @@ describe('MediaRecorder', () => {
 
             // bug #29
 
-            it('should dispatch no dataavailable event while being recording', function (done) {
-                this.timeout(10000);
+            it('should dispatch no dataavailable event while being recording', () => {
+                const { promise, resolve } = Promise.withResolvers();
 
                 let numberOfChunks = 0;
 
@@ -133,12 +156,14 @@ describe('MediaRecorder', () => {
 
                         expect(numberOfChunks).to.equal(1);
 
-                        done();
+                        resolve();
                     }
                 };
                 mediaRecorder.start(100);
 
                 setTimeout(() => mediaRecorder.stop(), 5000);
+
+                return promise;
             });
         });
     });

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createNativeMediaRecorderConstructor } from '../../../src/factories/native-media-recorder-constructor';
 
 describe('createNativeMediaRecorderConstructor()', () => {

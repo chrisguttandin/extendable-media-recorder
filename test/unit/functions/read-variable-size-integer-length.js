@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { readVariableSizeIntegerLength } from '../../../src/functions/read-variable-size-integer-length';
 
 describe('readVariableSizeIntegerLength()', () => {

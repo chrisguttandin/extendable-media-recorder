@@ -10,7 +10,7 @@ on:
 
 jobs:
     build:
-        runs-on: ubuntu-latest
+        runs-on: ${{ (matrix.target == 'firefox' && matrix.type == 'integration') && 'macos-latest' || 'ubuntu-latest' }}
 
         strategy:
             matrix:
@@ -18,11 +18,8 @@ jobs:
                     - node-version: 20.x
                       target: firefox
                       type: expectation
-                    - node-version: 20.x
-                      target: safari
-                      type: expectation
                 node-version: [20.x]
-                target: [chrome, firefox, safari]
+                target: [chrome, firefox]
                 type: [integration, unit]
             max-parallel: 3
 

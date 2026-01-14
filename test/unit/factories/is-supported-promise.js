@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createIsSupportedPromise } from '../../../src/factories/is-supported-promise';
 
 describe('createIsSupportedPromise()', () => {

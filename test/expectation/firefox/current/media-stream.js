@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AudioContext } from 'standardized-audio-context';
 import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 

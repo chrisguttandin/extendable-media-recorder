@@ -1,4 +1,5 @@
 import { AudioContext, MediaStreamAudioDestinationNode, OscillatorNode } from 'standardized-audio-context';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 describe('MediaStream', () => {
     let audioContext;

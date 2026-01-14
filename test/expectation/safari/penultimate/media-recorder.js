@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createMediaStreamWithVideoTrack } from '../../../helpers/create-media-stream-with-video-track';
 
 describe('MediaRecorder', () => {
@@ -14,17 +15,19 @@ describe('MediaRecorder', () => {
 
         // bug #6
 
-        it('should emit a blob without any data', function (done) {
-            this.timeout(10000);
+        it('should emit a blob without any data', () => {
+            const { promise, resolve } = Promise.withResolvers();
 
             mediaRecorder.addEventListener('dataavailable', ({ data }) => {
                 expect(data.size).to.equal(0);
 
-                done();
+                resolve();
             });
             mediaRecorder.start();
 
             setTimeout(() => mediaRecorder.stop(), 1000);
+
+            return promise;
         });
     });
 

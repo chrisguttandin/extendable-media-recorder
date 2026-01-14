@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AudioContext } from 'standardized-audio-context';
 import { createMediaStreamWithAudioTrack } from '../../../helpers/create-media-stream-with-audio-track';
 
@@ -20,9 +21,8 @@ describe('MediaRecorder', () => {
 
         // bug #26
 
-        it('should emit chunks of at least about a second', function (done) {
-            this.timeout(10000);
-
+        it('should emit chunks of at least about a second', () => {
+            const { promise, resolve } = Promise.withResolvers();
             const chunks = [];
 
             let maximumSize = Number.NEGATIVE_INFINITY;
@@ -40,12 +40,14 @@ describe('MediaRecorder', () => {
                     expect(chunks.length).to.equal(5);
                     expect(minimumSize / maximumSize).to.be.above(0.75);
 
-                    done();
+                    resolve();
                 }
             });
             mediaRecorder.start(100);
 
             setTimeout(() => mediaRecorder.stop(), 5000);
+
+            return promise;
         });
     });
 
