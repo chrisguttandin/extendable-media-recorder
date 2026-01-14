@@ -52,5 +52,9 @@ describe('MediaRecorder', () => {
         it('should not support audio/ogg', () => {
             expect(MediaRecorder.isTypeSupported('audio/ogg')).to.be.false;
         });
+
+        it('should not support audio/webm', () => {
+            expect(MediaRecorder.isTypeSupported('audio/webm')).to.be.false;
+        });
     });
 });
