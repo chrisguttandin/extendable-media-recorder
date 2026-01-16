@@ -45,7 +45,7 @@
         "prettier": "^3.8.0",
         "rimraf": "^6.1.2",
         "rollup": "^4.55.1",
-        "sinon": "^17.0.2",
+        "sinon": "^21.0.1",
         "sinon-chai": "^3.7.0",
         "tsconfig-holy-grail": "^15.0.3",
         "tslint": "^6.1.3",
