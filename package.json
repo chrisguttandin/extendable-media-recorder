@@ -41,7 +41,6 @@
         "eslint-config-holy-grail": "^61.0.4",
         "extendable-media-recorder-wav-encoder": "^7.0.134",
         "husky": "^9.1.7",
-        "karma-webkit-launcher": "^2.6.0",
         "karma-webpack": "^5.0.1",
         "lint-staged": "^16.2.7",
         "mocha": "^11.7.5",
