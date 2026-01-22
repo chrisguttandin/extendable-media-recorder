@@ -44,7 +44,7 @@
         "lint-staged": "^16.2.7",
         "prettier": "^3.8.1",
         "rimraf": "^6.1.2",
-        "rollup": "^4.55.1",
+        "rollup": "^4.56.0",
         "sinon": "^21.0.1",
         "sinon-chai": "^4.0.1",
         "tsconfig-holy-grail": "^15.0.3",
