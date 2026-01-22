@@ -42,7 +42,7 @@
         "extendable-media-recorder-wav-encoder": "^7.0.135",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
-        "prettier": "^3.8.0",
+        "prettier": "^3.8.1",
         "rimraf": "^6.1.2",
         "rollup": "^4.55.1",
         "sinon": "^21.0.1",
