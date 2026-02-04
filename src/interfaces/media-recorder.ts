@@ -26,4 +26,6 @@ export interface IMediaRecorder extends IEventTarget<IMediaRecorderEventMap> {
     start(timeslice?: number): void;
 
     stop(): void;
+
+    requestData(): void;
 }
