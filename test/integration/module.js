@@ -1,12 +1,11 @@
 import { AudioContext, ConstantSourceNode } from 'standardized-audio-context';
 import { MediaRecorder, deregister, isSupported, register } from '../../src/module';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { connect } from 'extendable-media-recorder-wav-encoder';
 import { createMediaStreamAudioDestinationNode } from '../helpers/create-media-stream-audio-destination-node';
 import { createMediaStreamWithAudioTrack } from '../helpers/create-media-stream-with-audio-track';
 import { createMediaStreamWithVideoTrack } from '../helpers/create-media-stream-with-video-track';
 import { isSafari } from '../helpers/is-safari';
-import { spy } from 'sinon';
 
 const MIME_TYPES = [
     { isTypeSupported: false, mimeType: 'audio/anything' },
@@ -139,7 +138,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const ondataavailable = spy();
+                                        const ondataavailable = vi.fn();
 
                                         mediaRecorder.ondataavailable = ondataavailable;
                                         mediaRecorder.addEventListener('dataavailable', ondataavailable);
@@ -182,7 +181,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const onerror = spy();
+                                        const onerror = vi.fn();
 
                                         mediaRecorder.onerror = onerror;
                                         mediaRecorder.addEventListener('error', onerror);
@@ -225,7 +224,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const onpause = spy();
+                                        const onpause = vi.fn();
 
                                         mediaRecorder.onpause = onpause;
                                         mediaRecorder.addEventListener('pause', onpause);
@@ -268,7 +267,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const onresume = spy();
+                                        const onresume = vi.fn();
 
                                         mediaRecorder.onresume = onresume;
                                         mediaRecorder.addEventListener('resume', onresume);
@@ -311,7 +310,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const onstart = spy();
+                                        const onstart = vi.fn();
 
                                         mediaRecorder.onstart = onstart;
                                         mediaRecorder.addEventListener('start', onstart);
@@ -354,7 +353,7 @@ describe('module', () => {
                                     });
 
                                     it('should register an independent event listener', () => {
-                                        const onstop = spy();
+                                        const onstop = vi.fn();
 
                                         mediaRecorder.onstop = onstop;
                                         mediaRecorder.addEventListener('stop', onstop);
