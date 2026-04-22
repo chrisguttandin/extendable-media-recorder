@@ -13,7 +13,8 @@ export default defineConfig({
                         capabilities: {
                             'moz:firefoxOptions': {
                                 args: ['-headless'],
-                                prefs: { 'media.autoplay.default': 0, 'binary': 'firefox-v147/firefox/Firefox.app/Contents/MacOS/firefox' }
+                                binary: 'firefox-v148/firefox/Firefox.app/Contents/MacOS/firefox',
+                                prefs: { 'media.autoplay.default': 0 }
                             }
                         }
                     })
