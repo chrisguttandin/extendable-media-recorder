@@ -3,11 +3,16 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
+        bail: 1,
         browser: {
             enabled: true,
-            isolate: false,
             instances: [
-                { browser: 'webkit', name: 'Safari', provider: playwright({ launchOptions: { executablePath: 'webkit-v18-4/pw_run.sh' } }) }
+                {
+                    browser: 'webkit',
+                    headless: true,
+                    name: 'Safari',
+                    provider: playwright({ launchOptions: { executablePath: 'webkit-v18-4/pw_run.sh' } })
+                }
             ]
         },
         dir: 'test/expectation/safari/previous/',

@@ -5,7 +5,6 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     test: {
         bail: 1,
-        watch: false,
         browser: {
             enabled: true,
             instances: env.CI
@@ -33,34 +32,34 @@ export default defineConfig({
                 : [
                       {
                           browser: 'chrome',
+                          headless: true,
                           name: 'Chrome',
                           provider: webdriverio({
                               capabilities: {
-                                  'goog:chromeOptions': {
-                                      args: ['--autoplay-policy=no-user-gesture-required', '--headless']
-                                  }
+                                  'goog:chromeOptions': { args: ['--autoplay-policy=no-user-gesture-required', '--mute-audio'] }
                               }
                           })
                       },
                       {
                           browser: 'chrome',
+                          headless: true,
                           name: 'Chrome Canary',
                           provider: webdriverio({
                               capabilities: {
                                   'goog:chromeOptions': {
-                                      args: ['--autoplay-policy=no-user-gesture-required', '--headless'],
+                                      args: ['--autoplay-policy=no-user-gesture-required', '--mute-audio'],
                                       binary: '/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary'
                                   }
                               }
                           })
                       },
                       {
-                          name: 'Firefox Developer',
                           browser: 'firefox',
+                          headless: true,
+                          name: 'Firefox Developer',
                           provider: webdriverio({
                               capabilities: {
                                   'moz:firefoxOptions': {
-                                      args: ['-headless'],
                                       prefs: { 'media.autoplay.default': 0 },
                                       binary: '/Applications/Firefox\ Developer\ Edition.app/Contents/MacOS/firefox'
                                   }
@@ -69,21 +68,21 @@ export default defineConfig({
                       },
                       {
                           browser: 'firefox',
+                          headless: true,
                           name: 'Firefox',
-                          provider: webdriverio({
-                              capabilities: {
-                                  'moz:firefoxOptions': {
-                                      args: ['-headless'],
-                                      prefs: { 'media.autoplay.default': 0 }
-                                  }
-                              }
-                          })
+                          provider: webdriverio({ capabilities: { 'moz:firefoxOptions': { prefs: { 'media.autoplay.default': 0 } } } })
                       },
-                      // @ts-expect-error
-                      { browser: 'safari', name: 'Safari', provider: webdriverio({ capabilities: { 'webkit:alwaysAllowAutoplay': true } }) }
+                      {
+                          browser: 'safari',
+                          headless: false,
+                          name: 'Safari',
+                          // @ts-expect-error
+                          provider: webdriverio({ capabilities: { 'webkit:alwaysAllowAutoplay': true } })
+                      }
                   ]
         },
         dir: 'test/integration/',
-        include: ['**/*.js']
+        include: ['**/*.js'],
+        watch: false
     }
 });

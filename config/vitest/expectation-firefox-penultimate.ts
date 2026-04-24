@@ -3,16 +3,17 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
+        bail: 1,
         browser: {
             enabled: true,
             instances: [
                 {
                     browser: 'firefox',
+                    headless: true,
                     name: 'Firefox',
                     provider: webdriverio({
                         capabilities: {
                             'moz:firefoxOptions': {
-                                args: ['-headless'],
                                 binary: 'firefox-v148/firefox/Firefox.app/Contents/MacOS/firefox',
                                 prefs: { 'media.autoplay.default': 0 }
                             }
