@@ -33,7 +33,7 @@
         "@commitlint/config-angular": "^21.0.1",
         "@rollup/plugin-babel": "^7.0.0",
         "@vitest/browser-playwright": "^4.1.7",
-        "@vitest/browser-webdriverio": "^4.1.5",
+        "@vitest/browser-webdriverio": "^4.1.7",
         "commitizen": "^4.3.1",
         "cz-conventional-changelog": "^3.3.0",
         "eslint": "^8.57.0",
