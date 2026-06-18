@@ -2,6 +2,7 @@ import { env } from 'node:process';
 import { webdriverio } from '@vitest/browser-webdriverio';
 import { defineConfig } from 'vitest/config';
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
     test: {
         bail: 1,
@@ -48,7 +49,7 @@ export default defineConfig({
                               capabilities: {
                                   'goog:chromeOptions': {
                                       args: ['--autoplay-policy=no-user-gesture-required', '--mute-audio'],
-                                      binary: '/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary'
+                                      binary: '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
                                   }
                               }
                           })
@@ -60,8 +61,8 @@ export default defineConfig({
                           provider: webdriverio({
                               capabilities: {
                                   'moz:firefoxOptions': {
-                                      prefs: { 'media.autoplay.default': 0 },
-                                      binary: '/Applications/Firefox\ Developer\ Edition.app/Contents/MacOS/firefox'
+                                      binary: '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
+                                      prefs: { 'media.autoplay.default': 0 }
                                   }
                               }
                           })
@@ -76,7 +77,7 @@ export default defineConfig({
                           browser: 'safari',
                           headless: false,
                           name: 'Safari',
-                          // @ts-expect-error
+                          // @ts-expect-error "webkit:alwaysAllowAutoplay" is not a known property.
                           provider: webdriverio({ capabilities: { 'webkit:alwaysAllowAutoplay': true } })
                       }
                   ]
