@@ -31,7 +31,7 @@
         "@babel/preset-env": "^7.29.7",
         "@commitlint/cli": "^21.0.2",
         "@commitlint/config-angular": "^21.0.2",
-        "@rollup/plugin-babel": "^7.0.0",
+        "@rollup/plugin-babel": "^7.1.0",
         "@vitest/browser-playwright": "^4.1.7",
         "@vitest/browser-webdriverio": "^4.1.7",
         "commitizen": "^4.3.1",
