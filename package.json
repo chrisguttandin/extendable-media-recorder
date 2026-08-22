@@ -39,7 +39,7 @@
         "eslint": "^9.39.4",
         "eslint-config-holy-grail": "^63.0.7",
         "extendable-media-recorder-wav-encoder": "^7.0.140",
-        "globals": "^17.7.0",
+        "globals": "^17.11.0",
         "husky": "^9.1.7",
         "lint-staged": "^17.0.8",
         "prettier": "^3.9.5",
